@@ -111,7 +111,11 @@ namespace Cevir.LanguagePacks.AzSLD
                 case SignKind.Sentence:
                     return "cumle_" + Map(AzLower(sign.Gloss), MediaWordMap);
                 default:
-                    return Map(AzLower(sign.Gloss), MediaWordMap);
+                    // "Mən/mənim": one sign with two meanings; the video is named after the first form (men.mp4).
+                    string gloss = sign.Gloss;
+                    int slash = gloss.IndexOf('/');
+                    if (slash > 0) gloss = gloss.Substring(0, slash);
+                    return Map(AzLower(gloss), MediaWordMap);
             }
         }
 

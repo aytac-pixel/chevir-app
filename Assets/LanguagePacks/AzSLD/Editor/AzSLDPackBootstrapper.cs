@@ -65,7 +65,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         };
 
         /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
-        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz" };
+        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin" };
 
         // Unit 2 as in kurikulum (L01–L05 + review), without "Xoş gəldin" and "Dəyməz" (removed 2026-11-14).
         private static readonly LessonSpec[] Unit2Lessons =
@@ -78,10 +78,11 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         };
 
         // Unit 3 as in kurikulum, with the media delivered 2026-11-14: «Mən bilirəm», «Bəli, var», «Xeyr, yoxdur» are left out
-        // (repeats of words already taught); the sentences are grouped in one lesson.
+        // (repeats of words already taught) and so are the head nod / head shake. "Mən" and "mənim" ("sən" and "sənin")
+        // are one sign in AzSL, taught as "Mən/mənim" and "Sən/sənin".
         private static readonly LessonSpec[] Unit3Lessons =
         {
-            new LessonSpec("I, you, he/she", "Mən, sən, o", "Mən", "Sən", "O"),
+            new LessonSpec("I, you, he/she", "Mən, sən, o", "Mən/mənim", "Sən/sənin", "O"),
             new LessonSpec("We, you, they", "Biz, siz, onlar", "Biz", "Siz", "Onlar"),
             new LessonSpec("Yes and no", "Bəli və xeyr", "Bəli", "Xeyr"),
             new LessonSpec("There is, there isn't", "Var və yox", "Var", "Yox"),
