@@ -1,0 +1,20 @@
+{
+    "name": "Cevir.LanguagePacks.AzSLD.Editor",
+    "rootNamespace": "Cevir.LanguagePacks.AzSLD.Editor",
+    "references": [
+        "Cevir.Core",
+        "Cevir.Core.Editor",
+        "Cevir.LanguagePacks.AzSLD"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

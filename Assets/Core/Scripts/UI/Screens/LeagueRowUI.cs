@@ -1,0 +1,81 @@
+using Cevir.Core.Social;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Cevir.Core.UI
+{
+    /// <summary>One leaderboard row: rank (cup for the top 3), avatar initials, name, zone arrow and XP.</summary>
+    public sealed class LeagueRowUI : MonoBehaviour
+    {
+        [SerializeField] private Image background;
+        [SerializeField] private Image youGlow;
+        [SerializeField] private TextMeshProUGUI rankLabel;
+        [SerializeField] private Image rankCup;
+        [SerializeField] private Image avatar;
+        [SerializeField] private Image avatarRing;
+        [SerializeField] private TextMeshProUGUI initialsLabel;
+        [SerializeField] private TextMeshProUGUI nameLabel;
+        [SerializeField] private Image zoneArrow;
+        [SerializeField] private TextMeshProUGUI xpLabel;
+        [SerializeField] private TextMeshProUGUI xpUnitLabel;
+
+        private static readonly Color[] CupColors = { UIPalette.Gold, UIPalette.Silver, UIPalette.Bronze };
+
+        public void Bind(LeagueEntry entry, CevirTheme theme)
+        {
+            bool you = entry.IsYou;
+            bool top = entry.Rank <= 3 && !you;
+
+            if (background != null)
+            {
+                background.sprite = you ? theme.buttonGradient : theme.panel;
+                background.color = you ? Color.white : entry.Zone == LeagueZone.Demote ? UIPalette.DemoteRow : new Color(1f, 1f, 1f, 0f);
+            }
+
+            if (youGlow != null) youGlow.gameObject.SetActive(you);
+
+            if (rankCup != null)
+            {
+                rankCup.gameObject.SetActive(top);
+                if (top) rankCup.color = CupColors[entry.Rank - 1];
+            }
+
+            if (rankLabel != null)
+            {
+                rankLabel.gameObject.SetActive(!top);
+                rankLabel.text = entry.Rank.ToString();
+                rankLabel.color = you ? Color.white : UIPalette.TextSecondary;
+            }
+
+            if (avatar != null) avatar.color = entry.AvatarColor;
+            if (avatarRing != null) avatarRing.gameObject.SetActive(you);
+            if (initialsLabel != null) initialsLabel.text = entry.Initials;
+
+            if (nameLabel != null)
+            {
+                nameLabel.text = entry.DisplayName;
+                nameLabel.color = you ? Color.white : UIPalette.TextPrimary;
+            }
+
+            if (zoneArrow != null)
+            {
+                bool showArrow = !you && entry.Zone != LeagueZone.Stay;
+                zoneArrow.gameObject.SetActive(showArrow);
+                if (showArrow)
+                {
+                    zoneArrow.sprite = entry.Zone == LeagueZone.Promote ? theme.iconArrowUp : theme.iconArrowDown;
+                    zoneArrow.color = entry.Zone == LeagueZone.Promote ? UIPalette.Primary : UIPalette.Red;
+                }
+            }
+
+            if (xpLabel != null)
+            {
+                xpLabel.text = entry.Xp.ToString();
+                xpLabel.color = you ? Color.white : UIPalette.TextPrimary;
+            }
+
+            if (xpUnitLabel != null) xpUnitLabel.color = you ? new Color(1f, 1f, 1f, 0.85f) : UIPalette.TextMuted;
+        }
+    }
+}

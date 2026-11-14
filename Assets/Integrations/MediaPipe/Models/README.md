@@ -1,0 +1,1 @@
+`hand_landmarker.bytes` and `face_landmarker.bytes` are Google's MediaPipe Tasks models (float16, Apache License 2.0), downloaded from storage.googleapis.com/mediapipe-models and renamed from `.task` to `.bytes` so Unity imports them as TextAssets. The setup menu assigns them to `MediaPipeLandmarkProvider` automatically.

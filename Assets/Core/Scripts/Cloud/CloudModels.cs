@@ -1,0 +1,141 @@
+using System;
+using System.Collections.Generic;
+
+namespace Cevir.Core.Cloud
+{
+    // Plain data for JsonUtility. Field names match the JSON of Supabase Auth / PostgREST and Tools/supabase/schema.sql.
+
+    [Serializable]
+    public sealed class AuthUser
+    {
+        public string id;
+        public string email;
+    }
+
+    [Serializable]
+    public sealed class AuthResponse
+    {
+        public string access_token;
+        public string refresh_token;
+        public long expires_in;
+        public long expires_at;
+        public AuthUser user;
+
+        // Sign-up with e-mail confirmation turned on returns the user itself (no tokens).
+        public string id;
+        public string email;
+
+        // Errors come in two shapes depending on the endpoint.
+        public string error;
+        public string error_description;
+        public string error_code;
+        public string msg;
+    }
+
+    [Serializable]
+    public sealed class SignUpRequest
+    {
+        public string email;
+        public string password;
+        public SignUpData data;
+    }
+
+    [Serializable]
+    public sealed class SignUpData
+    {
+        public string display_name;
+    }
+
+    [Serializable]
+    public sealed class PasswordGrant
+    {
+        public string email;
+        public string password;
+    }
+
+    [Serializable]
+    public sealed class RefreshGrant
+    {
+        public string refresh_token;
+    }
+
+    [Serializable]
+    public sealed class EmailOnly
+    {
+        public string email;
+    }
+
+    [Serializable]
+    public sealed class ProgressRow
+    {
+        public string user_id;
+        public string data;
+        public long client_updated;
+    }
+
+    [Serializable]
+    public sealed class ProfileRow
+    {
+        public string id;
+        public string display_name;
+        public int league_tier;
+        public int total_xp;
+        public int streak;
+    }
+
+    [Serializable]
+    public sealed class WeeklyXpRow
+    {
+        public string user_id;
+        public string week;
+        public int tier;
+        public int xp;
+    }
+
+    [Serializable]
+    public sealed class StandingRow
+    {
+        public string display_name;
+        public int xp;
+        public bool is_you;
+    }
+
+    [Serializable]
+    public sealed class StandingsRequest
+    {
+        public string p_week;
+        public int p_tier;
+    }
+
+    [Serializable]
+    public sealed class SettleRequest
+    {
+        public string p_week;
+    }
+
+    [Serializable]
+    public sealed class SettleResponse
+    {
+        public int tier;
+        public int rank;
+        public int group_size;
+    }
+
+    [Serializable]
+    public sealed class ProgressRows
+    {
+        public List<ProgressRow> items = new List<ProgressRow>();
+    }
+
+    [Serializable]
+    public sealed class StandingRows
+    {
+        public List<StandingRow> items = new List<StandingRow>();
+    }
+
+    [Serializable]
+    public sealed class SettleRows
+    {
+        public List<SettleResponse> items = new List<SettleResponse>();
+    }
+}

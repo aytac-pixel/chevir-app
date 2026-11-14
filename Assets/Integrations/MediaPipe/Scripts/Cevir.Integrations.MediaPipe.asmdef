@@ -1,0 +1,32 @@
+{
+    "name": "Cevir.Integrations.MediaPipe",
+    "rootNamespace": "Cevir.Integrations.MediaPipe",
+    "references": [
+        "Cevir.Core",
+        "Mediapipe.Runtime"
+    ],
+    "includePlatforms": [
+        "Android",
+        "iOS",
+        "Editor",
+        "LinuxStandalone64",
+        "macOSStandalone",
+        "WindowsStandalone64"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "CEVIR_MEDIAPIPE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.github.homuler.mediapipe",
+            "expression": "0.10.0",
+            "define": "CEVIR_MEDIAPIPE"
+        }
+    ],
+    "noEngineReferences": false
+}

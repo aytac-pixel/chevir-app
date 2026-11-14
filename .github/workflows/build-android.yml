@@ -1,0 +1,52 @@
+# Builds the Android APK in the cloud. Needs three repository secrets (Settings > Secrets > Actions):
+#   UNITY_LICENSE  contents of your Unity_lic.ulf (personal licence works; see game.ci/docs/github/activation)
+#   UNITY_EMAIL    Unity account e-mail
+#   UNITY_PASSWORD Unity account password
+# Run it from the Actions tab ("Run workflow"); the APK is attached to the run as an artifact.
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          android: false
+          large-packages: false
+
+      - name: Install MediaPipe Unity Plugin
+        run: bash Tools/setup/install_mediapipe_plugin.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Android-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json') }}
+          restore-keys: Library-Android-
+
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: Android
+          androidExportType: androidPackage
+          buildMethod: Cevir.Setup.Editor.CevirBuild.CiBuildAndroid
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cevir-Android-APK
+          path: Builds/Android/*.apk
+          if-no-files-found: error

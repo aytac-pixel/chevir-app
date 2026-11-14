@@ -1,0 +1,16 @@
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+*.csproj
+*.sln
+*.apk
+*.aab
+.DS_Store
+# Raw dataset videos never go in the repo; only extracted landmarks/features do.
+Tools/landmark_extraction/videos/
+# Prebuilt MediaPipe plugin tarball is downloaded by Tools/setup (too large for git).
+Packages/com.github.homuler.mediapipe-*.tgz
