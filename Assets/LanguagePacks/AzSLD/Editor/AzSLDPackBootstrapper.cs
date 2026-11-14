@@ -60,7 +60,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         /// <summary>Glosses taught as whole sentences (media prefix "cumle_").</summary>
         private static readonly HashSet<string> Sentences = new HashSet<string>
         {
-            "Mənim adım ...", "Sənin adın nədir?", "Tanış olduğuma şadam"
+            "Mənim adım ...", "Sənin adın nədir?", "Tanış olduğuma şadam",
+            "Bilmirəm", "İstəmirəm", "Sən bilirsən?"
         };
 
         /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
@@ -76,6 +77,18 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new LessonSpec("Polite words", "Nəzakət sözləri", "Xahiş edirəm", "Bağışlayın")
         };
 
+        // Unit 3 as in kurikulum, with the media delivered 2026-11-14: «Mən bilirəm», «Bəli, var», «Xeyr, yoxdur» are left out
+        // (repeats of words already taught); the sentences are grouped in one lesson.
+        private static readonly LessonSpec[] Unit3Lessons =
+        {
+            new LessonSpec("I, you, he/she", "Mən, sən, o", "Mən", "Sən", "O"),
+            new LessonSpec("We, you, they", "Biz, siz, onlar", "Biz", "Siz", "Onlar"),
+            new LessonSpec("Yes and no", "Bəli və xeyr", "Bəli", "Xeyr"),
+            new LessonSpec("There is, there isn't", "Var və yox", "Var", "Yox"),
+            new LessonSpec("To want and to know", "İstəmək və bilmək", "İstəmək", "Bilmək"),
+            new LessonSpec("First sentences", "İlk cümlələr", "Bilmirəm", "İstəmirəm", "Sən bilirsən?")
+        };
+
         private static readonly UnitSpec[] Units =
         {
             // Unit 1 teaches the 32 letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
@@ -85,7 +98,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new UnitSpec { En = "Greetings & Introductions", Az = "Salamlaşma və tanışlıq", Category = "salamlaşma",
                 Lessons = Unit2Lessons },
             new UnitSpec { En = "Pronouns & Basic Sentences", Az = "Əvəzliklər və sadə cümlələr", Category = "əvəzliklər",
-                Words = new[] { "Mən", "Sən", "O", "Biz", "Siz", "Onlar", "Bəli", "Xeyr", "Var", "Yox", "İstəmək", "Bilmək" } },
+                Lessons = Unit3Lessons },
             new UnitSpec { En = "Question Words", Az = "Sual sözləri", Category = "suallar",
                 Words = new[] { "Nə", "Kim", "Harada", "Nə vaxt", "Niyə", "Necə", "Neçə", "Hansı" } },
             new UnitSpec { En = "Family & People", Az = "Ailə və insanlar", Category = "ailə",
