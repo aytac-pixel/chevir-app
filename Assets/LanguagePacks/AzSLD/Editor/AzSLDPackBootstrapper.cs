@@ -64,11 +64,12 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             "Bilmirəm", "İstəmirəm", "Sən bilirsən?",
             "O kimdir?", "Sən haradasan?", "Bu nədir?",
             "Bu mənim anamdır", "Mənim bir qardaşım var", "Sənin bacın varmı?",
-            "Saat neçədir?", "Saat beşdir"
+            "Saat neçədir?", "Saat beşdir",
+            "Qırmızı çanta", "Bu kitabdır", "Telefonum yoxdur"
         };
 
         /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
-        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin", "On", "İyirmi", "Yüz", "Sabah", "Dünən" };
+        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin", "On", "İyirmi", "Yüz", "Sabah", "Dünən", "Ağ", "Qara" };
 
         // Unit 2 as in kurikulum (L01–L05 + review), without "Xoş gəldin" and "Dəyməz" (removed 2026-11-14).
         private static readonly LessonSpec[] Unit2Lessons =
@@ -136,6 +137,17 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new LessonSpec("What time is it?", "Saat neçədir?", "Saat", "Saat neçədir?", "Saat beşdir")
         };
 
+        // Unit 8 as in kurikulum, without Ağ, Qara, Boz, Narıncı, «Hansı rəng?» (not recorded) and "Bu", «Bu nədir?» (repeats).
+        private static readonly LessonSpec[] Unit8Lessons =
+        {
+            new LessonSpec("Colours 1", "Rənglər 1", "Rəng", "Qırmızı", "Mavi", "Yaşıl"),
+            new LessonSpec("Colours 2", "Rənglər 2", "Sarı", "Qəhvəyi", "Bənövşəyi", "Çəhrayı"),
+            new LessonSpec("School things", "Məktəb əşyaları", "Kitab", "Dəftər", "Qələm", "Çanta"),
+            new LessonSpec("Things at home", "Evdə əşyalar", "Telefon", "Açar", "Masa", "Stul"),
+            new LessonSpec("Water, bread, tea", "Su, çörək, çay", "Su", "Çörək", "Çay"),
+            new LessonSpec("Colour + thing", "Rəng + əşya", "Qırmızı çanta", "Bu kitabdır", "Telefonum yoxdur")
+        };
+
         private static readonly UnitSpec[] Units =
         {
             // Unit 1 teaches the 32 letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
@@ -155,7 +167,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new UnitSpec { En = "Time & Schedules", Az = "Zaman və cədvəl", Category = "zaman",
                 Lessons = Unit7Lessons },
             new UnitSpec { En = "Daily Objects & Colors", Az = "Gündəlik əşyalar və rənglər", Category = "əşyalar",
-                Words = new[] { "Qırmızı", "Mavi", "Yaşıl", "Sarı", "Ağ", "Qara", "Kitab", "Telefon", "Su", "Çörək", "Masa", "Qələm" } },
+                Lessons = Unit8Lessons },
             new UnitSpec { En = "Essential Places", Az = "Vacib yerlər", Category = "yerlər",
                 Words = new[] { "Ev", "Məktəb", "Xəstəxana", "Mağaza", "Kafe", "Park", "İş", "Küçə", "Avtobus", "Aptek" } },
             new UnitSpec { En = "A1 Review & Final Checkpoint", Az = "A1 təkrar və yekun imtahan", Category = "təkrar",
