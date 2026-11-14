@@ -17,6 +17,12 @@ namespace Cevir.Core.UI
         public static string BackToMap => Loc.Pick("BACK HOME", "ƏSAS EKRANA QAYIT");
         public static string Practice => Loc.Pick("PRACTICE", "TƏKRAR ET");
         public static string Slow => Loc.Pick("Slow", "Yavaş");
+
+        /// <summary>Playback speed label: 1 → "1x", 0.75 → "0.75x" (same in every language).</summary>
+        public static string Speed(float value)
+        {
+            return value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "x";
+        }
         public static string Normal => Loc.Pick("Normal", "Normal");
         public static string SkipCamera => Loc.Pick("Can't use the camera now", "İndi kamera istifadə edə bilmirəm");
 

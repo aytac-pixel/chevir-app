@@ -43,8 +43,10 @@ namespace Cevir.Core.UI
         [SerializeField] private RawImage videoImage;
         [SerializeField] private VideoPlayer videoPlayer;
         [SerializeField] private Image thumbnailImage;
-        [SerializeField] private Button speedButton;
-        [SerializeField] private TextMeshProUGUI speedLabel;
+        [Tooltip("Row holding the playback speed buttons, shown while a lesson video plays.")]
+        [SerializeField] private GameObject speedRow;
+        [Tooltip("One button per entry of PlaybackSpeeds (1x, 0.75x, 0.5x), in that order.")]
+        [SerializeField] private List<Button> speedButtons = new List<Button>();
 
         [Header("Camera")]
         [SerializeField] private GameObject cameraPanel;
@@ -64,7 +66,10 @@ namespace Cevir.Core.UI
         private LessonSession _session;
         private Exercise _shown;
         private RenderTexture _videoTexture;
-        private bool _slow;
+        /// <summary>Speeds the learner can pick while a lesson video plays; every new video starts at the first (1x).</summary>
+        public static readonly float[] PlaybackSpeeds = { 1f, 0.75f, 0.5f };
+
+        private int _speedIndex;
         private bool _attempting;
         private bool _awaitingFeedback;
         private float _progressTarget;
@@ -76,7 +81,11 @@ namespace Cevir.Core.UI
             if (closeButton != null) closeButton.onClick.AddListener(OnClose);
             if (primaryButton != null) primaryButton.onClick.AddListener(OnPrimary);
             if (skipButton != null) skipButton.onClick.AddListener(OnSkip);
-            if (speedButton != null) speedButton.onClick.AddListener(ToggleSpeed);
+            for (int i = 0; i < speedButtons.Count; i++)
+            {
+                int index = i;
+                if (speedButtons[i] != null) speedButtons[i].onClick.AddListener(() => SetSpeed(index));
+            }
             for (int i = 0; i < choiceButtons.Count; i++)
             {
                 int index = i;
@@ -192,7 +201,8 @@ namespace Cevir.Core.UI
             SetActive(choicesPanel, isChoice);
             SetActive(skipButton, isCamera);
             SetActive(primaryButton, !isChoice);
-            SetActive(speedButton, exercise.Type == ExerciseType.Watch);
+            _speedIndex = 0; // every new video starts at 1x
+            if (speedRow != null) speedRow.SetActive(!isCamera);
 
             if (promptLabel != null) promptLabel.text = PromptFor(exercise);
             if (glossLabel != null)
@@ -204,7 +214,7 @@ namespace Cevir.Core.UI
             bool selfCheck = isCamera && IsSelfCheck(exercise);
             SetStatus(isCamera ? (selfCheck ? UIStrings.LetterSelfCheck : UIStrings.WaitingForHand) : string.Empty);
 
-            if (!isCamera) PlayClip(sign, exercise.Type == ExerciseType.Watch ? _slow : false);
+            if (!isCamera) PlayClip(sign, true);
             else StopVideo();
 
             switch (exercise.Type)
@@ -446,9 +456,12 @@ namespace Cevir.Core.UI
 
         // ------------------------------------------------------------------ media
 
-        private void PlayClip(SignDefinition sign, bool slow)
+        /// <summary>Shows the sign's video at the chosen speed; <paramref name="restart"/> plays it from the start.</summary>
+        private void PlayClip(SignDefinition sign, bool restart)
         {
-            VideoClip clip = sign == null ? null : (slow ? sign.SlowClip : sign.ReferenceClip);
+            float speed = PlaybackSpeeds[Mathf.Clamp(_speedIndex, 0, PlaybackSpeeds.Length - 1)];
+            // The original recording is 1x; 0.75x and 0.5x are the same video played slower.
+            VideoClip clip = sign != null ? sign.ReferenceClip : null;
             bool hasClip = clip != null && videoPlayer != null && videoImage != null;
 
             if (thumbnailImage != null)
@@ -458,6 +471,8 @@ namespace Cevir.Core.UI
             }
 
             if (videoImage != null) videoImage.gameObject.SetActive(hasClip);
+            if (speedRow != null) speedRow.SetActive(hasClip);
+            RefreshSpeedButtons();
             if (!hasClip)
             {
                 StopVideo();
@@ -469,15 +484,33 @@ namespace Cevir.Core.UI
             videoPlayer.targetTexture = _videoTexture;
             videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
             videoPlayer.isLooping = true;
-            videoPlayer.clip = clip;
+            if (restart || videoPlayer.clip != clip)
+            {
+                videoPlayer.Stop();
+                videoPlayer.clip = clip;
+            }
 
-            // A dedicated slow clip plays at normal speed; otherwise slow the normal clip down.
-            bool hasDedicatedSlow = sign.SlowClip != sign.ReferenceClip;
-            videoPlayer.playbackSpeed = slow && !hasDedicatedSlow ? 0.5f : 1f;
+            videoPlayer.playbackSpeed = speed;
             videoImage.texture = _videoTexture;
-            videoPlayer.Play();
+            if (!videoPlayer.isPlaying) videoPlayer.Play();
+        }
 
-            if (speedLabel != null) speedLabel.text = slow ? UIStrings.Normal : UIStrings.Slow;
+        private void RefreshSpeedButtons()
+        {
+            for (int i = 0; i < speedButtons.Count; i++)
+            {
+                Button button = speedButtons[i];
+                if (button == null) continue;
+                bool selected = i == _speedIndex;
+                var image = button.targetGraphic as Image;
+                if (image != null) image.color = selected ? UIPalette.Primary : Color.white;
+                TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (label != null)
+                {
+                    label.text = i < PlaybackSpeeds.Length ? UIStrings.Speed(PlaybackSpeeds[i]) : string.Empty;
+                    label.color = selected ? Color.white : UIPalette.Primary;
+                }
+            }
         }
 
         private void EnsureVideoTexture(int width, int height)
@@ -504,10 +537,13 @@ namespace Cevir.Core.UI
             if (videoPlayer != null && videoPlayer.isPlaying) videoPlayer.Stop();
         }
 
-        private void ToggleSpeed()
+        /// <summary>The learner picked a speed: the video keeps playing from where it is, at the new speed.</summary>
+        private void SetSpeed(int index)
         {
-            _slow = !_slow;
-            if (_session != null && _session.Current != null) PlayClip(_session.Current.Sign, _slow);
+            if (index < 0 || index >= PlaybackSpeeds.Length || index == _speedIndex) return;
+            _speedIndex = index;
+            if (_session != null && _session.Current != null && _session.Current.Type != ExerciseType.CameraSign)
+                PlayClip(_session.Current.Sign, false);
         }
 
         // ------------------------------------------------------------------ HUD

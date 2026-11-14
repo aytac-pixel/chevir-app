@@ -312,13 +312,29 @@ namespace Cevir.Core.Editor
             thumb.raycastTarget = false;
             thumbRt.gameObject.SetActive(false);
 
-            TextMeshProUGUI speedLabel;
-            Button speed = MakeButton(media, "SpeedButton", UIStrings.Slow, Color.white, UIPalette.Blue, 80f, out speedLabel);
-            RectTransform speedRt = (RectTransform)speed.transform;
-            speedRt.anchorMin = speedRt.anchorMax = new Vector2(1f, 0f);
-            speedRt.pivot = new Vector2(1f, 0f);
-            speedRt.anchoredPosition = new Vector2(-24f, 24f);
-            speedRt.sizeDelta = new Vector2(200f, 80f);
+            // Playback speed: 1x / 0.75x / 0.5x, bottom-right of the video.
+            RectTransform speedRow = Rect("SpeedRow", media);
+            speedRow.anchorMin = speedRow.anchorMax = new Vector2(1f, 0f);
+            speedRow.pivot = new Vector2(1f, 0f);
+            speedRow.anchoredPosition = new Vector2(-24f, 24f);
+            speedRow.sizeDelta = new Vector2(420f, 72f);
+            HorizontalLayoutGroup speedLayout = speedRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            speedLayout.spacing = 10f;
+            speedLayout.childAlignment = TextAnchor.MiddleRight;
+            speedLayout.childControlWidth = true;
+            speedLayout.childControlHeight = true;
+            speedLayout.childForceExpandWidth = true;
+            speedLayout.childForceExpandHeight = true;
+            var speedButtons = new List<Object>();
+            foreach (float value in LessonScreenUI.PlaybackSpeeds)
+            {
+                TextMeshProUGUI speedLabel;
+                Button speed = MakeButton(speedRow, "Speed_" + UIStrings.Speed(value), UIStrings.Speed(value), Color.white, UIPalette.Primary, 72f,
+                    out speedLabel);
+                speedLabel.fontSize = 32f;
+                Stretch(speedLabel.rectTransform, 6f, 6f, 6f, 6f);
+                speedButtons.Add(speed);
+            }
 
             RectTransform cameraPanel = Rect("CameraPanel", stage);
             Stretch(cameraPanel);
@@ -388,8 +404,8 @@ namespace Cevir.Core.Editor
             Set(ui, "videoImage", video);
             Set(ui, "videoPlayer", player);
             Set(ui, "thumbnailImage", thumb);
-            Set(ui, "speedButton", speed);
-            Set(ui, "speedLabel", speedLabel);
+            Set(ui, "speedRow", speedRow.gameObject);
+            SetList(ui, "speedButtons", speedButtons);
             Set(ui, "cameraPanel", cameraPanel.gameObject);
             Set(ui, "choicesPanel", choices.gameObject);
             SetList(ui, "choiceButtons", choiceButtons);
