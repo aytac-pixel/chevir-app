@@ -62,7 +62,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         {
             "Mənim adım ...", "Sənin adın nədir?", "Tanış olduğuma şadam",
             "Bilmirəm", "İstəmirəm", "Sən bilirsən?",
-            "O kimdir?", "Sən haradasan?", "Bu nədir?"
+            "O kimdir?", "Sən haradasan?", "Bu nədir?",
+            "Bu mənim anamdır", "Mənim bir qardaşım var", "Sənin bacın varmı?"
         };
 
         /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
@@ -101,6 +102,17 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new LessonSpec("Questions", "Sual cümlələri", "O kimdir?", "Sən haradasan?", "Bu nədir?")
         };
 
+        // Unit 5 as in kurikulum.
+        private static readonly LessonSpec[] Unit5Lessons =
+        {
+            new LessonSpec("Mother, father, family", "Ana, ata, ailə", "Ana", "Ata", "Ailə"),
+            new LessonSpec("Brother, sister, child", "Qardaş, bacı, uşaq", "Qardaş", "Bacı", "Uşaq"),
+            new LessonSpec("Grandparents, baby", "Nənə, baba, körpə", "Nənə", "Baba", "Körpə"),
+            new LessonSpec("Man, woman, boy, girl", "Kişi, qadın, oğlan, qız", "Kişi", "Qadın", "Oğlan", "Qız"),
+            new LessonSpec("Friend, teacher, spouse", "Dost, müəllim, həyat yoldaşı", "Dost", "Müəllim", "Həyat yoldaşı"),
+            new LessonSpec("My family", "Mənim ailəm", "Bu mənim anamdır", "Mənim bir qardaşım var", "Sənin bacın varmı?")
+        };
+
         private static readonly UnitSpec[] Units =
         {
             // Unit 1 teaches the 32 letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
@@ -114,7 +126,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new UnitSpec { En = "Question Words", Az = "Sual sözləri", Category = "suallar",
                 Lessons = Unit4Lessons },
             new UnitSpec { En = "Family & People", Az = "Ailə və insanlar", Category = "ailə",
-                Words = new[] { "Ana", "Ata", "Qardaş", "Bacı", "Nənə", "Baba", "Uşaq", "Dost", "Kişi", "Qadın", "Ailə", "Müəllim" } },
+                Lessons = Unit5Lessons },
             new UnitSpec { En = "Numbers & Counting", Az = "Rəqəmlər və sayma", Category = "rəqəmlər",
                 Words = new[] { "On", "İyirmi", "Yüz" } },
             new UnitSpec { En = "Time & Schedules", Az = "Zaman və cədvəl", Category = "zaman",
