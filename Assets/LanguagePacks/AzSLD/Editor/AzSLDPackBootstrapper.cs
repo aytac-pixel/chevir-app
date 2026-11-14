@@ -61,7 +61,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         private static readonly HashSet<string> Sentences = new HashSet<string>
         {
             "Mənim adım ...", "Sənin adın nədir?", "Tanış olduğuma şadam",
-            "Bilmirəm", "İstəmirəm", "Sən bilirsən?"
+            "Bilmirəm", "İstəmirəm", "Sən bilirsən?",
+            "O kimdir?", "Sən haradasan?", "Bu nədir?"
         };
 
         /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
@@ -90,6 +91,16 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new LessonSpec("First sentences", "İlk cümlələr", "Bilmirəm", "İstəmirəm", "Sən bilirsən?")
         };
 
+        // Unit 4 as in kurikulum, without the question facial expressions (no mimika in A1).
+        private static readonly LessonSpec[] Unit4Lessons =
+        {
+            new LessonSpec("What? Who?", "Nə? Kim?", "Nə", "Kim"),
+            new LessonSpec("Where? When?", "Harada? Nə vaxt?", "Harada", "Nə vaxt"),
+            new LessonSpec("Why? How?", "Niyə? Necə?", "Niyə", "Necə"),
+            new LessonSpec("How many? Which?", "Neçə? Hansı?", "Neçə", "Hansı"),
+            new LessonSpec("Questions", "Sual cümlələri", "O kimdir?", "Sən haradasan?", "Bu nədir?")
+        };
+
         private static readonly UnitSpec[] Units =
         {
             // Unit 1 teaches the 32 letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
@@ -101,7 +112,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new UnitSpec { En = "Pronouns & Basic Sentences", Az = "Əvəzliklər və sadə cümlələr", Category = "əvəzliklər",
                 Lessons = Unit3Lessons },
             new UnitSpec { En = "Question Words", Az = "Sual sözləri", Category = "suallar",
-                Words = new[] { "Nə", "Kim", "Harada", "Nə vaxt", "Niyə", "Necə", "Neçə", "Hansı" } },
+                Lessons = Unit4Lessons },
             new UnitSpec { En = "Family & People", Az = "Ailə və insanlar", Category = "ailə",
                 Words = new[] { "Ana", "Ata", "Qardaş", "Bacı", "Nənə", "Baba", "Uşaq", "Dost", "Kişi", "Qadın", "Ailə", "Müəllim" } },
             new UnitSpec { En = "Numbers & Counting", Az = "Rəqəmlər və sayma", Category = "rəqəmlər",
