@@ -67,7 +67,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         };
 
         /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
-        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin" };
+        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin", "On", "İyirmi", "Yüz" };
 
         // Unit 2 as in kurikulum (L01–L05 + review), without "Xoş gəldin" and "Dəyməz" (removed 2026-11-14).
         private static readonly LessonSpec[] Unit2Lessons =
@@ -113,6 +113,17 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new LessonSpec("My family", "Mənim ailəm", "Bu mənim anamdır", "Mənim bir qardaşım var", "Sənin bacın varmı?")
         };
 
+        // Unit 6: 37 number videos were delivered (1–20, tens, hundreds, 1000). To keep the unit light, 21 are taught;
+        // the rest (13, 14, 16–19, 60–90, 300, 400, 600–900) are kept outside the project for a later unit.
+        private static readonly LessonSpec[] Unit6Lessons =
+        {
+            new LessonSpec("1–5", "1–5", "1", "2", "3", "4", "5"),
+            new LessonSpec("6–10", "6–10", "6", "7", "8", "9", "10"),
+            new LessonSpec("11–20", "11–20", "11", "12", "15", "20"),
+            new LessonSpec("Tens", "Onluqlar", "30", "40", "50", "100"),
+            new LessonSpec("Big numbers", "Böyük rəqəmlər", "200", "500", "1000")
+        };
+
         private static readonly UnitSpec[] Units =
         {
             // Unit 1 teaches the 32 letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
@@ -128,7 +139,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new UnitSpec { En = "Family & People", Az = "Ailə və insanlar", Category = "ailə",
                 Lessons = Unit5Lessons },
             new UnitSpec { En = "Numbers & Counting", Az = "Rəqəmlər və sayma", Category = "rəqəmlər",
-                Words = new[] { "On", "İyirmi", "Yüz" } },
+                Lessons = Unit6Lessons },
             new UnitSpec { En = "Time & Schedules", Az = "Zaman və cədvəl", Category = "zaman",
                 Words = new[] { "Bu gün", "Sabah", "Dünən", "Səhər", "Axşam", "Gün", "Həftə", "Saat", "İndi", "Sonra" } },
             new UnitSpec { En = "Daily Objects & Colors", Az = "Gündəlik əşyalar və rənglər", Category = "əşyalar",
@@ -287,7 +298,6 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 else
                 {
                     var signs = new List<SignDefinition>(unitSigns[u]);
-                    if (u == 5) signs.InsertRange(0, numbers); // Numbers & Counting: numerals first
                     lessons = CreateTeachingLessons(unitId, u, spec, signs);
                 }
 
@@ -568,7 +578,18 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             foreach (string gloss in glosses)
             {
                 SignDefinition sign;
-                if (!index.TryGetValue(gloss, out sign))
+                if (!index.TryGetValue(gloss, out sign) && IsNumber(gloss))
+                {
+                    // Numbers share the numeral assets (Numbers folder, media "reqem_N").
+                    string numberId = AzSLDLanguagePack.NumberId(gloss);
+                    bool multiDigit = gloss.Length > 1;
+                    sign = CevirAssetUtility.LoadOrCreate<SignDefinition>(
+                        Root + "/Signs/Dictionary/Numbers/" + CevirAssetUtility.SafeFileName(numberId) + ".asset",
+                        s => s.EditorInitialize(numberId, gloss, SignKind.Number, multiDigit, false, "rəqəmlər"));
+                    dictionary.EditorAdd(sign);
+                    index[gloss] = sign;
+                }
+                else if (sign == null)
                 {
                     string id = AzSLDLanguagePack.WordId(gloss);
                     SignKind kind = Sentences.Contains(gloss) ? SignKind.Sentence : SignKind.Word;
@@ -583,6 +604,13 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             }
 
             return result;
+        }
+
+        private static bool IsNumber(string gloss)
+        {
+            if (string.IsNullOrEmpty(gloss)) return false;
+            foreach (char c in gloss) if (c < '0' || c > '9') return false;
+            return true;
         }
 
         private static void AddToRegistry(LanguagePackRegistry registry, LanguagePackDefinition pack)
