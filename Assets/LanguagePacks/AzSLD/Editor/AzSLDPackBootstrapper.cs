@@ -38,7 +38,43 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             public string[] Words;
             public string GuideEn;
             public string GuideAz;
+
+            /// <summary>Fixed lesson plan (title EN, title AZ, glosses...) when the unit follows the curriculum table exactly.</summary>
+            public LessonSpec[] Lessons;
         }
+
+        private sealed class LessonSpec
+        {
+            public string En;
+            public string Az;
+            public string[] Glosses;
+
+            public LessonSpec(string en, string az, params string[] glosses)
+            {
+                En = en;
+                Az = az;
+                Glosses = glosses;
+            }
+        }
+
+        /// <summary>Glosses taught as whole sentences (media prefix "cumle_").</summary>
+        private static readonly HashSet<string> Sentences = new HashSet<string>
+        {
+            "Mənim adım ...", "Sənin adın nədir?", "Tanış olduğuma şadam"
+        };
+
+        /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
+        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz" };
+
+        // Unit 2 as in kurikulum (L01–L05 + review), without "Xoş gəldin" and "Dəyməz" (removed 2026-11-14).
+        private static readonly LessonSpec[] Unit2Lessons =
+        {
+            new LessonSpec("Hello and goodbye", "Salam və sağollaşma", "Salam", "Sabahınız xeyir", "Axşamınız xeyir", "Gecəniz xeyrə", "Görüşərik"),
+            new LessonSpec("How are you?", "Necəsən?", "Necəsən", "Yaxşı", "Pis", "Normal", "Sağ ol"),
+            new LessonSpec("My name is...", "Adım...", "Ad", "Soyad", "Mənim adım ...", "Sənin adın nədir?"),
+            new LessonSpec("Getting acquainted", "Tanışlıq", "Tanış olmaq", "Şad olmaq", "Tanış olduğuma şadam"),
+            new LessonSpec("Polite words", "Nəzakət sözləri", "Xahiş edirəm", "Bağışlayın")
+        };
 
         private static readonly UnitSpec[] Units =
         {
@@ -47,7 +83,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 GuideEn = "Show each letter with your dominant hand at shoulder height, palm towards the viewer.",
                 GuideAz = "Hər hərfi əsas əlinlə, çiyin hündürlüyündə, ovucu qarşı tərəfə göstər." },
             new UnitSpec { En = "Greetings & Introductions", Az = "Salamlaşma və tanışlıq", Category = "salamlaşma",
-                Words = new[] { "Salam", "Sağ ol", "Xoş gəldin", "Necəsən", "Yaxşı", "Ad", "Soyad", "Tanış olmaq", "Şad olmaq", "Xahiş edirəm", "Bağışlayın", "Görüşərik" } },
+                Lessons = Unit2Lessons },
             new UnitSpec { En = "Pronouns & Basic Sentences", Az = "Əvəzliklər və sadə cümlələr", Category = "əvəzliklər",
                 Words = new[] { "Mən", "Sən", "O", "Biz", "Siz", "Onlar", "Bəli", "Xeyr", "Var", "Yox", "İstəmək", "Bilmək" } },
             new UnitSpec { En = "Question Words", Az = "Sual sözləri", Category = "suallar",
@@ -104,7 +140,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             var unitSigns = new List<List<SignDefinition>>();
             foreach (UnitSpec spec in Units)
             {
-                unitSigns.Add(spec.Words != null ? CreateWordSigns(dictionary, spec.Words, spec.Category, SignKind.Word, words) : new List<SignDefinition>());
+                string[] glosses = spec.Lessons != null ? AllGlosses(spec.Lessons) : spec.Words;
+                unitSigns.Add(glosses != null ? CreateWordSigns(dictionary, glosses, spec.Category, words) : new List<SignDefinition>());
             }
 
             EditorUtility.SetDirty(dictionary);
@@ -154,16 +191,24 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             Debug.Log("[Çevir] AzSLD media: " + report);
         }
 
-        /// <summary>Unit 1 used to include facial expressions; those signs are no longer part of A1.</summary>
+        /// <summary>Signs no longer in A1: Unit 1 facial expressions and the words taken out of Unit 2.</summary>
         private static void RemoveDroppedSigns(SignDictionary dictionary)
         {
-            dictionary.EditorRemoveWhere(s => s.Category == "mimika");
+            System.Predicate<SignDefinition> dropped = s => s.Category == "mimika" || System.Array.IndexOf(DroppedGlosses, s.Gloss) >= 0;
+            dictionary.EditorRemoveWhere(dropped);
             foreach (string guid in AssetDatabase.FindAssets("t:SignDefinition", new[] { Root + "/Signs/Dictionary/Words" }))
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 var sign = AssetDatabase.LoadAssetAtPath<SignDefinition>(path);
-                if (sign != null && sign.Category == "mimika") AssetDatabase.DeleteAsset(path);
+                if (sign != null && dropped(sign)) AssetDatabase.DeleteAsset(path);
             }
+        }
+
+        private static string[] AllGlosses(LessonSpec[] lessons)
+        {
+            var all = new List<string>();
+            foreach (LessonSpec lesson in lessons) all.AddRange(lesson.Glosses);
+            return all.ToArray();
         }
 
         // ------------------------------------------------------------------ A1 level
@@ -200,6 +245,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
                 List<LessonData> lessons;
                 if (u == 0) lessons = CreateUnit1Lessons(unitId, letters);
+                else if (spec.Lessons != null) lessons = CreateFixedLessons(unitId, u, spec, unitSigns[u]);
                 else if (checkpoint) lessons = CreateReviewLessons(unitId, u, everything);
                 else
                 {
@@ -244,6 +290,34 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             for (int n = lessons.Count + 1; n <= 12; n++)
             {
                 string stale = A1 + "/Lessons/U01_L" + n.ToString("00") + ".asset";
+                if (AssetDatabase.LoadAssetAtPath<LessonData>(stale) != null) AssetDatabase.DeleteAsset(stale);
+            }
+
+            return lessons;
+        }
+
+        /// <summary>
+        /// Units with a fixed plan (the curriculum table): one lesson per row, then a review of the whole unit.
+        /// Always rewritten so the lessons follow the media that was delivered.
+        /// </summary>
+        private static List<LessonData> CreateFixedLessons(string unitId, int unitIndex, UnitSpec spec, List<SignDefinition> unitSigns)
+        {
+            int unitNumber = unitIndex + 1;
+            var lessons = new List<LessonData>();
+            int next = 0;
+            foreach (LessonSpec row in spec.Lessons)
+            {
+                List<SignDefinition> slice = unitSigns.GetRange(next, row.Glosses.Length);
+                next += row.Glosses.Length;
+                lessons.Add(Lesson(unitId, unitNumber, lessons.Count + 1, LessonType.Standard, slice, row.En, row.Az, true));
+            }
+
+            lessons.Add(Lesson(unitId, unitNumber, lessons.Count + 1, LessonType.Practice, unitSigns,
+                "Unit " + unitNumber + " practice", unitNumber + "-ci bölmə təkrarı", true));
+
+            for (int n = lessons.Count + 1; n <= 12; n++)
+            {
+                string stale = A1 + "/Lessons/U" + unitNumber.ToString("00") + "_L" + n.ToString("00") + ".asset";
                 if (AssetDatabase.LoadAssetAtPath<LessonData>(stale) != null) AssetDatabase.DeleteAsset(stale);
             }
 
@@ -369,7 +443,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                     text = new LocalizedString("Hello! What is your name?", "Salam! Adın nədir?"),
                     // The old voice clips also asked for the surname; record "story1_name_az/en.wav" to give this line a voice.
                     voice = new LocalizedAudio { en = LoadAudio("story1_name_en"), az = LoadAudio("story1_name_az") },
-                    npcSigns = Signs(words, "Salam", "Sən", "Ad", "Nə")
+                    npcSigns = Signs(words, "Salam", "Sənin adın nədir?")
                 },
                 new StoryBeat
                 {
@@ -383,7 +457,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                     pose = NpcPose.Wave,
                     text = new LocalizedString("Nice to meet you, {name}!", "Tanış olduğuma şadam, {name}!"),
                     voice = new LocalizedAudio { en = LoadAudio("story1_nice_en"), az = LoadAudio("story1_nice_az") },
-                    npcSigns = Signs(words, "Tanış olmaq", "Şad olmaq")
+                    npcSigns = Signs(words, "Tanış olduğuma şadam")
                 }
             };
 
@@ -450,7 +524,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             return result;
         }
 
-        private static List<SignDefinition> CreateWordSigns(SignDictionary dictionary, string[] glosses, string category, SignKind kind,
+        private static List<SignDefinition> CreateWordSigns(SignDictionary dictionary, string[] glosses, string category,
             Dictionary<string, SignDefinition> index)
         {
             var result = new List<SignDefinition>();
@@ -460,6 +534,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 if (!index.TryGetValue(gloss, out sign))
                 {
                     string id = AzSLDLanguagePack.WordId(gloss);
+                    SignKind kind = Sentences.Contains(gloss) ? SignKind.Sentence : SignKind.Word;
                     sign = CevirAssetUtility.LoadOrCreate<SignDefinition>(
                         Root + "/Signs/Dictionary/Words/" + CevirAssetUtility.SafeFileName(id) + ".asset",
                         s => s.EditorInitialize(id, gloss, kind, true, false, category));

@@ -97,7 +97,7 @@ namespace Cevir.LanguagePacks.AzSLD
 
         /// <summary>
         /// Media file name (without extension) the content team uses for a sign, as in kurikulum/Media_siyahisi_A1_A2.csv:
-        /// letters "herf_a", "herf_ch", "herf_i_noqtesiz" (I), "herf_i" (İ); numbers "reqem_5"; words "sagh_ol".
+        /// letters "herf_a", "herf_ch", "herf_i_noqtesiz" (I), "herf_i" (İ); numbers "reqem_5"; words "sagh_ol"; sentences "cumle_menim_adim".
         /// </summary>
         public static string MediaSlug(SignDefinition sign)
         {
@@ -108,6 +108,8 @@ namespace Cevir.LanguagePacks.AzSLD
                     return "herf_" + Map(AzLower(sign.Gloss), MediaLetterMap);
                 case SignKind.Number:
                     return "reqem_" + sign.Gloss;
+                case SignKind.Sentence:
+                    return "cumle_" + Map(AzLower(sign.Gloss), MediaWordMap);
                 default:
                     return Map(AzLower(sign.Gloss), MediaWordMap);
             }
