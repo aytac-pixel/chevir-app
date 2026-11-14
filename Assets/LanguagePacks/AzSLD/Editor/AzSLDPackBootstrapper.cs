@@ -63,11 +63,12 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             "Mənim adım ...", "Sənin adın nədir?", "Tanış olduğuma şadam",
             "Bilmirəm", "İstəmirəm", "Sən bilirsən?",
             "O kimdir?", "Sən haradasan?", "Bu nədir?",
-            "Bu mənim anamdır", "Mənim bir qardaşım var", "Sənin bacın varmı?"
+            "Bu mənim anamdır", "Mənim bir qardaşım var", "Sənin bacın varmı?",
+            "Saat neçədir?", "Saat beşdir"
         };
 
         /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
-        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin", "On", "İyirmi", "Yüz" };
+        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin", "On", "İyirmi", "Yüz", "Sabah", "Dünən" };
 
         // Unit 2 as in kurikulum (L01–L05 + review), without "Xoş gəldin" and "Dəyməz" (removed 2026-11-14).
         private static readonly LessonSpec[] Unit2Lessons =
@@ -124,6 +125,17 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new LessonSpec("Big numbers", "Böyük rəqəmlər", "200", "500", "1000")
         };
 
+        // Unit 7 as in kurikulum, without "Sabah", "Dünən" and «Sabah səhər» (not recorded); "Bu gün" joins lesson 1.
+        private static readonly LessonSpec[] Unit7Lessons =
+        {
+            new LessonSpec("Now, before, after", "İndi, əvvəl, sonra", "İndi", "Əvvəl", "Sonra", "Bu gün"),
+            new LessonSpec("Parts of the day", "Günün hissələri", "Səhər", "Günorta", "Axşam", "Gecə"),
+            new LessonSpec("Day, week, month, year", "Gün, həftə, ay, il", "Gün", "Həftə", "Ay", "İl"),
+            new LessonSpec("Days of the week 1", "Həftənin günləri 1", "Bazar ertəsi", "Çərşənbə axşamı", "Çərşənbə", "Cümə axşamı"),
+            new LessonSpec("Days of the week 2", "Həftənin günləri 2", "Cümə", "Şənbə", "Bazar"),
+            new LessonSpec("What time is it?", "Saat neçədir?", "Saat", "Saat neçədir?", "Saat beşdir")
+        };
+
         private static readonly UnitSpec[] Units =
         {
             // Unit 1 teaches the 32 letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
@@ -141,7 +153,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new UnitSpec { En = "Numbers & Counting", Az = "Rəqəmlər və sayma", Category = "rəqəmlər",
                 Lessons = Unit6Lessons },
             new UnitSpec { En = "Time & Schedules", Az = "Zaman və cədvəl", Category = "zaman",
-                Words = new[] { "Bu gün", "Sabah", "Dünən", "Səhər", "Axşam", "Gün", "Həftə", "Saat", "İndi", "Sonra" } },
+                Lessons = Unit7Lessons },
             new UnitSpec { En = "Daily Objects & Colors", Az = "Gündəlik əşyalar və rənglər", Category = "əşyalar",
                 Words = new[] { "Qırmızı", "Mavi", "Yaşıl", "Sarı", "Ağ", "Qara", "Kitab", "Telefon", "Su", "Çörək", "Masa", "Qələm" } },
             new UnitSpec { En = "Essential Places", Az = "Vacib yerlər", Category = "yerlər",
