@@ -75,6 +75,9 @@ jobs:
           androidExportType: androidPackage
           buildMethod: Cevir.Setup.Editor.CevirBuild.CiBuildAndroid
           customParameters: -cevirBuildNumber ${{ github.run_number }}
+          # Version comes from the run number (see CevirBuild); the plugin install edits manifest.json.
+          versioning: None
+          allowDirtyBuild: true
 
       - name: Collect APK
         run: |
