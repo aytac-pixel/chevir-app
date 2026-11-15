@@ -230,7 +230,7 @@ namespace Cevir.Integrations.MediaPipe
                     runningMode: RunningMode.LIVE_STREAM,
                     numFaces: 1,
                     outputFaceBlendshapes: true,
-                    outputFacialTransformationMatrixes: true,
+                    outputFaceTransformationMatrixes: true,
                     resultCallback: OnFaceResult);
                 _face = FaceLandmarker.CreateFromOptions(faceOptions);
             }
