@@ -30,6 +30,12 @@ namespace Cevir.Core.Cloud
                 return Loc.Pick("Too many attempts. Wait a minute and try again.", "Çox cəhd oldu. Bir dəqiqə gözlə və yenidən yoxla.");
             if (code == "signup_disabled")
                 return Loc.Pick("New accounts are closed right now.", "Hazırda yeni hesab açmaq bağlıdır.");
+            if (code == "same_password" || text.Contains("different from the old"))
+                return Loc.Pick("The new password must be different from the old one.", "Yeni şifrə köhnəsindən fərqli olmalıdır.");
+            if (code == "otp_expired" || code == "otp_disabled" || text.Contains("token has expired") || text.Contains("invalid token"))
+                return Loc.Pick("The code is wrong or has expired. Request a new one.", "Kod səhvdir və ya vaxtı keçib. Yenisini istə.");
+            if (code == "reauthentication_needed")
+                return Loc.Pick("Sign out and sign in again, then change the password.", "Hesabdan çıx, yenidən daxil ol, sonra şifrəni dəyiş.");
             if (status == 401 || status == 403)
                 return SignedOut;
             return Unknown;

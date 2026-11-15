@@ -44,6 +44,12 @@ namespace Cevir.Core.Game
         public XpState xp = new XpState();
         public StreakState streak = new StreakState();
 
+        /// <summary>Daily practice time window and reminder notifications (asked right after sign-up).</summary>
+        public ReminderSettings reminders = new ReminderSettings();
+
+        /// <summary>Public URL of the profile photo on the server (empty: none, or only stored on this phone).</summary>
+        public string avatarUrl = "";
+
         /// <summary>Opt-in to share anonymised landmark data (never video). Off by default.</summary>
         public bool shareAnonymousLandmarks;
 
@@ -173,5 +179,37 @@ namespace Cevir.Core.Game
 
         public int correct;
         public int attempts;
+    }
+
+    /// <summary>
+    /// When the learner can practise each day (minutes after local midnight) and whether reminders are on.
+    /// Two reminders 30 minutes apart are sent inside the window; a third one when the flame is at stake.
+    /// </summary>
+    [Serializable]
+    public sealed class ReminderSettings
+    {
+        public const int Step = 30;
+        public const int MinLength = 60;
+
+        /// <summary>False until the learner has answered the "when can you practise?" question once.</summary>
+        public bool configured;
+        public bool enabled = true;
+        public int startMinutes = 18 * 60;
+        public int endMinutes = 20 * 60;
+
+        public void Normalize()
+        {
+            startMinutes = Math.Max(0, Math.Min(24 * 60 - MinLength, startMinutes / Step * Step));
+            endMinutes = Math.Max(startMinutes + MinLength, Math.Min(24 * 60, endMinutes / Step * Step));
+        }
+
+        public static string Clock(int minutes)
+        {
+            if (minutes == 24 * 60) return "24:00";
+            minutes = ((minutes % (24 * 60)) + 24 * 60) % (24 * 60);
+            return (minutes / 60).ToString("00") + ":" + (minutes % 60).ToString("00");
+        }
+
+        public string WindowText => Clock(startMinutes) + "–" + Clock(endMinutes);
     }
 }

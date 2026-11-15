@@ -29,7 +29,7 @@ namespace Cevir.Core.UI
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning("[Çevir] Share sheet failed, copying instead: " + e.Message);
+                Debug.LogWarning("[Chevir] Share sheet failed, copying instead: " + e.Message);
             }
 #endif
             // iOS needs a native plugin for UIActivityViewController; until then the link is copied.

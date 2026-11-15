@@ -146,7 +146,7 @@ namespace Cevir.Integrations.MediaPipe
             if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
             {
                 CameraDenied = true;
-                Debug.LogWarning("[Çevir] Camera permission denied.");
+                Debug.LogWarning("[Chevir] Camera permission denied.");
                 yield break;
             }
 #else
@@ -156,7 +156,7 @@ namespace Cevir.Integrations.MediaPipe
                 if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
                 {
                     CameraDenied = true;
-                    Debug.LogWarning("[Çevir] Camera permission denied.");
+                    Debug.LogWarning("[Chevir] Camera permission denied.");
                     yield break;
                 }
             }
@@ -176,7 +176,7 @@ namespace Cevir.Integrations.MediaPipe
             if (deviceName == null && WebCamTexture.devices.Length > 0) deviceName = WebCamTexture.devices[0].name;
             if (deviceName == null)
             {
-                Debug.LogError("[Çevir] No camera found.");
+                Debug.LogError("[Chevir] No camera found.");
                 yield break;
             }
 
@@ -188,7 +188,7 @@ namespace Cevir.Integrations.MediaPipe
             while (_camera.width <= 16 && Time.realtimeSinceStartup < timeout) yield return null;
             if (_camera.width <= 16)
             {
-                Debug.LogError("[Çevir] Camera did not start.");
+                Debug.LogError("[Chevir] Camera did not start.");
                 yield break;
             }
 
@@ -205,7 +205,7 @@ namespace Cevir.Integrations.MediaPipe
         {
             if (handLandmarkerModel == null)
             {
-                Debug.LogError("[Çevir] Hand landmarker model is not assigned.");
+                Debug.LogError("[Chevir] Hand landmarker model is not assigned.");
                 return;
             }
 

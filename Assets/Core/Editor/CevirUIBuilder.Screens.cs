@@ -154,35 +154,39 @@ namespace Cevir.Core.Editor
             Stretch(screen);
             HomeScreenUI ui = screen.gameObject.AddComponent<HomeScreenUI>();
 
-            // Top bar: language badge + name on the left; streak, hearts and XP on the right.
+            // Top bar: language badge on the left, then level (A1), streak, hearts and XP spread evenly over the rest,
+            // so the row fills any phone width instead of bunching up on one side.
             const float topBar = 170f;
             RectTransform bar = Rect("TopBar", screen);
             AnchorTop(bar, topBar);
             Image barBg = bar.gameObject.AddComponent<Image>();
             barBg.color = new Color(1f, 1f, 1f, 0.9f);
             Image barLine = Img(bar, "BottomLine", null, UIPalette.Border);
-            Place(barLine.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(2000f, 2f));
-            HorizontalLayoutGroup barRow = Row(bar.gameObject, 22f);
-            barRow.padding = new RectOffset(44, 44, 0, 0);
-            barRow.childControlHeight = false;
+            Place(barLine.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(4000f, 2f));
+            Layout(barLine.gameObject).ignoreLayout = true;
+            HorizontalLayoutGroup barRow = Row(bar.gameObject, 12f, TextAnchor.MiddleCenter);
+            barRow.padding = new RectOffset(36, 36, 0, 0);
 
             Image badge = Img(bar, "Badge", Sprite("UI", "tile_gradient"), Color.white);
             badge.preserveAspect = false;
-            Layout(badge.gameObject, preferredWidth: 104f, preferredHeight: 104f);
-            badge.rectTransform.sizeDelta = new Vector2(104f, 104f);
+            Layout(badge.gameObject, preferredWidth: 100f, preferredHeight: 100f).minWidth = 100f;
             badge.gameObject.AddComponent<Shadow>().effectColor = new Color(0.06f, 0.37f, 0.82f, 0.3f);
-            TextMeshProUGUI badgeLabel = Text(badge.transform, "Code", "AZ", 40f, Color.white, TextAlignmentOptions.Center, true);
+            TextMeshProUGUI badgeLabel = Text(badge.transform, "Code", "AZ", 38f, Color.white, TextAlignmentOptions.Center, true);
             Stretch(badgeLabel.rectTransform);
 
-            TextMeshProUGUI language = Text(bar, "Language", "Azerbaijani\nSign Language", 27f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, true);
-            language.lineSpacing = -12f;
-            language.rectTransform.sizeDelta = new Vector2(300f, 100f);
-            Layout(language.gameObject, flexibleWidth: 1f, preferredHeight: 100f);
+            // Level pill ("A1": the level the learner is on now).
+            RectTransform levelCell = StatCell(bar, "Level");
+            Image levelPill = Img(levelCell, "Pill", Sprite("UI", "pill"), UIPalette.Primary, true);
+            Layout(levelPill.gameObject, preferredWidth: 112f, preferredHeight: 72f).minWidth = 112f;
+            TextMeshProUGUI levelBadge = Text(levelPill.transform, "Value", "A1", 36f, Color.white, TextAlignmentOptions.Center, true);
+            levelBadge.enableWordWrapping = false;
+            Stretch(levelBadge.rectTransform);
 
-            TextMeshProUGUI streak = StatChip(bar, "Streak", "flame", UIPalette.Streak, "0");
-            TextMeshProUGUI hearts = StatChip(bar, "Hearts", "heart", UIPalette.Heart, "5");
-            TextMeshProUGUI xp = StatChip(bar, "Xp", "zap", UIPalette.Xp, "0");
-
+            Image streakIcon;
+            TextMeshProUGUI streak = StatChip(bar, "Streak", "flame", UIPalette.Streak, "0", out streakIcon);
+            Image ignoredIcon;
+            TextMeshProUGUI hearts = StatChip(bar, "Hearts", "heart", UIPalette.Heart, "10", out ignoredIcon);
+            TextMeshProUGUI xp = StatChip(bar, "Xp", "zap", UIPalette.Xp, "0", out ignoredIcon);
             // Scrollable path with the level header at its top.
             RectTransform scroll = Rect("PathScroll", screen);
             Stretch(scroll, 0f, 0f, topBar, 0f);
@@ -228,7 +232,8 @@ namespace Cevir.Core.Editor
             BottomSheetUI sheet = BuildSheet(screen, "UnitSheet", out extra);
 
             Set(ui, "badgeLabel", badgeLabel);
-            Set(ui, "languageLabel", language);
+            Set(ui, "levelBadgeLabel", levelBadge);
+            Set(ui, "streakIcon", streakIcon);
             Set(ui, "streakLabel", streak);
             Set(ui, "heartsLabel", hearts);
             Set(ui, "xpLabel", xp);
@@ -244,17 +249,25 @@ namespace Cevir.Core.Editor
             return ui;
         }
 
-        private static TextMeshProUGUI StatChip(Transform parent, string name, string icon, Color color, string value)
+        /// <summary>An equal share of the top bar, content centred in it.</summary>
+        private static RectTransform StatCell(Transform parent, string name)
         {
-            RectTransform chip = Rect(name, parent);
-            Row(chip.gameObject, 8f, TextAnchor.MiddleCenter);
-            Layout(chip.gameObject, preferredHeight: 80f);
-            chip.sizeDelta = new Vector2(150f, 80f);
-            Icon(chip, "Icon", icon, 46f, color);
+            RectTransform cell = Rect(name, parent);
+            HorizontalLayoutGroup row = Row(cell.gameObject, 8f, TextAnchor.MiddleCenter);
+            row.childForceExpandWidth = false;
+            Layout(cell.gameObject, preferredHeight: 90f, flexibleWidth: 1f);
+            cell.GetComponent<LayoutElement>().minWidth = 100f;
+            return cell;
+        }
+
+        private static TextMeshProUGUI StatChip(Transform parent, string name, string icon, Color color, string value, out Image iconImage)
+        {
+            RectTransform chip = StatCell(parent, name);
+            iconImage = Icon(chip, "Icon", icon, 48f, color);
             TextMeshProUGUI label = Text(chip, "Value", value, 38f, color, TextAlignmentOptions.MidlineLeft, true);
             label.enableWordWrapping = false;
-            Layout(label.gameObject, preferredHeight: 60f);
-            label.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            label.overflowMode = TextOverflowModes.Overflow;
+            Layout(label.gameObject, preferredHeight: 56f);
             return label;
         }
 
@@ -579,6 +592,13 @@ namespace Cevir.Core.Editor
             Place(avatar.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(204f, 204f));
             Image avatarIcon = Img(avatar.transform, "Icon", IconSprite("user"), Color.white);
             Place(avatarIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(120f, 120f));
+            // Profile photo, cut to the circle by the avatar's mask.
+            avatar.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+            RectTransform photoRt = Rect("Photo", avatar.transform);
+            Stretch(photoRt);
+            RawImage photo = photoRt.gameObject.AddComponent<RawImage>();
+            photo.raycastTarget = false;
+            photoRt.gameObject.SetActive(false);
             Image dot = Img(avatarRing.transform, "Online", Sprite("UI", "circle"), Color.white);
             Place(dot.rectTransform, new Vector2(1f, 0f), new Vector2(0.5f, 0.5f), new Vector2(-28f, 34f), new Vector2(54f, 54f));
             Image dotInner = Img(dot.transform, "Inner", Sprite("UI", "circle"), UIPalette.Primary);
@@ -632,11 +652,31 @@ namespace Cevir.Core.Editor
             gridLayout.spacing = new Vector2(24f, 24f);
             gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             gridLayout.constraintCount = 2;
+            grid.gameObject.AddComponent<GridAutoFit>();
             Layout(grid.gameObject, preferredHeight: 444f);
             TextMeshProUGUI streak = StatCard(grid, "Streak", "flame", "Day Streak", "Günlük seriya", "0");
             TextMeshProUGUI xp = StatCard(grid, "Xp", "zap", "Total XP", "Ümumi XP", "0");
             TextMeshProUGUI level = StatCard(grid, "Level", "crown", "Level", "Səviyyə", "A1");
             TextMeshProUGUI signs = StatCard(grid, "Signs", "hand", "Signs Learned", "Öyrənilən işarə", "0");
+
+            // Notifications: daily practice reminders.
+            Label(content, "NotificationsTitle", "Notifications", "Bildirişlər", 44f, UIPalette.TextPrimary);
+            Image notifications = Glass(content, "NotificationsCard", 36, UIPalette.Glass);
+            HorizontalLayoutGroup notificationsRow = Row(notifications.gameObject, 24f);
+            notificationsRow.padding = new RectOffset(30, 30, 28, 28);
+            Image bellTile = Img(notifications.transform, "IconTile", Panel(24), UIPalette.CyanLight, true);
+            Layout(bellTile.gameObject, preferredWidth: 104f, preferredHeight: 104f).minWidth = 104f;
+            Image bell = Img(bellTile.transform, "Icon", IconSprite("bell"), UIPalette.Primary);
+            Place(bell.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(58f, 58f));
+            RectTransform notificationTexts = Rect("Texts", notifications.transform);
+            Column(notificationTexts.gameObject, 0, 4f, TextAnchor.MiddleLeft);
+            Layout(notificationTexts.gameObject, flexibleWidth: 1f);
+            Label(notificationTexts, "Title", "Practice reminders", "Məşq xatırlatmaları", 34f, UIPalette.TextPrimary);
+            TextMeshProUGUI notificationsStatus = Text(notificationTexts, "Status", "", 27f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
+            TextMeshProUGUI notificationsLabel;
+            Button notificationsButton = MakeButton(notifications.transform, "SetupButton", "AYARLA", UIPalette.CyanLight, UIPalette.Primary, 88f, out notificationsLabel);
+            notificationsLabel.fontSize = 30f;
+            Layout(notificationsButton.gameObject, preferredWidth: 200f).minWidth = 180f;
 
             // Invite.
             Label(content, "FriendsTitle", "Friends", "Dostlar", 44f, UIPalette.TextPrimary);
@@ -661,6 +701,9 @@ namespace Cevir.Core.Editor
             TextMeshProUGUI email = Text(account.transform, "Email", "", 30f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
             email.enableWordWrapping = false;
             email.overflowMode = TextOverflowModes.Ellipsis;
+            TextMeshProUGUI settingsLabel;
+            Button settings = MakeButton(account.transform, "SettingsButton", "HESAB AYARLARI", UIPalette.CyanLight, UIPalette.Primary, 100f, out settingsLabel);
+            settingsLabel.fontSize = 32f;
             TextMeshProUGUI signOutLabel;
             Button signOut = MakeButton(account.transform, "SignOutButton", "SIGN OUT", UIPalette.RedLight, UIPalette.RedDark, 100f, out signOutLabel);
             signOutLabel.fontSize = 32f;
@@ -678,6 +721,11 @@ namespace Cevir.Core.Editor
             Button right = ToggleButton(hands, "Right", "Right", "Sağ");
             Button left = ToggleButton(hands, "Left", "Left", "Sol");
 
+            Set(ui, "avatarPhoto", photo);
+            Set(ui, "avatarIcon", avatarIcon.gameObject);
+            Set(ui, "notificationsStatus", notificationsStatus);
+            Set(ui, "notificationsButton", notificationsButton);
+            Set(ui, "settingsButton", settings);
             Set(ui, "nameLabel", name);
             Set(ui, "joinedLabel", joined);
             Set(ui, "editButton", editButton);
@@ -731,7 +779,7 @@ namespace Cevir.Core.Editor
             Image logo = Img(content, "Logo", Sprite("Brand", "cevir_logo"), Color.white);
             Layout(logo.gameObject, preferredWidth: 300f, preferredHeight: 300f);
             logo.GetComponent<LayoutElement>().flexibleWidth = 0f;
-            TextMeshProUGUI brand = Text(content, "Brand", "Çevir", 96f, UIPalette.PrimaryDark, TextAlignmentOptions.Center, true);
+            TextMeshProUGUI brand = Text(content, "Brand", "Chevir", 96f, UIPalette.PrimaryDark, TextAlignmentOptions.Center, true);
             Layout(brand.gameObject, preferredHeight: 120f);
             TextMeshProUGUI tagline = Label(content, "Tagline", "Learn Azerbaijani Sign Language", "Azərbaycan İşarə Dilini öyrən", 36f,
                 UIPalette.TextSecondary, TextAlignmentOptions.Center, false);
@@ -744,6 +792,8 @@ namespace Cevir.Core.Editor
             TMP_InputField name = InputField(card.transform, "Name", "Name and surname", "Ad və soyad");
             name.characterLimit = 40;
             TMP_InputField email = InputField(card.transform, "Email", "E-mail", "E-poçt");
+            TMP_InputField code = InputField(card.transform, "Code", "6-digit code from the e-mail", "E-poçta gələn 6 rəqəmli kod");
+            code.gameObject.SetActive(false);
             TMP_InputField password = InputField(card.transform, "Password", "Password", "Şifrə");
             TextMeshProUGUI message = Text(card.transform, "Message", "", 30f, UIPalette.Red, TextAlignmentOptions.Center, false);
             message.gameObject.SetActive(false);
@@ -763,6 +813,7 @@ namespace Cevir.Core.Editor
             Set(ui, "nameField", name);
             Set(ui, "emailField", email);
             Set(ui, "passwordField", password);
+            Set(ui, "codeField", code);
             Set(ui, "primaryButton", primary);
             Set(ui, "primaryLabel", primaryLabel);
             Set(ui, "switchButton", switchMode);

@@ -7,7 +7,7 @@ namespace Cevir.Core.LanguagePacks
     /// Lists the packs available to the app. Built-in packs are referenced here; downloadable packs
     /// (planned: Addressables remote catalog) register at runtime through <see cref="Register"/>.
     /// </summary>
-    [CreateAssetMenu(menuName = "Çevir/Language Pack Registry", fileName = "LanguagePackRegistry")]
+    [CreateAssetMenu(menuName = "Chevir/Language Pack Registry", fileName = "LanguagePackRegistry")]
     public sealed class LanguagePackRegistry : ScriptableObject
     {
         [SerializeField] private List<LanguagePackDefinition> builtInPacks = new List<LanguagePackDefinition>();

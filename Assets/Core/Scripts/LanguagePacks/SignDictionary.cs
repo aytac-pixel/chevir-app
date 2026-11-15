@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Cevir.Core.LanguagePacks
 {
-    [CreateAssetMenu(menuName = "Çevir/Language Pack/Sign Dictionary", fileName = "SignDictionary")]
+    [CreateAssetMenu(menuName = "Chevir/Language Pack/Sign Dictionary", fileName = "SignDictionary")]
     public sealed class SignDictionary : ScriptableObject
     {
         [SerializeField] private List<SignDefinition> signs = new List<SignDefinition>();

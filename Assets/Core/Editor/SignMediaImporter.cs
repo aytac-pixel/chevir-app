@@ -112,7 +112,7 @@ namespace Cevir.Core.Editor
 
                 var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
                 if (sprite != null) pictures[sign] = sprite;
-                else Debug.LogWarning("[Çevir] Picture is not imported as a Sprite (re-import it): " + path);
+                else Debug.LogWarning("[Chevir] Picture is not imported as a Sprite (re-import it): " + path);
             }
 
             foreach (SignDefinition sign in dictionary.Signs)

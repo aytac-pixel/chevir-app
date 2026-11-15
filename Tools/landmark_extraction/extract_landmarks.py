@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Offline landmark extraction for Çevir sign references.
+"""Offline landmark extraction for Chevir sign references.
 
 Runs MediaPipe HandLandmarker + FaceLandmarker (the same models the app uses on-device) over dataset
 videos such as AzSLD and writes one raw-landmark JSON per video. Import the folder in Unity with
-"Çevir > Import Sign References From Folder...": the importer converts landmarks to features with the
+"Chevir > Import Sign References From Folder...": the importer converts landmarks to features with the
 app's own SignFeatureExtractor, so reference and live features always match.
 
 Only landmarks are kept; videos are not copied or redistributed.

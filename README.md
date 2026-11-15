@@ -1,6 +1,6 @@
-# Çevir
+# Chevir
 
-2D, Duolingo-style app for learning Azerbaijani Sign Language (AİD / AzSLD). The interface is in Azerbaijani; all strings go through `Loc` so more interface languages can be added later. Recognition runs fully on the phone (MediaPipe hand + face landmarks); video never leaves the device. Built from the project plan *"Çevir — Azərbaycan İşarət Dili Öyrənmə Tətbiqi: Layihə Planı"*. All numbers (units, XP, thresholds) are the plan's proposals and are meant to be tuned.
+2D, Duolingo-style app for learning Azerbaijani Sign Language (AİD / AzSLD). The interface is in Azerbaijani; all strings go through `Loc` so more interface languages can be added later. Recognition runs fully on the phone (MediaPipe hand + face landmarks); video never leaves the device. Built from the project plan *"Chevir — Azərbaycan İşarə Dili Öyrənmə Tətbiqi: Layihə Planı"*. All numbers (units, XP, thresholds) are the plan's proposals and are meant to be tuned.
 
 Target: Unity 2022.3 LTS (pinned to 2022.3.45f1 in ProjectSettings/ProjectVersion.txt; Unity 6 should also work), Android + iOS, TextMeshPro, Unity Test Framework.
 
@@ -58,12 +58,12 @@ Short version (step-by-step guide in Azerbaijani: `QURASDIRMA.md`):
 
 1. Open this folder with Unity 2022.3 LTS and the Android (or iOS) build modules installed.
 2. Install the MediaPipe Unity Plugin: `Tools/setup/install_mediapipe_plugin.ps1` (Windows) or `bash Tools/setup/install_mediapipe_plugin.sh`. The bridge assembly turns itself on when the package `com.github.homuler.mediapipe` is present, so there is no define to add. The hand and face models are already in `Assets/Integrations/MediaPipe/Models/`.
-3. **Çevir > Setup > 1. Configure Mobile Project (one click)**: imports TMP resources, creates the Nunito TMP fonts (SemiBold, with ExtraBold as its bold face and DejaVu Sans as fallback; all cover Ə/ə), builds the AzSLD pack, creates `Assets/Core/Resources/CevirCloudConfig.asset`, generates `Assets/Scenes/Main.unity` with the full UI, sets build settings and Android/iOS player settings (portrait, IL2CPP ARM64, min API 24, GLES3, camera usage text, internet permission, app icon from the logo, bundle id `com.chevirapp.cevir`).
+3. **Chevir > Setup > 1. Configure Mobile Project (one click)**: imports TMP resources, creates the Nunito TMP fonts (SemiBold, with ExtraBold as its bold face and DejaVu Sans as fallback; all cover Ə/ə), builds the AzSLD pack, creates `Assets/Core/Resources/CevirCloudConfig.asset`, generates `Assets/Scenes/Main.unity` with the full UI, sets build settings and Android/iOS player settings (portrait, IL2CPP ARM64, min API 24, GLES3, camera usage text, internet permission, app icon from the logo, bundle id `com.chevirapp.cevir`).
 4. Database: create a Supabase project, run `Tools/supabase/schema.sql` in its SQL Editor, and paste the project URL and anon key into `CevirCloudConfig` (details in `QURASDIRMA.md`). Without it the app runs on the phone only, with no accounts or league ranking.
-5. **Çevir > Build > Android APK** (writes `Builds/Android/Cevir.apk`), **Android App Bundle** or **iOS Xcode Project**.
+5. **Chevir > Build > Android APK** (writes `Builds/Android/Cevir.apk`), **Android App Bundle** or **iOS Xcode Project**.
 6. CI: `.github/workflows/build-android.yml` builds the APK with game-ci from a fresh clone (`Cevir.Setup.Editor.CevirBuild.CiBuildAndroid` runs the setup, then the build). It runs on every push to `main` and publishes the APK to the `demo` release (always the latest: `releases/latest/download/Cevir.apk`). It needs `UNITY_LICENSE`, `UNITY_EMAIL` and `UNITY_PASSWORD` secrets.
 
-Signs without reference landmark data are checked only for a clearly visible hand (the screen says so). Real handshape scoring takes over once references are imported (see "Reference data pipeline"). References for every lesson video and letter picture are already extracted into `Tools/references/azsld/` (one recording per sign, by `Tools/landmark_extraction/extract_pack_media.py`) and are imported automatically by *Çevir > AzSLD > Create Or Update Pack Skeleton*. Re-run the script after adding media. One recording per sign is a starting point: more signers per sign and thresholds tuned on real phones will make the check fairer. Lessons without any signs show "Tezliklə" instead of completing for free.
+Signs without reference landmark data are checked only for a clearly visible hand (the screen says so). Real handshape scoring takes over once references are imported (see "Reference data pipeline"). References for every lesson video and letter picture are already extracted into `Tools/references/azsld/` (one recording per sign, by `Tools/landmark_extraction/extract_pack_media.py`) and are imported automatically by *Chevir > AzSLD > Create Or Update Pack Skeleton*. Re-run the script after adding media. One recording per sign is a starting point: more signers per sign and thresholds tuned on real phones will make the check fairer. Lessons without any signs show "Tezliklə" instead of completing for free.
 
 ## Screens
 
@@ -95,8 +95,8 @@ The story logic (`StorySession`, `FingerspellingTask`) is plain C# with unit tes
 
 ## Generated UI
 
-**Çevir > UI > Generate Complete UI Hierarchy** (also run by the one-click setup) builds and wires the scene; re-running replaces the generated canvas:
-- **Çevir Systems:** `GameManager`, `AudioManager`, `MediaPipeLandmarkProvider` (if the bridge is compiled) and `SignPracticeController`.
+**Chevir > UI > Generate Complete UI Hierarchy** (also run by the one-click setup) builds and wires the scene; re-running replaces the generated canvas:
+- **Chevir Systems:** `GameManager`, `AudioManager`, `MediaPipeLandmarkProvider` (if the bridge is compiled) and `SignPracticeController`.
 - **Canvas:** 1080×1920 reference size inside a `SafeAreaFitter`. `CevirUIRoot` routes between the four tab screens, the lesson screen and the story screen; Android back goes to Home, then quits.
 - **Screens** as described above, plus the lesson screen and `FeedbackOverlayUI` from the first version.
 - **Prefabs** in `Assets/Core/Prefabs/UI/` (UnitNode, StoryCard, LeagueRow) and a `CevirTheme` asset in `Assets/Core/Data/` holding the theme sprites.
@@ -105,7 +105,7 @@ Sprites in `Assets/Core/Sprites` are imported as UI sprites automatically; a `__
 
 ## Sign media (pictures and videos)
 
-Copy files into `Assets/LanguagePacks/AzSLD/Media/` using the checklist layout (`A1/U01_Elifba/herf_a.png`) and run **Çevir > AzSLD > Import Media** (setup runs it too). `SignMediaImporter` (Core/Editor) matches file names to signs through the pack's `AzSLDLanguagePack.MediaSlug`: `<slug>.png/.jpg` → thumbnail, `<slug>.mp4` → reference clip, `<slug>_yavas.mp4` → slow clip. Pictures import as sprites, videos are transcoded to H.264 without audio. Lessons show the video when there is one and the picture otherwise. Media spec: 720×960 portrait, videos 2–5 s silent, pictures under 300 KB.
+Copy files into `Assets/LanguagePacks/AzSLD/Media/` using the checklist layout (`A1/U01_Elifba/herf_a.png`) and run **Chevir > AzSLD > Import Media** (setup runs it too). `SignMediaImporter` (Core/Editor) matches file names to signs through the pack's `AzSLDLanguagePack.MediaSlug`: `<slug>.png/.jpg` → thumbnail, `<slug>.mp4` → reference clip, `<slug>_yavas.mp4` → slow clip. Pictures import as sprites, videos are transcoded to H.264 without audio. Lessons show the video when there is one and the picture otherwise. Media spec: 720×960 portrait, videos 2–5 s silent, pictures under 300 KB.
 
 Unit 1 is letters only (A–Ə, F–I, İ–M, N–S, Ş–Z, then practice); facial expressions and fingerspelled words were removed on 2026-11-13. Re-running setup on an older project rewrites Unit 1 and Story 1 and deletes the old facial-expression signs.
 
@@ -113,7 +113,7 @@ Unit 1 is letters only (A–Ə, F–I, İ–M, N–S, Ş–Z, then practice); fa
 
 1. Build `index.csv` (`video_path,sign_id,signer_id[,dominant_hand]`) from the AzSLD annotations.
 2. `python Tools/landmark_extraction/extract_landmarks.py --index index.csv --out refs/ --hand-model hand_landmarker.task --face-model face_landmarker.task`
-3. In Unity: **Çevir > Import Sign References From Folder...**, pick `refs/` and the pack's `SignDictionary`.
+3. In Unity: **Chevir > Import Sign References From Folder...**, pick `refs/` and the pack's `SignDictionary`.
 
 The importer runs the app's own `SignFeatureExtractor`, so reference and live features come from the same code.
 

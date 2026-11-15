@@ -18,6 +18,7 @@ namespace Cevir.Core.UI
         [SerializeField] private TMP_InputField nameField;
         [SerializeField] private TMP_InputField emailField;
         [SerializeField] private TMP_InputField passwordField;
+        [SerializeField] private TMP_InputField codeField;
         [SerializeField] private Button primaryButton;
         [SerializeField] private TextMeshProUGUI primaryLabel;
         [SerializeField] private Button switchButton;
@@ -27,12 +28,24 @@ namespace Cevir.Core.UI
 
         private CloudService _cloud;
         private bool _signUp = true;
+        private bool _reset; // entering the e-mailed code and a new password
         private bool _busy;
 
         private void Awake()
         {
             if (primaryButton != null) primaryButton.onClick.AddListener(Submit);
-            if (switchButton != null) switchButton.onClick.AddListener(() => { _signUp = !_signUp; Message(null, false); Render(); });
+            if (switchButton != null) switchButton.onClick.AddListener(() =>
+            {
+                if (_reset) _reset = false;
+                else _signUp = !_signUp;
+                Message(null, false);
+                Render();
+            });
+            if (codeField != null)
+            {
+                codeField.contentType = TMP_InputField.ContentType.IntegerNumber;
+                codeField.characterLimit = 10;
+            }
             if (forgotButton != null) forgotButton.onClick.AddListener(ForgotPassword);
             if (passwordField != null)
             {
@@ -87,11 +100,19 @@ namespace Cevir.Core.UI
 
         private void Render()
         {
-            if (titleLabel != null) titleLabel.text = _signUp ? UIStrings.SignUpTitle : UIStrings.SignInTitle;
-            if (nameRow != null) nameRow.SetActive(_signUp);
-            if (primaryLabel != null) primaryLabel.text = _busy ? UIStrings.PleaseWait : (_signUp ? UIStrings.SignUpButton : UIStrings.SignInButton);
-            if (switchLabel != null) switchLabel.text = _signUp ? UIStrings.SwitchToSignIn : UIStrings.SwitchToSignUp;
-            if (forgotButton != null) forgotButton.gameObject.SetActive(!_signUp);
+            if (titleLabel != null) titleLabel.text = _reset ? "Yeni şifrə" : _signUp ? UIStrings.SignUpTitle : UIStrings.SignInTitle;
+            if (nameRow != null) nameRow.SetActive(_signUp && !_reset);
+            if (codeField != null) codeField.gameObject.SetActive(_reset);
+            var passwordHint = passwordField != null ? passwordField.placeholder as TextMeshProUGUI : null;
+            if (passwordHint != null) passwordHint.text = _reset ? "Yeni şifrə" : "Şifrə";
+            if (primaryLabel != null)
+            {
+                primaryLabel.text = _busy ? UIStrings.PleaseWait
+                    : _reset ? "ŞİFRƏNİ YENİLƏ" : (_signUp ? UIStrings.SignUpButton : UIStrings.SignInButton);
+            }
+
+            if (switchLabel != null) switchLabel.text = _reset ? "Daxil olmağa qayıt" : _signUp ? UIStrings.SwitchToSignIn : UIStrings.SwitchToSignUp;
+            if (forgotButton != null) forgotButton.gameObject.SetActive(!_signUp && !_reset);
             if (primaryButton != null) primaryButton.interactable = !_busy;
         }
 
@@ -107,6 +128,25 @@ namespace Cevir.Core.UI
             if (password.Length < 6) { Message(UIStrings.NeedPassword, true); return; }
 
             SetBusy(true);
+            if (_reset)
+            {
+                string code = codeField != null ? codeField.text.Trim() : string.Empty;
+                if (code.Length < 6)
+                {
+                    SetBusy(false);
+                    Message("E-poçtuna gələn kodu yaz.", true);
+                    return;
+                }
+
+                _cloud.ResetPasswordWithCode(email, code, password, error =>
+                {
+                    SetBusy(false);
+                    if (error != null) Message(error, true);
+                    else _reset = false;
+                });
+                return;
+            }
+
             if (_signUp)
             {
                 _cloud.SignUp(name, email, password, (error, needsConfirmation) =>
@@ -150,6 +190,14 @@ namespace Cevir.Core.UI
             _cloud.SendPasswordReset(email, error =>
             {
                 SetBusy(false);
+                if (error == null)
+                {
+                    _reset = true;
+                    if (codeField != null) codeField.text = string.Empty;
+                    if (passwordField != null) passwordField.text = string.Empty;
+                    Render();
+                }
+
                 Message(error ?? UIStrings.ResetSent, error != null);
             });
         }

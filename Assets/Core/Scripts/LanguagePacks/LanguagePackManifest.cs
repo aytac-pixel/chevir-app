@@ -11,7 +11,7 @@ namespace Cevir.Core.LanguagePacks
     public sealed class LanguagePackManifest
     {
         public string languageCode = "azsld";
-        public string displayName = "Azərbaycan İşarət Dili";
+        public string displayName = "Azərbaycan İşarə Dili";
         public string englishName = "Azerbaijani Sign Language";
 
         /// <summary>Two-letter badge shown in the home top bar, e.g. "AZ". Empty = derived from the code.</summary>

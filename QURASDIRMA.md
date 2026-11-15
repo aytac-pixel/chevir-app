@@ -1,4 +1,4 @@
-# Çevir: telefona quraşdırma
+# Chevir: telefona quraşdırma
 
 Bu qovluq tam Unity layihəsidir. Aşağıdakı addımlarla Android telefonda (və ya iPhone-da) işləyən tətbiq alırsan.
 
@@ -22,7 +22,7 @@ El və üz modelləri (`hand_landmarker`, `face_landmarker`) layihəyə artıq d
 ## 3. Layihəni aç və bir kliklə qur
 
 1. Unity Hub > **Add** > bu qovluğu seç və aç (ilk açılış bir neçə dəqiqə çəkir).
-2. Menyuda **Çevir > Setup > 1. Configure Mobile Project (one click)**.
+2. Menyuda **Chevir > Setup > 1. Configure Mobile Project (one click)**.
    - TextMeshPro resursları idxal olunarsa, eyni menyunu bir dəfə də bas.
    - Bu addım AzSLD dil paketini (A1 səviyyəsi, 10 bölmə, 10 hekayə), Nunito şriftini (Ə daxil), əsas səhnəni (`Assets/Scenes/Main.unity`), dörd əsas ekranı (Dərs, Hekayə, Liqa, Profil), giriş/qeydiyyat ekranını, dərs və hekayə ekranlarını, Android/iOS ayarlarını (portret, kamera və internet icazəsi, loqodan tətbiq ikonu, `com.chevirapp.cevir`) hazırlayır.
 3. **Play** düyməsinə bas. Verilənlər bazası qoşulubsa (aşağıda, 3a), əvvəlcə qeydiyyat/giriş ekranı açılır; sonra Dərs ekranı, 1-ci bölmə (Əlifba: 32 hərf, 5 dərs + təkrar) aktivdir. Kompüterin kamerası ilə də yoxlaya bilərsən.
@@ -32,10 +32,11 @@ El və üz modelləri (`hand_landmarker`, `face_landmarker`) layihəyə artıq d
 Tətbiq istifadəçiləri, onların irəliləyişini və liqa reytinqini Supabase-də saxlayır (pulsuz plan kifayətdir).
 
 1. supabase.com-da hesab aç, **New project** yarat (region: Frankfurt / eu-central yaxındır). Verilənlər bazası şifrəsini bir yerdə saxla.
-2. Layihədə **SQL Editor > New query**, `Tools/supabase/schema.sql` faylının bütün mətnini yapışdır və **Run** bas. Cədvəllər, giriş qaydaları və liqa funksiyaları yaranır (təkrar işə salmaq təhlükəsizdir).
+2. Layihədə **SQL Editor > New query**, `Tools/supabase/schema.sql` faylının bütün mətnini yapışdır və **Run** bas. Cədvəllər, giriş qaydaları, liqa funksiyaları, profil şəkilləri üçün `avatars` qovluğu və hesabı silmə funksiyası yaranır (təkrar işə salmaq təhlükəsizdir).
 3. **Project Settings > API** (və ya *Data API*) bölməsindən **Project URL** və **anon public** açarını götür.
-4. Unity-də `Assets/Core/Resources/CevirCloudConfig.asset` faylını seç və bu iki dəyəri *Supabase Url* və *Anon Key* xanalarına yapışdır. Bu açar açıq (public) açardır, tətbiqə yazmaq olar; **service_role** açarını heç vaxt tətbiqə qoyma.
-5. **Authentication > Sign In / Providers > Email**: test zamanı *Confirm email* seçimini söndürsən, qeydiyyatdan dərhal sonra giriş olur. Açıq qalsa, istifadəçi e-poçtuna gələn linki açıb sonra daxil olur. Bu halda *Authentication > URL Configuration* bölməsində Site URL olaraq `https://chevirapp.com` yaz.
+4. Bu iki dəyəri `Assets/Core/Resources/cevir_cloud.json` faylına yaz (`supabaseUrl`, `anonKey`). Bu açar açıq (public) açardır, tətbiqə yazmaq olar; **service_role** açarını heç vaxt tətbiqə qoyma.
+5. **Authentication > Sign In / Providers > Email**: *Confirm email* açıqdır, istifadəçi e-poçtuna gələn linki açıb sonra daxil olur. *Authentication > URL Configuration* bölməsində Site URL olaraq `https://chevirapp.com` yaz.
+6. **Authentication > Emails > Reset password** şablonuna `{{ .Token }}` əlavə et: şifrəni unudan istifadəçi e-poçtdakı 6 rəqəmli kodu tətbiqə yazıb yeni şifrə qoyur.
 
 Bu addım edilməsə tətbiq yalnız telefonda işləyir: hesab, sinxronizasiya və liqa reytinqi olmur (Unity konsolunda xəbərdarlıq çıxır).
 
@@ -43,17 +44,17 @@ Bu addım edilməsə tətbiq yalnız telefonda işləyir: hesab, sinxronizasiya 
 
 **Android (APK):**
 1. *File > Build Settings > Android > Switch Platform* (bir dəfəlik).
-2. **Çevir > Build > Android APK (install on phone)**. Fayl: `Builds/Android/Cevir.apk`.
+2. **Chevir > Build > Android APK (install on phone)**. Fayl: `Builds/Android/Cevir.apk`.
 3. APK-ni telefona köçür və aç (telefonda "naməlum mənbələrdən quraşdırma"ya icazə ver). Və ya telefonu USB ilə qoşub *File > Build And Run*.
 
-**iPhone:** Mac-da **Çevir > Build > iOS Xcode Project**, sonra `Builds/iOS` qovluğunu Xcode-da aç, öz Apple hesabınla imzala və telefona yüklə.
+**iPhone:** Mac-da **Chevir > Build > iOS Xcode Project**, sonra `Builds/iOS` qovluğunu Xcode-da aç, öz Apple hesabınla imzala və telefona yüklə.
 
-**Google Play üçün:** **Çevir > Build > Android App Bundle (Google Play)**. Yayından əvvəl öz imza açarını (*Player Settings > Publishing Settings > Keystore*) yarat.
+**Google Play üçün:** **Chevir > Build > Android App Bundle (Google Play)**. Yayından əvvəl öz imza açarını (*Player Settings > Publishing Settings > Keystore*) yarat.
 
 ## 4a. Şəkil və videoları əlavə etmək
 
 1. Faylları `Assets/LanguagePacks/AzSLD/Media/` qovluğuna, siyahıdakı kimi qoy: məs. `Media/A1/U01_Elifba/herf_a.png`.
-2. Unity-də **Çevir > AzSLD > Import Media (pictures and videos)** (və ya **Çevir > Setup Project**). Konsolda neçə faylın bağlandığı və hansı adların heç bir işarəyə uyğun gəlmədiyi yazılır.
+2. Unity-də **Chevir > AzSLD > Import Media (pictures and videos)** (və ya **Chevir > Setup Project**). Konsolda neçə faylın bağlandığı və hansı adların heç bir işarəyə uyğun gəlmədiyi yazılır.
 3. Qayda: `<ad>.png/.jpg` şəkil, `<ad>.mp4` video, `<ad>_yavas.mp4` yavaş video. Adlar `kurikulum/Media_siyahisi_A1_A2.csv` ilə eynidir (herf_ch, herf_i_noqtesiz, sagh_ol...). Alt qovluq vacib deyil, yalnız fayl adı uyğunlaşdırılır.
 4. Ölçü: 720×960 (3:4, şaquli). Video H.264, səssiz, 2–5 san. Şəkil 300 KB-dan az.
 

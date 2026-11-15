@@ -24,7 +24,9 @@ concurrency:
 
 env:
   RELEASE_TAG: demo
-  APK_NAME: Cevir.apk
+  APK_NAME: Chevir.apk
+  # Older download link that is already shared; the same APK is also published under this name.
+  OLD_APK_NAME: Cevir.apk
 
 jobs:
   android:
@@ -92,11 +94,12 @@ jobs:
           apk="$(ls Builds/Android/*.apk | head -n 1)"
           mkdir -p release
           cp "$apk" "release/$APK_NAME"
+          cp "$apk" "release/$OLD_APK_NAME"
           ls -lh release
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Cevir-Android-APK
+          name: Chevir-Android-APK
           path: release/${{ env.APK_NAME }}
           if-no-files-found: error
 
@@ -108,7 +111,7 @@ jobs:
           built_at="$(TZ=Asia/Baku date '+%d.%m.%Y %H:%M')"
           version="0.1.${GITHUB_RUN_NUMBER}"
           cat > notes.md <<EOF
-          ## Çevir — Android APK
+          ## Chevir — Android APK
 
           **Yüklə:** [${APK_NAME}](https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/${APK_NAME})
 
@@ -128,8 +131,8 @@ jobs:
           git push -f origin "refs/tags/$RELEASE_TAG"
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release edit "$RELEASE_TAG" --title "Çevir ${version} — Android APK" --notes-file notes.md --latest --draft=false --prerelease=false
+            gh release edit "$RELEASE_TAG" --title "Chevir ${version} — Android APK" --notes-file notes.md --latest --draft=false --prerelease=false
           else
-            gh release create "$RELEASE_TAG" --title "Çevir ${version} — Android APK" --notes-file notes.md --latest
+            gh release create "$RELEASE_TAG" --title "Chevir ${version} — Android APK" --notes-file notes.md --latest
           fi
-          gh release upload "$RELEASE_TAG" "release/$APK_NAME" --clobber
+          gh release upload "$RELEASE_TAG" "release/$APK_NAME" "release/$OLD_APK_NAME" --clobber

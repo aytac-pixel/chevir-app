@@ -39,7 +39,7 @@ namespace Cevir.Core.UI
             _game = GameManager.Instance;
             if (_game == null)
             {
-                Debug.LogError("[Çevir] CevirUIRoot needs a GameManager in the scene.");
+                Debug.LogError("[Chevir] CevirUIRoot needs a GameManager in the scene.");
                 return;
             }
 

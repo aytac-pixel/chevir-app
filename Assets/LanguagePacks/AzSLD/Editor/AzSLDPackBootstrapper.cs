@@ -280,7 +280,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             }
         };
 
-        [MenuItem("Çevir/AzSLD/Create Or Update Pack Skeleton")]
+        [MenuItem("Chevir/AzSLD/Create Or Update Pack Skeleton")]
         public static void Create()
         {
             CreateInternal();
@@ -320,11 +320,11 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             var registry = CevirAssetUtility.LoadOrCreate<LanguagePackRegistry>(CoreData + "/LanguagePackRegistry.asset");
             AddToRegistry(registry, pack);
 
-            Debug.Log("[Çevir] AzSLD pack ready: A1 with " + units.Count + " units, " + dictionary.Signs.Count + " signs, " +
+            Debug.Log("[Chevir] AzSLD pack ready: A1 with " + units.Count + " units, " + dictionary.Signs.Count + " signs, " +
                       pack.Stories.Count + " stories.");
         }
 
-        [MenuItem("Çevir/AzSLD/Import Media (pictures and videos)")]
+        [MenuItem("Chevir/AzSLD/Import Media (pictures and videos)")]
         public static void ImportMedia()
         {
             var dictionary = AssetDatabase.LoadAssetAtPath<SignDictionary>(Root + "/Signs/AzSLD_SignDictionary.asset");
@@ -343,12 +343,12 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             if (!AssetDatabase.IsValidFolder(MediaRoot))
             {
                 AssetDatabase.CreateFolder(Root, "Media");
-                Debug.Log("[Çevir] Created " + MediaRoot + ". Copy media here, e.g. A1/U01_Elifba/herf_a.png, then run Çevir > AzSLD > Import Media.");
+                Debug.Log("[Chevir] Created " + MediaRoot + ". Copy media here, e.g. A1/U01_Elifba/herf_a.png, then run Chevir > AzSLD > Import Media.");
                 return;
             }
 
             SignMediaImporter.Report report = SignMediaImporter.Import(dictionary, MediaRoot, AzSLDLanguagePack.MediaSlug);
-            Debug.Log("[Çevir] AzSLD media: " + report);
+            Debug.Log("[Chevir] AzSLD media: " + report);
             ImportReferencesInternal(dictionary);
         }
 
@@ -362,7 +362,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             string folder = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "../Tools/references/azsld"));
             if (!System.IO.Directory.Exists(folder)) return;
             int count = SignReferenceImporter.ImportFolder(folder, dictionary, Root + "/Signs/References", AzSLDLanguagePack.MediaSlug);
-            Debug.Log("[Çevir] AzSLD sign references: " + count + " imported from " + folder);
+            Debug.Log("[Chevir] AzSLD sign references: " + count + " imported from " + folder);
         }
 
         /// <summary>Signs no longer in A1: Unit 1 facial expressions and the words taken out of Unit 2.</summary>
@@ -701,12 +701,12 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                         beat.pose = beats.Count == 0 ? NpcPose.Wave : NpcPose.Idle;
                         beat.npcSigns = Signs(words, part[3].Split(';'));
                         if (beat.npcSigns.Count < part[3].Split(';').Length)
-                            Debug.LogWarning("[Çevir] Story " + number + ": a sign in \"" + part[3] + "\" is not in the dictionary.");
+                            Debug.LogWarning("[Chevir] Story " + number + ": a sign in \"" + part[3] + "\" is not in the dictionary.");
                         break;
                     case "you":
                         beat.type = StoryBeatType.LearnerSign;
                         SignDefinition expected;
-                        if (!words.TryGetValue(part[3], out expected)) Debug.LogWarning("[Çevir] Story " + number + ": no sign \"" + part[3] + "\".");
+                        if (!words.TryGetValue(part[3], out expected)) Debug.LogWarning("[Chevir] Story " + number + ": no sign \"" + part[3] + "\".");
                         beat.expectedSign = expected;
                         break;
                     default:
@@ -744,7 +744,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         private static Sprite LoadSprite(string name)
         {
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(StorySprites + "/" + name + ".png");
-            if (sprite == null) Debug.LogWarning("[Çevir] Story sprite not found (is it imported as a Sprite?): " + name);
+            if (sprite == null) Debug.LogWarning("[Chevir] Story sprite not found (is it imported as a Sprite?): " + name);
             return sprite;
         }
 

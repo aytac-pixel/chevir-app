@@ -18,7 +18,7 @@ using Object = UnityEngine.Object;
 namespace Cevir.Core.Editor
 {
     /// <summary>
-    /// Generates the whole Çevir UI in the open scene: systems (GameManager, AudioManager, camera provider,
+    /// Generates the whole Chevir UI in the open scene: systems (GameManager, AudioManager, camera provider,
     /// SignPracticeController), EventSystem, a portrait Canvas with the four tab screens (Home, Stories, League,
     /// Profile) and the bottom tab bar, the lesson screen with its feedback overlay, the first-person story screen,
     /// and the prefabs the screens instantiate (unit node, story card, league row, letter tile). Every serialized
@@ -27,8 +27,8 @@ namespace Cevir.Core.Editor
     /// </summary>
     public static partial class CevirUIBuilder
     {
-        private const string UiRootName = "Çevir UI";
-        private const string SystemsName = "Çevir Systems";
+        private const string UiRootName = "Chevir UI";
+        private const string SystemsName = "Chevir Systems";
         private const string PrefabFolder = "Assets/Core/Prefabs/UI";
         private const string DataFolder = "Assets/Core/Data";
         private const string FontFolder = "Assets/Core/Fonts";
@@ -41,7 +41,7 @@ namespace Cevir.Core.Editor
         private static TMP_FontAsset _font;
         private static readonly List<string> Problems = new List<string>();
 
-        [MenuItem("Çevir/UI/Generate Complete UI Hierarchy")]
+        [MenuItem("Chevir/UI/Generate Complete UI Hierarchy")]
         private static void GenerateMenu()
         {
             Generate(true);
@@ -56,7 +56,7 @@ namespace Cevir.Core.Editor
             GameObject existing = GameObject.Find(UiRootName);
             if (existing != null)
             {
-                if (interactive && !EditorUtility.DisplayDialog("Çevir UI", "Replace the existing generated UI in this scene?", "Replace", "Cancel")) return false;
+                if (interactive && !EditorUtility.DisplayDialog("Chevir UI", "Replace the existing generated UI in this scene?", "Replace", "Cancel")) return false;
                 Undo.DestroyObjectImmediate(existing);
             }
 
@@ -83,7 +83,11 @@ namespace Cevir.Core.Editor
             LessonScreenUI lesson = BuildLessonScreen(safe, practice);
             StoryScreenUI story = BuildStoryScreen(safe, practice, theme);
             ToastUI toast = BuildToast(safe);
+            BuildRuntimePanel<AccountSettingsUI>(canvasGo.transform, "AccountSettingsLayer", theme);
+            BuildRuntimePanel<ReminderSettingsUI>(canvasGo.transform, "ReminderSettingsLayer", theme);
             BuildAuthScreen(canvasGo.transform);
+            toast.transform.SetParent(canvasGo.transform, false); // above the full-screen panels, so their messages show
+            toast.transform.SetAsLastSibling();
 
             CevirUIRoot root = canvasGo.AddComponent<CevirUIRoot>();
             Set(root, "tabBar", tabBar);
@@ -100,18 +104,18 @@ namespace Cevir.Core.Editor
             lesson.gameObject.SetActive(false);
             story.gameObject.SetActive(false);
 
-            Undo.RegisterCreatedObjectUndo(canvasGo, "Generate Çevir UI");
+            Undo.RegisterCreatedObjectUndo(canvasGo, "Generate Chevir UI");
             EditorSceneManager.MarkSceneDirty(canvasGo.scene);
             Selection.activeGameObject = canvasGo;
             AssetDatabase.SaveAssets();
 
             if (Problems.Count == 0)
             {
-                Debug.Log("[Çevir] UI generated and wired. Press Play to see the Home screen.");
+                Debug.Log("[Chevir] UI generated and wired. Press Play to see the Home screen.");
             }
             else
             {
-                Debug.LogWarning("[Çevir] UI generated with notes:\n- " + string.Join("\n- ", Problems.ToArray()));
+                Debug.LogWarning("[Chevir] UI generated with notes:\n- " + string.Join("\n- ", Problems.ToArray()));
             }
 
             return true;
@@ -145,8 +149,8 @@ namespace Cevir.Core.Editor
             if (_font == null)
             {
                 const string message = "TextMeshPro resources are missing. Run Window > TextMeshPro > Import TMP Essential Resources, then try again.";
-                if (interactive) EditorUtility.DisplayDialog("Çevir UI", message, "OK");
-                else Debug.LogError("[Çevir] " + message);
+                if (interactive) EditorUtility.DisplayDialog("Chevir UI", message, "OK");
+                else Debug.LogError("[Chevir] " + message);
                 return false;
             }
 
@@ -161,13 +165,13 @@ namespace Cevir.Core.Editor
             if (systems == null)
             {
                 systems = new GameObject(SystemsName);
-                Undo.RegisterCreatedObjectUndo(systems, "Create Çevir systems");
+                Undo.RegisterCreatedObjectUndo(systems, "Create Chevir systems");
             }
 
             GameManager game = Object.FindFirstObjectByType<GameManager>();
             if (game == null) game = systems.AddComponent<GameManager>();
             if (GetRef(game, "registry") == null) Set(game, "registry", FindAsset<LanguagePackRegistry>(),
-                "No LanguagePackRegistry asset found. Run Çevir > AzSLD > Create Or Update Pack Skeleton.");
+                "No LanguagePackRegistry asset found. Run Chevir > AzSLD > Create Or Update Pack Skeleton.");
             if (GetRef(game, "gamificationConfig") == null) Set(game, "gamificationConfig", FindAsset<GamificationConfig>());
 
             if (Object.FindFirstObjectByType<AudioManager>() == null) systems.AddComponent<AudioManager>();
@@ -219,6 +223,7 @@ namespace Cevir.Core.Editor
             scaler.referenceResolution = ReferenceResolution;
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0f; // portrait phones: layouts are designed for a 1080-unit width
+            go.AddComponent<AdaptiveCanvasScaler>(); // blends towards the height on short / wide screens
             go.AddComponent<GraphicRaycaster>();
 
             // Soft sky background behind everything, including the notch area outside the safe area.
@@ -231,6 +236,25 @@ namespace Cevir.Core.Editor
             Stretch(safe);
             safe.gameObject.AddComponent<SafeAreaFitter>();
             return go;
+        }
+
+        /// <summary>
+        /// Full-screen panel that builds its own content at runtime (account settings, reminders): an always-active
+        /// layer with the component, given the app font, theme, background and icons.
+        /// </summary>
+        private static T BuildRuntimePanel<T>(Transform canvas, string name, CevirTheme theme) where T : MonoBehaviour
+        {
+            RectTransform layer = Rect(name, canvas);
+            Stretch(layer);
+            T ui = layer.gameObject.AddComponent<T>();
+            Set(ui, "font", _font);
+            Set(ui, "theme", theme);
+            Set(ui, "background", Sprite("UI", "app_background"));
+            Set(ui, "iconBack", IconSprite("chevron_left"));
+            Set(ui, "iconBell", IconSprite("bell"));
+            if (typeof(T) == typeof(AccountSettingsUI)) Set(ui, "iconUser", IconSprite("user"));
+
+            return ui;
         }
 
         // ================================================================== lesson screen

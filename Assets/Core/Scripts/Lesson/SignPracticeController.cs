@@ -73,7 +73,7 @@ namespace Cevir.Core.Lesson
             _provider = landmarkProvider as ILandmarkProvider;
             if (landmarkProvider != null && _provider == null)
             {
-                Debug.LogError("[Çevir] " + landmarkProvider.name + " does not implement ILandmarkProvider.");
+                Debug.LogError("[Chevir] " + landmarkProvider.name + " does not implement ILandmarkProvider.");
             }
         }
 
@@ -163,7 +163,7 @@ namespace Cevir.Core.Lesson
         {
             if (_matcher == null)
             {
-                Debug.LogError("[Çevir] SignPracticeController.Configure must be called before an attempt.");
+                Debug.LogError("[Chevir] SignPracticeController.Configure must be called before an attempt.");
                 return;
             }
 

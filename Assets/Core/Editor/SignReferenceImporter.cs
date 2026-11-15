@@ -49,7 +49,7 @@ namespace Cevir.Core.Editor
             public float[] face = new float[0];
         }
 
-        [MenuItem("Çevir/Import Sign References From Folder...")]
+        [MenuItem("Chevir/Import Sign References From Folder...")]
         private static void ImportMenu()
         {
             string jsonFolder = EditorUtility.OpenFolderPanel("Folder with landmark JSON files", "", "");
@@ -61,13 +61,13 @@ namespace Cevir.Core.Editor
             var dictionary = AssetDatabase.LoadAssetAtPath<SignDictionary>(dictionaryPath);
             if (dictionary == null)
             {
-                Debug.LogError("[Çevir] Not a SignDictionary: " + dictionaryPath);
+                Debug.LogError("[Chevir] Not a SignDictionary: " + dictionaryPath);
                 return;
             }
 
             string packRoot = Path.GetDirectoryName(Path.GetDirectoryName(dictionaryPath)).Replace('\\', '/');
             int count = ImportFolder(jsonFolder, dictionary, packRoot + "/Signs/References");
-            Debug.Log("[Çevir] Imported " + count + " sign references.");
+            Debug.Log("[Chevir] Imported " + count + " sign references.");
         }
 
         /// <param name="slugOf">Optional: the pack's media naming rule, to resolve files that carry a mediaSlug instead of a sign id.</param>
@@ -94,7 +94,7 @@ namespace Cevir.Core.Editor
             {
                 for (int i = 0; i < files.Length; i++)
                 {
-                    EditorUtility.DisplayProgressBar("Çevir", Path.GetFileName(files[i]), i / (float)files.Length);
+                    EditorUtility.DisplayProgressBar("Chevir", Path.GetFileName(files[i]), i / (float)files.Length);
                     RawFile raw = JsonUtility.FromJson<RawFile>(File.ReadAllText(files[i]));
                     if (raw == null || raw.frames.Count < 2) continue;
 
@@ -102,7 +102,7 @@ namespace Cevir.Core.Editor
                     if (sign == null && bySlug != null && !string.IsNullOrEmpty(raw.mediaSlug)) bySlug.TryGetValue(raw.mediaSlug, out sign);
                     if (sign == null)
                     {
-                        Debug.LogWarning("[Çevir] No sign '" + (raw.signId ?? raw.mediaSlug) + "' in dictionary; skipped " + files[i]);
+                        Debug.LogWarning("[Chevir] No sign '" + (raw.signId ?? raw.mediaSlug) + "' in dictionary; skipped " + files[i]);
                         continue;
                     }
 

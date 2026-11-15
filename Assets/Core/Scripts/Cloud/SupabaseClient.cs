@@ -85,6 +85,37 @@ namespace Cevir.Core.Cloud
             Send("POST", "/auth/v1/recover", JsonUtility.ToJson(new EmailOnly { email = email }), null, false, done);
         }
 
+        /// <summary>Signs in with the 6-digit code from the password reset e-mail (the learner then sets a new password).</summary>
+        public void VerifyRecoveryCode(string email, string code, Action<CloudResponse> done)
+        {
+            var body = new VerifyRequest { type = "recovery", email = email, token = code };
+            Send("POST", "/auth/v1/verify", JsonUtility.ToJson(body), null, false, response =>
+            {
+                if (response.Ok && !ApplyAuth(response.Body)) response.Error = CloudErrors.Unknown;
+                done(response);
+            });
+        }
+
+        /// <summary>Changes the signed-in user's password and / or e-mail (PUT /auth/v1/user).</summary>
+        public void UpdateUser(string json, Action<CloudResponse> done)
+        {
+            Authorized(() => Send("PUT", "/auth/v1/user", json, null, true, response =>
+            {
+                if (response.Ok && _session != null)
+                {
+                    AuthUser user = Parse<AuthUser>(response.Body);
+                    if (user != null && !string.IsNullOrEmpty(user.email) && user.email != _session.email)
+                    {
+                        _session.email = user.email;
+                        PlayerPrefs.SetString(PrefsKey, JsonUtility.ToJson(_session));
+                        PlayerPrefs.Save();
+                    }
+                }
+
+                done(response);
+            }), done);
+        }
+
         public void SignOut()
         {
             if (HasSession)
@@ -183,6 +214,24 @@ namespace Cevir.Core.Cloud
             Authorized(() => Send("POST", "/rest/v1/rpc/" + function, json ?? "{}", null, true, done), done);
         }
 
+        /// <summary>Uploads (or replaces) a file in a storage bucket as the signed-in user.</summary>
+        public void UploadFile(string bucket, string path, byte[] data, string contentType, Action<CloudResponse> done)
+        {
+            var headers = new Dictionary<string, string> { { "x-upsert", "true" }, { "Cache-Control", "max-age=60" } };
+            Authorized(() => SendRaw("POST", "/storage/v1/object/" + bucket + "/" + path, data, contentType, headers, true, done), done);
+        }
+
+        public void DeleteFile(string bucket, string path, Action<CloudResponse> done)
+        {
+            Authorized(() => Send("DELETE", "/storage/v1/object/" + bucket + "/" + path, null, null, true, done), done);
+        }
+
+        /// <summary>Address of a file in a public bucket (no token needed to read it).</summary>
+        public string PublicFileUrl(string bucket, string path)
+        {
+            return _config.BaseUrl + "/storage/v1/object/public/" + bucket + "/" + path;
+        }
+
         private void Authorized(Action call, Action<CloudResponse> fail)
         {
             EnsureFreshToken(ok =>
@@ -196,24 +245,30 @@ namespace Cevir.Core.Cloud
 
         private void Send(string method, string path, string json, Dictionary<string, string> headers, bool asUser, Action<CloudResponse> done)
         {
+            SendRaw(method, path, json != null ? Encoding.UTF8.GetBytes(json) : null, "application/json", headers, asUser, done);
+        }
+
+        private void SendRaw(string method, string path, byte[] body, string contentType, Dictionary<string, string> headers, bool asUser,
+            Action<CloudResponse> done)
+        {
             if (_host == null || !_host.isActiveAndEnabled)
             {
                 done(new CloudResponse { Error = CloudErrors.Network, IsNetworkError = true });
                 return;
             }
 
-            _host.StartCoroutine(SendRoutine(method, path, json, headers, asUser, done));
+            _host.StartCoroutine(SendRoutine(method, path, body, contentType, headers, asUser, done));
         }
 
-        private IEnumerator SendRoutine(string method, string path, string json, Dictionary<string, string> headers, bool asUser,
-            Action<CloudResponse> done)
+        private IEnumerator SendRoutine(string method, string path, byte[] body, string contentType, Dictionary<string, string> headers,
+            bool asUser, Action<CloudResponse> done)
         {
             using (var request = new UnityWebRequest(_config.BaseUrl + path, method))
             {
-                if (json != null)
+                if (body != null)
                 {
-                    request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
-                    request.SetRequestHeader("Content-Type", "application/json");
+                    request.uploadHandler = new UploadHandlerRaw(body);
+                    request.SetRequestHeader("Content-Type", contentType);
                 }
 
                 request.downloadHandler = new DownloadHandlerBuffer();
@@ -242,7 +297,7 @@ namespace Cevir.Core.Cloud
                 else if (request.responseCode < 200 || request.responseCode >= 300)
                 {
                     response.Error = CloudErrors.FromBody(response.Body, request.responseCode);
-                    Debug.LogWarning("[Çevir] Server " + method + " " + path.Split('?')[0] + " -> " + request.responseCode + ": " + response.Body);
+                    Debug.LogWarning("[Chevir] Server " + method + " " + path.Split('?')[0] + " -> " + request.responseCode + ": " + response.Body);
                 }
 
                 done(response);

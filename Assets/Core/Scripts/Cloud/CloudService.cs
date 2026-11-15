@@ -34,6 +34,7 @@ namespace Cevir.Core.Cloud
         private bool _synced;
         private float _nextRetry;
         private string _pendingName;
+        private const string PendingNameKey = "cevir.auth.pendingName";
 
         public static CloudService Instance { get; private set; }
 
@@ -64,7 +65,7 @@ namespace Cevir.Core.Cloud
             if (_config == null || !_config.IsConfigured)
             {
                 State = CloudState.Disabled;
-                Debug.LogWarning("[Çevir] Server not configured (Assets/Core/Resources/CevirCloudConfig.asset): accounts, sync and the " +
+                Debug.LogWarning("[Chevir] Server not configured (Assets/Core/Resources/CevirCloudConfig.asset): accounts, sync and the " +
                                  "league ranking are off. See QURASDIRMA.md, section 'Verilənlər bazası'.");
                 return;
             }
@@ -134,6 +135,8 @@ namespace Cevir.Core.Cloud
 
                 // The name typed at sign-up is the learner's name in the app and on the league table.
                 _pendingName = name;
+                PlayerPrefs.SetString(PendingNameKey, name); // kept until the first sign-in (after e-mail confirmation)
+                PlayerPrefs.Save();
                 if (signedIn) OnSignedIn();
                 done(null, !signedIn);
             });
@@ -171,6 +174,136 @@ namespace Cevir.Core.Cloud
             _client.SendPasswordReset(email.Trim(), response => done(response.Ok ? null : response.Error));
         }
 
+        /// <summary>After "forgot password": signs in with the e-mailed 6-digit code and sets the new password.</summary>
+        public void ResetPasswordWithCode(string email, string code, string newPassword, Action<string> done)
+        {
+            if (_client == null)
+            {
+                done(CloudErrors.Unknown);
+                return;
+            }
+
+            _client.VerifyRecoveryCode(email.Trim(), code.Trim(), response =>
+            {
+                if (!response.Ok)
+                {
+                    done(response.Error);
+                    return;
+                }
+
+                _client.UpdateUser(JsonUtility.ToJson(new PasswordUpdate { password = newPassword }), update =>
+                {
+                    OnSignedIn();
+                    done(update.Ok ? null : update.Error);
+                });
+            });
+        }
+
+        public void ChangePassword(string newPassword, Action<string> done)
+        {
+            if (_client == null || !_client.HasSession)
+            {
+                done(CloudErrors.SignedOut);
+                return;
+            }
+
+            _client.UpdateUser(JsonUtility.ToJson(new PasswordUpdate { password = newPassword }), r => done(r.Ok ? null : r.Error));
+        }
+
+        /// <summary>Changes the e-mail. With confirmation on, the change applies after the link in the new inbox is opened.</summary>
+        public void ChangeEmail(string newEmail, Action<string, bool> done)
+        {
+            if (_client == null || !_client.HasSession)
+            {
+                done(CloudErrors.SignedOut, false);
+                return;
+            }
+
+            string before = _client.Email;
+            _client.UpdateUser(JsonUtility.ToJson(new EmailUpdate { email = newEmail.Trim() }), r =>
+            {
+                if (!r.Ok)
+                {
+                    done(r.Error, false);
+                    return;
+                }
+
+                bool pending = _client.Email == before;
+                if (StateChanged != null) StateChanged(State);
+                done(null, pending);
+            });
+        }
+
+        /// <summary>Uploads the profile photo (JPEG) to the "avatars" bucket and stores its address in the profile.</summary>
+        public void UploadAvatar(byte[] jpeg, Action<string> done)
+        {
+            if (_client == null || !_client.HasSession)
+            {
+                done(null); // no account: the photo stays on this phone only
+                return;
+            }
+
+            string path = _client.UserId + "/avatar.jpg";
+            _client.UploadFile("avatars", path, jpeg, "image/jpeg", r =>
+            {
+                if (!r.Ok)
+                {
+                    done(r.Error);
+                    return;
+                }
+
+                _game.SetAvatarUrl(_client.PublicFileUrl("avatars", path) + "?v=" + DateTime.UtcNow.Ticks);
+                done(null);
+            });
+        }
+
+        public void RemoveAvatar(Action<string> done)
+        {
+            if (_client == null || !_client.HasSession)
+            {
+                done(null);
+                return;
+            }
+
+            _client.DeleteFile("avatars", _client.UserId + "/avatar.jpg", r =>
+            {
+                _game.SetAvatarUrl(string.Empty);
+                done(r.Ok || r.Status == 404 || r.Status == 400 ? null : r.Error);
+            });
+        }
+
+        /// <summary>Deletes the account and everything stored for it on the server, then signs out.</summary>
+        public void DeleteAccount(Action<string> done)
+        {
+            if (_client == null || !_client.HasSession)
+            {
+                done(CloudErrors.SignedOut);
+                return;
+            }
+
+            _client.DeleteFile("avatars", _client.UserId + "/avatar.jpg", ignored =>
+            {
+                _client.Rpc("delete_account", "{}", r =>
+                {
+                    if (!r.Ok)
+                    {
+                        done(r.Error);
+                        return;
+                    }
+
+                    _uploadPending = false;
+                    _client.SignOut();
+                    _league.Clear();
+                    _synced = false;
+                    _game.SetServices(_localLeague, null);
+                    _game.ResetLocalProgress();
+                    AvatarStore.Delete();
+                    SetState(CloudState.SignedOut);
+                    done(null);
+                });
+            });
+        }
+
         public void SignOut()
         {
             if (_client == null) return;
@@ -181,11 +314,13 @@ namespace Cevir.Core.Cloud
             _uploadPending = false;
             _game.SetServices(_localLeague, null);
             _game.ResetLocalProgress();
+            AvatarStore.Delete();
             SetState(CloudState.SignedOut);
         }
 
         private void OnSignedIn()
         {
+            if (string.IsNullOrEmpty(_pendingName)) _pendingName = PlayerPrefs.GetString(PendingNameKey, string.Empty);
             _synced = false;
             _game.SetServices(_league, null);
             SetState(CloudState.SignedIn);
@@ -239,6 +374,7 @@ namespace Cevir.Core.Cloud
                 }
 
                 _pendingName = null;
+                PlayerPrefs.DeleteKey(PendingNameKey);
 
                 _synced = true;
                 SettleLeague();
@@ -294,7 +430,11 @@ namespace Cevir.Core.Cloud
                 display_name = PublicName(progress),
                 league_tier = progress.leagueTier,
                 total_xp = progress.xp != null ? progress.xp.total : 0,
-                streak = progress.streak != null ? progress.streak.current : 0
+                streak = progress.streak != null ? progress.streak.current : 0,
+                avatar_url = progress.avatarUrl ?? string.Empty,
+                reminders_on = progress.reminders != null && progress.reminders.enabled,
+                practice_from = progress.reminders != null ? ReminderSettings.Clock(progress.reminders.startMinutes) : null,
+                practice_to = progress.reminders != null ? ReminderSettings.Clock(progress.reminders.endMinutes) : null
             };
 
             _client.Upsert("progress", "user_id", JsonUtility.ToJson(row), r1 =>

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Cevir.Core.Curriculum
 {
     /// <summary>A themed group of lessons, shown on the map as one section with its own header and colour.</summary>
-    [CreateAssetMenu(menuName = "Çevir/Curriculum/Unit", fileName = "Unit_")]
+    [CreateAssetMenu(menuName = "Chevir/Curriculum/Unit", fileName = "Unit_")]
     public sealed class UnitData : CurriculumAsset
     {
         [SerializeField] private Color themeColor = new Color(0.345f, 0.8f, 0.008f);

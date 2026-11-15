@@ -3,7 +3,9 @@
     "rootNamespace": "Cevir.Core",
     "references": [
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.Notifications.Android",
+        "NativeGallery.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

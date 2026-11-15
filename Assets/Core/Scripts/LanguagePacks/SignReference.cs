@@ -8,7 +8,7 @@ namespace Cevir.Core.LanguagePacks
     /// A reference performance of a sign as feature frames, produced offline from dataset videos
     /// (AzSLD) or the app's own recordings. Videos never ship for recognition; only these features do.
     /// </summary>
-    [CreateAssetMenu(menuName = "Çevir/Language Pack/Sign Reference", fileName = "Ref_")]
+    [CreateAssetMenu(menuName = "Chevir/Language Pack/Sign Reference", fileName = "Ref_")]
     public sealed class SignReference : ScriptableObject
     {
         [SerializeField] private string signId;

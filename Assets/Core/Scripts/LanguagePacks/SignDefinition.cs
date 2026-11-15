@@ -16,7 +16,7 @@ namespace Cevir.Core.LanguagePacks
     /// <summary>
     /// One sign in a language pack's dictionary: what to show (clips) and what to check (references + rules).
     /// </summary>
-    [CreateAssetMenu(menuName = "Çevir/Language Pack/Sign Definition", fileName = "Sign_")]
+    [CreateAssetMenu(menuName = "Chevir/Language Pack/Sign Definition", fileName = "Sign_")]
     public sealed class SignDefinition : ScriptableObject
     {
         [Tooltip("Stable id used in save data and reference files, e.g. 'azsld.letter.a' or 'azsld.word.salam'.")]

@@ -30,7 +30,7 @@ namespace Cevir.Core.LanguagePacks
     /// The project plan requires these to be written by sign-language linguists and Deaf community
     /// members, so a rule is only enforced once it is marked approved.
     /// </summary>
-    [CreateAssetMenu(menuName = "Çevir/Language Pack/Non-Manual Rule", fileName = "NMRule_")]
+    [CreateAssetMenu(menuName = "Chevir/Language Pack/Non-Manual Rule", fileName = "NMRule_")]
     public sealed class NonManualRule : ScriptableObject
     {
         [SerializeField] private string ruleId;

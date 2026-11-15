@@ -38,7 +38,7 @@ namespace Cevir.Core.Curriculum
         Review
     }
 
-    [CreateAssetMenu(menuName = "Çevir/Curriculum/Lesson", fileName = "Lesson_")]
+    [CreateAssetMenu(menuName = "Chevir/Curriculum/Lesson", fileName = "Lesson_")]
     public sealed class LessonData : CurriculumAsset
     {
         [SerializeField] private LessonType lessonType = LessonType.Standard;

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Unpacks TextMesh Pro Essential Resources into Assets/ (with their .meta files) for batch-mode builds.
 
-In the editor, Çevir > Setup imports them with Unity's own dialog. In CI the import would only finish
+In the editor, Chevir > Setup imports them with Unity's own dialog. In CI the import would only finish
 after the setup step has already checked for them, so the files are put in place before Unity starts.
 Usage: python3 Tools/setup/install_tmp_essentials.py [version]
 """

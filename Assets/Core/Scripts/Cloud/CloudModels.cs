@@ -54,6 +54,26 @@ namespace Cevir.Core.Cloud
     }
 
     [Serializable]
+    public sealed class VerifyRequest
+    {
+        public string type;
+        public string email;
+        public string token;
+    }
+
+    [Serializable]
+    public sealed class PasswordUpdate
+    {
+        public string password;
+    }
+
+    [Serializable]
+    public sealed class EmailUpdate
+    {
+        public string email;
+    }
+
+    [Serializable]
     public sealed class RefreshGrant
     {
         public string refresh_token;
@@ -81,6 +101,10 @@ namespace Cevir.Core.Cloud
         public int league_tier;
         public int total_xp;
         public int streak;
+        public string avatar_url;
+        public bool reminders_on;
+        public string practice_from;
+        public string practice_to;
     }
 
     [Serializable]

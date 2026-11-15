@@ -4,7 +4,7 @@
 Walks a pack's Media folder (e.g. Assets/LanguagePacks/AzSLD/Media), runs MediaPipe HandLandmarker +
 FaceLandmarker on every video (.mp4) and picture (.jpg/.png), and writes one landmark JSON per file into
 --out. Each JSON names its sign by media file name ("salam", "herf_a"); Unity resolves the name with the
-pack's media naming rule when "Çevir > AzSLD > Create Or Update Pack Skeleton" runs.
+pack's media naming rule when "Chevir > AzSLD > Create Or Update Pack Skeleton" runs.
 
 To keep the files small, only every --stride-th video frame is kept and only the face points the feature
 extractor uses (anchor, brows, eyes, lips) are stored. A picture becomes a short still clip.

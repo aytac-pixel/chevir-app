@@ -7,12 +7,12 @@ using UnityEngine;
 namespace Cevir.LanguagePacks.AzSLD
 {
     /// <summary>
-    /// Azərbaycan İşarət Dili (AzSLD / AİD) pack. Content (levels, signs, references, rules, model) is data
+    /// Azərbaycan İşarə Dili (AzSLD / AİD) pack. Content (levels, signs, references, rules, model) is data
     /// in this folder; this class only supplies AzSLD defaults and ids.
     /// Dataset: AzSLD (ADA University) + the dactyl alphabet dataset. See the licence note in the manifest:
     /// commercial release needs written permission from ADA University first.
     /// </summary>
-    [CreateAssetMenu(menuName = "Çevir/Language Pack/AzSLD Pack", fileName = "AzSLD_LanguagePack")]
+    [CreateAssetMenu(menuName = "Chevir/Language Pack/AzSLD Pack", fileName = "AzSLD_LanguagePack")]
     public sealed class AzSLDLanguagePack : LanguagePackDefinition
     {
         public const string Code = "azsld";
@@ -35,7 +35,7 @@ namespace Cevir.LanguagePacks.AzSLD
         protected override void ApplyDefaults(LanguagePackManifest target)
         {
             target.languageCode = Code;
-            target.displayName = "Azərbaycan İşarət Dili";
+            target.displayName = "Azərbaycan İşarə Dili";
             target.englishName = "Azerbaijani Sign Language";
             target.badge = "AZ";
             target.uiLanguage = "az";

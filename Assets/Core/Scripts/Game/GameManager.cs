@@ -134,6 +134,7 @@ namespace Cevir.Core.Game
             Application.targetFrameRate = 60;
             Initialize(new ProgressStore());
             Cloud.CloudService.Attach(this);
+            Notifications.ReminderService.Attach(this);
         }
 
         /// <summary>Separate from Awake so tests can inject a store.</summary>
@@ -167,7 +168,7 @@ namespace Cevir.Core.Game
                 : (registry != null ? registry.DefaultLanguageCode : "azsld");
             if (!SelectLanguagePack(code))
             {
-                Debug.LogError("[Çevir] No playable language pack found for '" + code + "'. Check the LanguagePackRegistry asset.");
+                Debug.LogError("[Chevir] No playable language pack found for '" + code + "'. Check the LanguagePackRegistry asset.");
             }
 
             SetState(GameState.Map);
@@ -290,6 +291,13 @@ namespace Cevir.Core.Game
         {
             Progress.firstName = (firstName ?? string.Empty).Trim();
             Progress.lastName = (lastName ?? string.Empty).Trim();
+            Save();
+            RaiseProfileChanged();
+        }
+
+        public void SetAvatarUrl(string url)
+        {
+            Progress.avatarUrl = url ?? string.Empty;
             Save();
             RaiseProfileChanged();
         }
@@ -421,7 +429,7 @@ namespace Cevir.Core.Game
             if (!CanStart(node, out reason))
             {
                 LastStartFailure = reason;
-                Debug.LogWarning("[Çevir] Cannot start node " + (node != null ? node.Id : "null") + ": " + reason);
+                Debug.LogWarning("[Chevir] Cannot start node " + (node != null ? node.Id : "null") + ": " + reason);
                 return null;
             }
 
@@ -574,7 +582,7 @@ namespace Cevir.Core.Game
             if (!CanStartStory(story, out reason))
             {
                 LastStartFailure = reason;
-                Debug.LogWarning("[Çevir] Cannot start story " + (story != null ? story.Id : "null") + ": " + reason);
+                Debug.LogWarning("[Chevir] Cannot start story " + (story != null ? story.Id : "null") + ": " + reason);
                 return null;
             }
 

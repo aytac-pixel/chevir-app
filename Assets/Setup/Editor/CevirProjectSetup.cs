@@ -37,13 +37,13 @@ namespace Cevir.Setup.Editor
             "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя" +
             ".,:;!?-–—+%/()·…\"'«» ";
 
-        [MenuItem("Çevir/Setup/1. Configure Mobile Project (one click)", priority = 0)]
+        [MenuItem("Chevir/Setup/1. Configure Mobile Project (one click)", priority = 0)]
         private static void RunMenu()
         {
             if (Run(true))
             {
-                EditorUtility.DisplayDialog("Çevir",
-                    "Layihə hazırdır.\n\nPlay düyməsini bas və ya Çevir > Build > Android APK ilə telefona yığ.", "OK");
+                EditorUtility.DisplayDialog("Chevir",
+                    "Layihə hazırdır.\n\nPlay düyməsini bas və ya Chevir > Build > Android APK ilə telefona yığ.", "OK");
             }
         }
 
@@ -59,7 +59,7 @@ namespace Cevir.Setup.Editor
             if (!BuildMainScene(interactive)) return false;
             ConfigurePlayer();
             AssetDatabase.SaveAssets();
-            Debug.Log("[Çevir] Project configured: scene " + ScenePath + ", bundle id " + BundleId + ".");
+            Debug.Log("[Chevir] Project configured: scene " + ScenePath + ", bundle id " + BundleId + ".");
             return true;
         }
 
@@ -73,9 +73,9 @@ namespace Cevir.Setup.Editor
             AssetDatabase.Refresh();
             if (TMP_Settings.instance != null) return true;
 
-            const string message = "TextMeshPro Essential Resources are being imported. Run Çevir > Setup > 1 again once importing finishes.";
-            if (interactive) EditorUtility.DisplayDialog("Çevir", message, "OK");
-            else Debug.LogError("[Çevir] " + message);
+            const string message = "TextMeshPro Essential Resources are being imported. Run Chevir > Setup > 1 again once importing finishes.";
+            if (interactive) EditorUtility.DisplayDialog("Chevir", message, "OK");
+            else Debug.LogError("[Chevir] " + message);
             return false;
         }
 
@@ -120,7 +120,7 @@ namespace Cevir.Setup.Editor
             var font = AssetDatabase.LoadAssetAtPath<Font>(sourcePath);
             if (font == null)
             {
-                Debug.LogWarning("[Çevir] " + sourcePath + " not found; text falls back to the next font.");
+                Debug.LogWarning("[Chevir] " + sourcePath + " not found; text falls back to the next font.");
                 return null;
             }
 
@@ -137,7 +137,7 @@ namespace Cevir.Setup.Editor
 
             string missing;
             asset.TryAddCharacters(Prewarm, out missing);
-            if (!string.IsNullOrEmpty(missing) && assetPath == FontAssetPath) Debug.LogWarning("[Çevir] Font is missing characters: " + missing);
+            if (!string.IsNullOrEmpty(missing) && assetPath == FontAssetPath) Debug.LogWarning("[Chevir] Font is missing characters: " + missing);
 
             EditorUtility.SetDirty(asset);
             AssetDatabase.SaveAssets();
@@ -154,7 +154,7 @@ namespace Cevir.Setup.Editor
             CloudConfig config = CevirAssetUtility.LoadOrCreate<CloudConfig>(CloudConfigPath);
             if (!config.IsConfigured)
             {
-                Debug.LogWarning("[Çevir] Fill in the Supabase URL and anon key in " + CloudConfigPath +
+                Debug.LogWarning("[Chevir] Fill in the Supabase URL and anon key in " + CloudConfigPath +
                                  " (QURASDIRMA.md: 'Verilənlər bazası'). Until then accounts and the league are off.");
             }
         }
@@ -187,8 +187,8 @@ namespace Cevir.Setup.Editor
 
         private static void ConfigurePlayer()
         {
-            PlayerSettings.companyName = "Çevir";
-            PlayerSettings.productName = "Çevir";
+            PlayerSettings.companyName = "Chevir";
+            PlayerSettings.productName = "Chevir";
             if (string.IsNullOrEmpty(PlayerSettings.bundleVersion) || PlayerSettings.bundleVersion == "0.1" || PlayerSettings.bundleVersion == "1.0")
             {
                 PlayerSettings.bundleVersion = "0.1.0";
@@ -199,7 +199,7 @@ namespace Cevir.Setup.Editor
             // App icon from the logo (all platforms and sizes are scaled from this one 1024 px image).
             var icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AppIconPath);
             if (icon != null) PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown, new[] { icon });
-            else Debug.LogWarning("[Çevir] App icon not found: " + AppIconPath);
+            else Debug.LogWarning("[Chevir] App icon not found: " + AppIconPath);
 
             // Accounts, sync and the league talk to the server.
             PlayerSettings.Android.forceInternetPermission = true;
@@ -218,7 +218,7 @@ namespace Cevir.Setup.Editor
             // iOS
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.iOS, BundleId);
             PlayerSettings.iOS.cameraUsageDescription =
-                "Çevir işarələrini yoxlamaq üçün kameradan istifadə edir. Görüntü telefondan çıxmır.";
+                "Chevir işarələrini yoxlamaq üçün kameradan istifadə edir. Görüntü telefondan çıxmır.";
             PlayerSettings.iOS.targetOSVersionString = "13.0";
         }
     }

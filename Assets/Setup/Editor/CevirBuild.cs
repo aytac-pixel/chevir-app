@@ -12,19 +12,19 @@ namespace Cevir.Setup.Editor
         public const string AndroidAabPath = "Builds/Android/Cevir.aab";
         public const string IosPath = "Builds/iOS";
 
-        [MenuItem("Çevir/Build/Android APK (install on phone)", priority = 10)]
+        [MenuItem("Chevir/Build/Android APK (install on phone)", priority = 10)]
         private static void AndroidApkMenu()
         {
             if (BuildAndroid(false)) EditorUtility.RevealInFinder(AndroidApkPath);
         }
 
-        [MenuItem("Çevir/Build/Android App Bundle (Google Play)", priority = 11)]
+        [MenuItem("Chevir/Build/Android App Bundle (Google Play)", priority = 11)]
         private static void AndroidAabMenu()
         {
             if (BuildAndroid(true)) EditorUtility.RevealInFinder(AndroidAabPath);
         }
 
-        [MenuItem("Çevir/Build/iOS Xcode Project", priority = 12)]
+        [MenuItem("Chevir/Build/iOS Xcode Project", priority = 12)]
         private static void IosMenu()
         {
             if (Build(BuildTarget.iOS, IosPath)) EditorUtility.RevealInFinder(IosPath);
@@ -55,7 +55,7 @@ namespace Cevir.Setup.Editor
 
             PlayerSettings.bundleVersion = "0.1." + number;
             PlayerSettings.Android.bundleVersionCode = number;
-            Debug.Log("[Çevir] Version " + PlayerSettings.bundleVersion + " (code " + number + ").");
+            Debug.Log("[Chevir] Version " + PlayerSettings.bundleVersion + " (code " + number + ").");
         }
 
         public static void CiBuildIos()
@@ -86,11 +86,11 @@ namespace Cevir.Setup.Editor
             BuildSummary summary = report.summary;
             if (summary.result == BuildResult.Succeeded)
             {
-                Debug.Log("[Çevir] Build succeeded: " + path + " (" + (summary.totalSize / (1024 * 1024)) + " MB)");
+                Debug.Log("[Chevir] Build succeeded: " + path + " (" + (summary.totalSize / (1024 * 1024)) + " MB)");
                 return true;
             }
 
-            Debug.LogError("[Çevir] Build " + summary.result + " with " + summary.totalErrors + " error(s). See the Console.");
+            Debug.LogError("[Chevir] Build " + summary.result + " with " + summary.totalErrors + " error(s). See the Console.");
             return false;
         }
     }

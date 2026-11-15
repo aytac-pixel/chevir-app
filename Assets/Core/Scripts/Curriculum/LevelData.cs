@@ -58,7 +58,7 @@ namespace Cevir.Core.Curriculum
     }
 
     /// <summary>A curriculum module, closed by a gate test that unlocks the next level.</summary>
-    [CreateAssetMenu(menuName = "Çevir/Curriculum/Level", fileName = "Level_")]
+    [CreateAssetMenu(menuName = "Chevir/Curriculum/Level", fileName = "Level_")]
     public sealed class LevelData : CurriculumAsset
     {
         [SerializeField] private CurriculumLevel level = CurriculumLevel.Daktil;

@@ -19,8 +19,10 @@ namespace Cevir.Core.Gamification
     }
 
     /// <summary>
-    /// Daily streak: grows when at least one lesson or mini-game is completed on a calendar day.
-    /// Missed days are covered by stored freezes (bought with XP, limited per week); otherwise the streak resets.
+    /// Daily streak (the flame): grows when at least one lesson or mini-game is completed on a calendar day.
+    /// One missed day is forgiven: after 5 days in a row, missing day 6 keeps the flame (the learner gets extra
+    /// reminders), and it goes out only when day 7 is missed as well. Longer gaps are covered by stored freezes
+    /// (bought with XP, limited per week); otherwise the streak resets.
     /// Dates are the device's local calendar days, passed in so the logic is testable.
     /// </summary>
     public sealed class StreakSystem
@@ -40,9 +42,39 @@ namespace Cevir.Core.Gamification
 
         public StreakState State => _state;
 
+        /// <summary>Missed days that do not break the flame.</summary>
+        public const int GraceDays = 1;
+
         public bool IsActiveToday(DateTime today)
         {
             return _state.lastActiveDate == today.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Days since the last active day (0 = today, 1 = yesterday); -1 if never active.</summary>
+        public int DaysSinceActive(DateTime today)
+        {
+            DateTime last;
+            if (!TryParse(_state.lastActiveDate, out last)) return -1;
+            return (today.Date - last).Days;
+        }
+
+        /// <summary>
+        /// True when yesterday was missed and the flame is still burning: it goes out unless the learner practises today.
+        /// </summary>
+        public bool IsAtRisk(DateTime today)
+        {
+            return _state.current > 0 && DaysSinceActive(today) == GraceDays + 1;
+        }
+
+        /// <summary>
+        /// The flame a given future day would still have if the learner does not practise before it:
+        /// the current streak while the gap stays within the grace day, otherwise 0.
+        /// </summary>
+        public int StreakAliveOn(DateTime day)
+        {
+            int since = DaysSinceActive(day);
+            if (_state.current <= 0 || since < 0) return 0;
+            return since <= GraceDays + 1 ? _state.current : 0;
         }
 
         /// <summary>
@@ -57,7 +89,8 @@ namespace Cevir.Core.Gamification
                 return 0;
             }
 
-            int missedDays = (today.Date - last).Days - 1;
+            // One missed day is forgiven; only the days after it count.
+            int missedDays = (today.Date - last).Days - 1 - GraceDays;
             if (missedDays <= 0)
             {
                 return 0;

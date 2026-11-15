@@ -32,7 +32,7 @@ namespace Cevir.Core.Game
             }
             catch (Exception e)
             {
-                Debug.LogError("[Çevir] Could not read progress, starting fresh: " + e.Message);
+                Debug.LogError("[Chevir] Could not read progress, starting fresh: " + e.Message);
             }
 
             return new PlayerProgress();
@@ -47,7 +47,7 @@ namespace Cevir.Core.Game
             }
             catch (Exception e)
             {
-                Debug.LogError("[Çevir] Could not delete progress: " + e.Message);
+                Debug.LogError("[Chevir] Could not delete progress: " + e.Message);
             }
         }
 
@@ -61,7 +61,7 @@ namespace Cevir.Core.Game
             }
             catch (Exception e)
             {
-                Debug.LogError("[Çevir] Could not read cloud progress: " + e.Message);
+                Debug.LogError("[Chevir] Could not read cloud progress: " + e.Message);
                 return null;
             }
         }
@@ -77,7 +77,7 @@ namespace Cevir.Core.Game
             }
             catch (Exception e)
             {
-                Debug.LogError("[Çevir] Could not save progress: " + e.Message);
+                Debug.LogError("[Chevir] Could not save progress: " + e.Message);
             }
         }
 

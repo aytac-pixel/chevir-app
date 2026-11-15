@@ -20,6 +20,8 @@ namespace Cevir.Core.UI
         [Header("Top bar")]
         [SerializeField] private TextMeshProUGUI badgeLabel;
         [SerializeField] private TextMeshProUGUI languageLabel;
+        [SerializeField] private TextMeshProUGUI levelBadgeLabel;
+        [SerializeField] private Image streakIcon;
         [SerializeField] private TextMeshProUGUI streakLabel;
         [SerializeField] private TextMeshProUGUI heartsLabel;
         [SerializeField] private TextMeshProUGUI xpLabel;
@@ -101,8 +103,20 @@ namespace Cevir.Core.UI
             if (_game == null) return;
             ILanguagePack pack = _game.ActivePack;
             if (badgeLabel != null) badgeLabel.text = pack != null ? pack.Manifest.Badge : "—";
-            if (languageLabel != null) languageLabel.text = pack != null ? pack.Manifest.LocalizedName.Replace(" Sign ", "\nSign ").Replace(" İşarət ", "\nİşarət ") : string.Empty;
+            if (languageLabel != null) languageLabel.text = pack != null ? pack.Manifest.LocalizedName.Replace(" Sign ", "\nSign ").Replace(" İşarə ", "\nİşarə ") : string.Empty;
             if (streakLabel != null) streakLabel.text = _game.Streak.State.current.ToString();
+            if (streakIcon != null)
+            {
+                // Grey while there is no flame; amber when yesterday was missed and today is the last chance.
+                bool burning = _game.Streak.State.current > 0;
+                bool atRisk = _game.Streak.IsAtRisk(_game.LocalNow());
+                Color color = !burning ? UIPalette.TextMuted : atRisk ? UIPalette.Amber : UIPalette.Streak;
+                streakIcon.color = color;
+                if (streakLabel != null) streakLabel.color = color;
+            }
+
+            LevelPathSummary current = _game.CurrentLevel;
+            if (levelBadgeLabel != null) levelBadgeLabel.text = current != null ? current.Level.Title : "A1";
             if (heartsLabel != null) heartsLabel.text = _game.Hearts.Hearts.ToString();
             if (xpLabel != null) xpLabel.text = _game.Xp.Total.ToString();
         }

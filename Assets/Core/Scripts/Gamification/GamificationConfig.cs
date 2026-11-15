@@ -5,7 +5,7 @@ namespace Cevir.Core.Gamification
     /// <summary>
     /// Game economy. Values are the plan's starting proposals, to be tuned by A/B tests.
     /// </summary>
-    [CreateAssetMenu(menuName = "Çevir/Gamification Config", fileName = "GamificationConfig")]
+    [CreateAssetMenu(menuName = "Chevir/Gamification Config", fileName = "GamificationConfig")]
     public sealed class GamificationConfig : ScriptableObject
     {
         [Header("Hearts")]

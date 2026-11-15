@@ -85,7 +85,7 @@ namespace Cevir.Core.Stories
     /// A first-person practice story. Stories unlock when a unit on the home path is finished and are replayable.
     /// Content lives in the language pack (like lessons); the player is <c>StoryScreenUI</c>.
     /// </summary>
-    [CreateAssetMenu(menuName = "Çevir/Curriculum/Story", fileName = "Story_")]
+    [CreateAssetMenu(menuName = "Chevir/Curriculum/Story", fileName = "Story_")]
     public sealed class StoryData : CurriculumAsset
     {
         [Min(1)]

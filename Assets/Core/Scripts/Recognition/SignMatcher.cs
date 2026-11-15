@@ -73,7 +73,7 @@ namespace Cevir.Core.Recognition
             {
                 if (target != null)
                 {
-                    Debug.LogWarning("[Çevir] Sign '" + target.SignId + "' has no reference data; cannot score.");
+                    Debug.LogWarning("[Chevir] Sign '" + target.SignId + "' has no reference data; cannot score.");
                 }
 
                 return Finish(ref result, SignFeedback.Unsure, FeedbackSeverity.Neutral);

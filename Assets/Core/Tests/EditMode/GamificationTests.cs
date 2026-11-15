@@ -66,16 +66,30 @@ namespace Cevir.Core.Tests
         }
 
         [Test]
-        public void MissedDayResetsWithoutFreeze()
+        public void OneMissedDayKeepsTheFlame()
         {
             var streak = new StreakSystem(GamificationConfig.CreateDefault(), new StreakState());
-            streak.RegisterActivity(Day);
-            streak.RegisterActivity(Day.AddDays(2));
-            Assert.AreEqual(1, streak.State.current);
+            for (int i = 0; i < 5; i++) streak.RegisterActivity(Day.AddDays(i)); // days 1-5
+            streak.Evaluate(Day.AddDays(5)); // day 6 missed so far
+            Assert.AreEqual(5, streak.State.current, "day 6 missed: the flame stays");
+            Assert.IsFalse(streak.IsAtRisk(Day.AddDays(5)));
+            Assert.IsTrue(streak.IsAtRisk(Day.AddDays(6)), "day 7: last chance");
+            Assert.IsTrue(streak.RegisterActivity(Day.AddDays(6)));
+            Assert.AreEqual(6, streak.State.current);
         }
 
         [Test]
-        public void FreezeCoversOneMissedDay()
+        public void TwoMissedDaysPutTheFlameOut()
+        {
+            var streak = new StreakSystem(GamificationConfig.CreateDefault(), new StreakState());
+            for (int i = 0; i < 5; i++) streak.RegisterActivity(Day.AddDays(i)); // days 1-5
+            streak.Evaluate(Day.AddDays(7)); // days 6 and 7 missed
+            Assert.AreEqual(0, streak.State.current);
+            Assert.AreEqual(5, streak.State.longest);
+        }
+
+        [Test]
+        public void FreezeCoversASecondMissedDay()
         {
             GamificationConfig config = GamificationConfig.CreateDefault();
             var xp = new XpSystem(config, new XpState());
@@ -88,7 +102,7 @@ namespace Cevir.Core.Tests
             Assert.AreEqual(50, xp.Balance);
             Assert.AreEqual(100, xp.Total, "spending does not reduce lifetime XP");
 
-            streak.RegisterActivity(Day.AddDays(2));
+            streak.RegisterActivity(Day.AddDays(3));
             Assert.AreEqual(2, streak.State.current);
             Assert.AreEqual(0, streak.State.freezes);
         }

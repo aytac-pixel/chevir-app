@@ -76,7 +76,7 @@ namespace Cevir.Core.UI
 
         public static string ThirdFailRequeue => Loc.Pick("We'll come back to this sign later.", "Bu işarəyə sonra qayıdacağıq.");
         public static string CameraStarting => Loc.Pick("Starting camera...", "Kamera açılır...");
-        public static string CameraDenied => Loc.Pick("Çevir needs the camera.\nAllow it in Settings > Apps > Çevir.", "Kameraya icazə lazımdır.\nTelefonun Ayarlar > Tətbiqlər > Çevir bölməsində kameranı aç.");
+        public static string CameraDenied => Loc.Pick("Chevir needs the camera.\nAllow it in Settings > Apps > Chevir.", "Kameraya icazə lazımdır.\nTelefonun Ayarlar > Tətbiqlər > Chevir bölməsində kameranı aç.");
         public static string CameraMissing => Loc.Pick("The camera module isn't installed.", "Kamera modulu quraşdırılmayıb.");
 
         // ---------------------------------------------------------------- tabs and home
@@ -156,8 +156,8 @@ namespace Cevir.Core.UI
         public static string FriendsTitle => Loc.Pick("Learning together is more fun!", "Birlikdə öyrənmək daha maraqlıdır!");
         public static string FriendsBody => Loc.Pick("Invite friends and share your streak.", "Dostlarını dəvət et və seriyanı paylaş.");
         public static string InviteFriends => Loc.Pick("Invite friends", "Dostları dəvət et");
-        public static string InviteMessage => Loc.Pick("I'm learning Azerbaijani Sign Language with Çevir. My streak: {0} days! Join me: {1}",
-            "Çevir ilə Azərbaycan İşarə Dilini öyrənirəm. Seriyam: {0} gün! Sən də qoşul: {1}");
+        public static string InviteMessage => Loc.Pick("I'm learning Azerbaijani Sign Language with Chevir. My streak: {0} days! Join me: {1}",
+            "Chevir ilə Azərbaycan İşarə Dilini öyrənirəm. Seriyam: {0} gün! Sən də qoşul: {1}");
         public static string LinkCopied => Loc.Pick("Invite link copied", "Dəvət linki kopyalandı");
         public static string Save => Loc.Pick("SAVE", "YADDA SAXLA");
         public static string AppLanguage => Loc.Pick("App language", "Tətbiqin dili");
@@ -173,7 +173,7 @@ namespace Cevir.Core.UI
         public static string SwitchToSignUp => Loc.Pick("No account yet? Create one", "Hesabın yoxdur? Yarat");
         public static string SwitchToSignIn => Loc.Pick("Already have an account? Sign in", "Hesabın var? Daxil ol");
         public static string ForgotPassword => Loc.Pick("Forgot password?", "Şifrəni unutmusan?");
-        public static string ResetSent => Loc.Pick("We sent a password reset link to your e-mail.", "Şifrəni yeniləmək üçün link e-poçtuna göndərildi.");
+        public static string ResetSent => Loc.Pick("We e-mailed you a 6-digit code. Enter it and a new password.", "E-poçtuna 6 rəqəmli kod göndərdik. Kodu və yeni şifrəni yaz.");
         public static string ConfirmEmailSent => Loc.Pick("Account created. Open the link we sent to your e-mail, then sign in.",
             "Hesab yaradıldı. E-poçtuna göndərilən linki aç, sonra daxil ol.");
         public static string NeedName => Loc.Pick("Enter your name.", "Adını yaz.");

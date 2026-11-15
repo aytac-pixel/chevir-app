@@ -4,9 +4,9 @@ namespace Cevir.Core.UI
 {
     /// <summary>
     /// Sprites the screens swap at runtime (node states, tab icons, tier cup). Generated and filled by
-    /// <c>Çevir > UI > Generate Complete UI Hierarchy</c> from Assets/Core/Sprites; replace art there.
+    /// <c>Chevir > UI > Generate Complete UI Hierarchy</c> from Assets/Core/Sprites; replace art there.
     /// </summary>
-    [CreateAssetMenu(menuName = "Çevir/UI Theme", fileName = "CevirTheme")]
+    [CreateAssetMenu(menuName = "Chevir/UI Theme", fileName = "CevirTheme")]
     public sealed class CevirTheme : ScriptableObject
     {
         [Header("Shapes")]
