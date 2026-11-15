@@ -243,7 +243,7 @@ namespace Cevir.Core.Editor
             card.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             RectTransform frame = Rect("VideoFrame", card.transform);
-            Layout(frame.gameObject, preferredHeight: 294f, minHeight: 294f);
+            Layout(frame.gameObject, preferredHeight: 392f, minHeight: 392f);
             AddImage(frame, Panel(24), new Color(0.1f, 0.14f, 0.2f, 1f), true).raycastTarget = false;
             RectTransform videoRt = Rect("Video", frame);
             Stretch(videoRt, 6f, 6f, 6f, 6f);
@@ -251,7 +251,7 @@ namespace Cevir.Core.Editor
             video.raycastTarget = false;
             AspectRatioFitter fit = videoRt.gameObject.AddComponent<AspectRatioFitter>();
             fit.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
-            fit.aspectRatio = 1f;
+            fit.aspectRatio = 3f / 4f; // sign videos are portrait
             VideoPlayer player = frame.gameObject.AddComponent<VideoPlayer>();
             player.playOnAwake = false;
             player.renderMode = VideoRenderMode.RenderTexture;

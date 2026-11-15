@@ -188,18 +188,96 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         /// <summary>Unit 1 lessons as in kurikulum/Tapilmali_media_A1_A2.txt: A–Ə, F–I, İ–M, N–S, Ş–Z (indices into the alphabet).</summary>
         private static readonly int[] Unit1LessonBounds = { 0, 7, 13, 19, 25, 32 };
 
+        // Story N closes unit N and uses only signs taught up to that unit (scripts: kurikulum/Hekayeler_A1_ssenari.md).
         private static readonly string[][] Stories =
         {
             new[] { "Hello, my name is...", "Salam, mənim adım..." },
-            new[] { "Meet My Family", "Ailəmlə tanış ol" },
-            new[] { "At the Supermarket", "Supermarketdə" },
-            new[] { "Ordering at a Café", "Kafedə sifariş" },
-            new[] { "The First Meeting", "İlk görüş" },
-            new[] { "A Walk Around the City", "Şəhərdə gəzinti" },
-            new[] { "Birthday Party", "Ad günü" },
-            new[] { "A Day at School", "Məktəbdə bir gün" },
-            new[] { "At the Doctor's", "Həkimdə" },
-            new[] { "Travel Plans", "Səyahət planları" }
+            new[] { "Good morning", "Sabahınız xeyir" },
+            new[] { "Do you know?", "Sən bilirsən?" },
+            new[] { "Who is that?", "O kimdir?" },
+            new[] { "Meet my family", "Ailəmlə tanış ol" },
+            new[] { "How many?", "Neçə?" },
+            new[] { "What time is it?", "Saat neçədir?" },
+            new[] { "My school bag", "Məktəb çantası" },
+            new[] { "A walk around the city", "Şəhərdə gəzinti" },
+            new[] { "A1 is done!", "A1 bitdi!" }
+        };
+
+        // Beat script: "npc|AZ text|EN text|sign;sign", "you|AZ instruction|EN instruction|expected sign", "name|AZ|EN".
+        private static readonly string[][] StoryScripts =
+        {
+            null, // Story 1 is built by FillStory1
+            new[]
+            {
+                "npc|Sabahınız xeyir! Necəsən?|Good morning! How are you?|Sabahınız xeyir;Necəsən",
+                "you|«Yaxşı» işarəsini göstər|Sign \"fine\"|Yaxşı",
+                "npc|Sağ ol! Görüşərik!|Thank you! See you!|Sağ ol;Görüşərik",
+                "you|«Görüşərik» işarəsini göstər|Sign \"see you\"|Görüşərik"
+            },
+            new[]
+            {
+                "npc|Salam! Sən bilirsən?|Hi! Do you know?|Salam;Sən bilirsən?",
+                "you|«Bilmirəm» işarəsini göstər|Sign \"I don't know\"|Bilmirəm",
+                "npc|O bilir. Onlar da bilir.|He knows. They know too.|O;Bilmək;Onlar",
+                "you|«Bəli» işarəsini göstər|Sign \"yes\"|Bəli"
+            },
+            new[]
+            {
+                "npc|O kimdir?|Who is that?|O kimdir?",
+                "you|«Kim» işarəsini göstər|Sign \"who\"|Kim",
+                "npc|Sən haradasan?|Where are you?|Sən haradasan?",
+                "you|«Harada» işarəsini göstər|Sign \"where\"|Harada",
+                "npc|Nə vaxt görüşərik?|When shall we meet?|Nə vaxt;Görüşərik"
+            },
+            new[]
+            {
+                "npc|Bu mənim anamdır.|This is my mother.|Bu mənim anamdır",
+                "you|«Ana» işarəsini göstər|Sign \"mother\"|Ana",
+                "npc|Mənim bir qardaşım var. Sənin bacın varmı?|I have a brother. Do you have a sister?|Mənim bir qardaşım var;Sənin bacın varmı?",
+                "you|«Bəli» işarəsini göstər|Sign \"yes\"|Bəli",
+                "npc|Ailə yaxşıdır!|Family is good!|Ailə;Yaxşı"
+            },
+            new[]
+            {
+                "npc|Salam! Neçə? Üç!|Hi! How many? Three!|Salam;Neçə",
+                "you|«3» rəqəmini göstər|Sign \"3\"|3",
+                "npc|Bəs on neçədir?|And ten?|Neçə",
+                "you|«10» rəqəmini göstər|Sign \"10\"|10",
+                "npc|Sağ ol!|Thank you!|Sağ ol"
+            },
+            new[]
+            {
+                "npc|Saat neçədir?|What time is it?|Saat neçədir?",
+                "you|Saat beşdir: «5» rəqəmini göstər|It is five o'clock: sign \"5\"|5",
+                "npc|Bu gün cümədir. Axşam görüşərik?|Today is Friday. See you in the evening?|Bu gün;Cümə;Axşam;Görüşərik",
+                "you|«Bəli» işarəsini göstər|Sign \"yes\"|Bəli"
+            },
+            new[]
+            {
+                "npc|Bu kitabdır.|This is a book.|Bu kitabdır",
+                "you|«Kitab» işarəsini göstər|Sign \"book\"|Kitab",
+                "npc|Qırmızı çanta. Telefonum yoxdur!|A red bag. I don't have my phone!|Qırmızı çanta;Telefonum yoxdur",
+                "you|«Telefon» işarəsini göstər|Sign \"phone\"|Telefon",
+                "npc|Sağ ol! Su?|Thank you! Water?|Sağ ol;Su",
+                "you|«Çay» işarəsini göstər|Sign \"tea\"|Çay"
+            },
+            new[]
+            {
+                "npc|Bağışlayın, aptek haradadır?|Excuse me, where is the pharmacy?|Bağışlayın;Aptek haradadır?",
+                "you|«Aptek» işarəsini göstər|Sign \"pharmacy\"|Aptek",
+                "npc|Avtobus? Metro?|Bus? Metro?|Avtobus;Metro",
+                "you|«Metro» işarəsini göstər|Sign \"metro\"|Metro",
+                "npc|Sağ ol! Mən evdəyəm, görüşərik.|Thanks! I'm at home, see you.|Sağ ol;Mən evdəyəm;Görüşərik"
+            },
+            new[]
+            {
+                "npc|Salam! Necəsən?|Hi! How are you?|Salam;Necəsən",
+                "you|«Yaxşı» işarəsini göstər|Sign \"fine\"|Yaxşı",
+                "npc|Sənin adın nədir?|What is your name?|Sənin adın nədir?",
+                "name|Adını hərf-hərf göstər|Show your name letter by letter",
+                "npc|Tanış olduğuma şadam, {name}! Sən bilirsən!|Nice to meet you, {name}! You know it!|Tanış olduğuma şadam;Sən bilirsən?",
+                "you|«Sağ ol» işarəsini göstər|Sign \"thank you\"|Sağ ol"
+            }
         };
 
         [MenuItem("Çevir/AzSLD/Create Or Update Pack Skeleton")]
@@ -516,7 +594,15 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 });
 
                 UnitData unlock = i < units.Count ? units[i] : null;
-                if (number == 1 && NeedsStory1(story)) FillStory1(story, unlock, words);
+                // Titles follow the unit each story closes; rewritten so older projects pick up the new names.
+                story.EditorSetIdentity(id, en, string.Empty);
+                story.EditorSetTranslation(Loc.Azerbaijani, az, string.Empty);
+                if (number == 1)
+                {
+                    if (NeedsStory1(story)) FillStory1(story, unlock, words);
+                    else if (story.UnlockUnit == null) story.EditorSetUnlock(number, unlock);
+                }
+                else if (i < StoryScripts.Length && StoryScripts[i] != null) FillScriptedStory(story, number, unlock, StoryScripts[i], words);
                 else if (story.UnlockUnit == null) story.EditorSetUnlock(number, unlock);
 
                 EditorUtility.SetDirty(story);
@@ -583,6 +669,50 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             };
 
             story.EditorSetContent(1, unlock, 20, LoadSprite("story_street_bg"), LoadSprite("pov_hands_bag"), npc, beats);
+        }
+
+        /// <summary>Builds a story from a beat script (see <see cref="StoryScripts"/>): Aysel on the street, as in Story 1.</summary>
+        private static void FillScriptedStory(StoryData story, int number, UnitData unlock, string[] script, Dictionary<string, SignDefinition> words)
+        {
+            var beats = new List<StoryBeat>();
+            foreach (string line in script)
+            {
+                string[] part = line.Split('|');
+                var beat = new StoryBeat { text = new LocalizedString(part[2], part[1]) };
+                switch (part[0])
+                {
+                    case "npc":
+                        beat.type = StoryBeatType.NpcLine;
+                        beat.approach = beats.Count == 0;
+                        beat.pose = beats.Count == 0 ? NpcPose.Wave : NpcPose.Idle;
+                        beat.npcSigns = Signs(words, part[3].Split(';'));
+                        if (beat.npcSigns.Count < part[3].Split(';').Length)
+                            Debug.LogWarning("[Çevir] Story " + number + ": a sign in \"" + part[3] + "\" is not in the dictionary.");
+                        break;
+                    case "you":
+                        beat.type = StoryBeatType.LearnerSign;
+                        SignDefinition expected;
+                        if (!words.TryGetValue(part[3], out expected)) Debug.LogWarning("[Çevir] Story " + number + ": no sign \"" + part[3] + "\".");
+                        beat.expectedSign = expected;
+                        break;
+                    default:
+                        beat.type = StoryBeatType.LearnerFingerspellName;
+                        beat.nameScope = NameScope.FirstName;
+                        break;
+                }
+
+                beats.Add(beat);
+            }
+
+            var npc = new StoryCharacter
+            {
+                displayName = new LocalizedString("Aysel", "Aysel"),
+                idle = LoadSprite("npc_idle"),
+                talking = LoadSprite("npc_talk"),
+                wave = LoadSprite("npc_wave_idle"),
+                waveTalking = LoadSprite("npc_wave")
+            };
+            story.EditorSetContent(number, unlock, 20, LoadSprite("story_street_bg"), LoadSprite("pov_hands_bag"), npc, beats);
         }
 
         private static List<SignDefinition> Signs(Dictionary<string, SignDefinition> words, params string[] glosses)
