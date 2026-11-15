@@ -11,7 +11,7 @@ namespace Cevir.Core.Editor
     /// <summary>
     /// Links media files dropped into a pack's Media folder to its signs by file name, so the content team only
     /// copies files in (same layout as their checklist, e.g. Media/A1/U01_Elifba/herf_a.png) and re-runs setup.
-    /// Per sign: "&lt;slug&gt;.mp4" = video, "&lt;slug&gt;_yavas.mp4" = slow video, "&lt;slug&gt;.png/.jpg" = picture.
+    /// Per sign: "&lt;slug&gt;.mp4/.webm" = video, "&lt;slug&gt;_yavas.mp4/.webm" = slow video, "&lt;slug&gt;.png/.jpg" = picture.
     /// Sub-folders do not matter; only the file name is matched. Files that match no sign are listed in the log.
     /// </summary>
     public sealed class SignMediaImporter : AssetPostprocessor
@@ -34,6 +34,8 @@ namespace Cevir.Core.Editor
         }
 
         // Videos are silent by spec; transcode so every Android device can play them.
+        // WebM (VP8) needs no transcoding; the Linux editor used by CI can neither read MP4 nor transcode,
+        // so CI converts the clips to WebM before Unity starts (Tools/setup/convert_videos_webm.sh).
         private void OnPreprocessAsset()
         {
             if (!IsPackMedia(assetPath)) return;
@@ -41,7 +43,7 @@ namespace Cevir.Core.Editor
             if (video == null) return;
             video.importAudio = false;
             VideoImporterTargetSettings settings = video.defaultTargetSettings;
-            settings.enableTranscoding = true;
+            settings.enableTranscoding = !assetPath.EndsWith(".webm", System.StringComparison.OrdinalIgnoreCase);
             settings.codec = VideoCodec.H264;
             video.defaultTargetSettings = settings;
         }

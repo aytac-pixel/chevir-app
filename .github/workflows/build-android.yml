@@ -59,6 +59,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Add TextMesh Pro Essential Resources
+        run: python3 Tools/setup/install_tmp_essentials.py
+
+      - name: Convert videos to WebM (the Linux editor cannot import MP4)
+        run: |
+          command -v ffmpeg >/dev/null || (sudo apt-get update -q && sudo apt-get install -y -q ffmpeg)
+          bash Tools/setup/convert_videos_webm.sh
+
       - uses: actions/cache@v4
         with:
           path: Library
