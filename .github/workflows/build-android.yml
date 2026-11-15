@@ -1,27 +1,57 @@
-# Builds the Android APK in the cloud. Needs three repository secrets (Settings > Secrets > Actions):
-#   UNITY_LICENSE  contents of your Unity_lic.ulf (personal licence works; see game.ci/docs/github/activation)
+# Builds the Android APK on every push to main and publishes it on the Releases page.
+# The release "demo" is replaced each time, so the latest release always holds the current APK:
+#   https://github.com/aytac-pixel/chevir-app/releases/latest
+#   https://github.com/aytac-pixel/chevir-app/releases/latest/download/Cevir.apk
+#
+# Needs three repository secrets (Settings > Secrets and variables > Actions):
+#   UNITY_LICENSE  contents of Unity_lic.ulf (a free Personal licence works)
 #   UNITY_EMAIL    Unity account e-mail
 #   UNITY_PASSWORD Unity account password
-# Run it from the Actions tab ("Run workflow"); the APK is attached to the run as an artifact.
 name: Build Android APK
 
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# A newer push replaces a build that is still running.
+concurrency:
+  group: android-release
+  cancel-in-progress: true
+
+env:
+  RELEASE_TAG: demo
+  APK_NAME: Cevir.apk
 
 jobs:
   android:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
+      - name: Check Unity secrets
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        run: |
+          missing=""
+          [ -z "$UNITY_LICENSE" ] && missing="$missing UNITY_LICENSE"
+          [ -z "$UNITY_EMAIL" ] && missing="$missing UNITY_EMAIL"
+          [ -z "$UNITY_PASSWORD" ] && missing="$missing UNITY_PASSWORD"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing (Settings > Secrets and variables > Actions)"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
       - name: Free disk space
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
-          android: false
+          android: true
           large-packages: false
 
       - name: Install MediaPipe Unity Plugin
@@ -44,9 +74,51 @@ jobs:
           targetPlatform: Android
           androidExportType: androidPackage
           buildMethod: Cevir.Setup.Editor.CevirBuild.CiBuildAndroid
+          customParameters: -cevirBuildNumber ${{ github.run_number }}
+
+      - name: Collect APK
+        run: |
+          apk="$(ls Builds/Android/*.apk | head -n 1)"
+          mkdir -p release
+          cp "$apk" "release/$APK_NAME"
+          ls -lh release
 
       - uses: actions/upload-artifact@v4
         with:
           name: Cevir-Android-APK
-          path: Builds/Android/*.apk
+          path: release/${{ env.APK_NAME }}
           if-no-files-found: error
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          short_sha="${GITHUB_SHA::7}"
+          built_at="$(TZ=Asia/Baku date '+%d.%m.%Y %H:%M')"
+          version="0.1.${GITHUB_RUN_NUMBER}"
+          cat > notes.md <<EOF
+          ## Çevir — Android APK
+
+          **Yüklə:** [${APK_NAME}](https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/${APK_NAME})
+
+          Versiya ${version} · ${built_at} (Bakı vaxtı) · commit ${short_sha}
+
+          ### Telefona necə qurmaq olar
+          1. Android telefonda yuxarıdakı **${APK_NAME}** faylını yükləyin.
+          2. Faylı açın. Telefon soruşsa, "Naməlum mənbələrdən quraşdırma"ya icazə verin.
+          3. **Quraşdır** düyməsini basın və tətbiqi açın. Kameraya icazə verin.
+
+          Köhnə versiya quraşdırılıbsa və yeniləmə alınmırsa, əvvəlcə köhnəsini silin.
+          Tələb: Android 7.0 və ya daha yeni, 64-bit (ARM64) telefon.
+          EOF
+
+          # Point the tag at this commit and replace the APK.
+          git tag -f "$RELEASE_TAG"
+          git push -f origin "refs/tags/$RELEASE_TAG"
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --title "Çevir ${version} — Android APK" --notes-file notes.md --latest --draft=false --prerelease=false
+          else
+            gh release create "$RELEASE_TAG" --title "Çevir ${version} — Android APK" --notes-file notes.md --latest
+          fi
+          gh release upload "$RELEASE_TAG" "release/$APK_NAME" --clobber

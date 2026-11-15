@@ -61,9 +61,11 @@ Dərsdə video varsa video, yoxdursa şəkil göstərilir.
 
 ## 5. Kompütersiz, buludda APK (istəyə görə)
 
-Layihəni GitHub repozitoriyasına yükləsən, `.github/workflows/build-android.yml` APK-ni GitHub-da avtomatik yığır:
-1. Repozitoriyada *Settings > Secrets and variables > Actions* bölməsinə `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD` əlavə et (pulsuz Unity Personal lisenziyası olar; game.ci/docs/github/activation).
-2. *Actions > Build Android APK > Run workflow*. Bitəndə APK "Artifacts" bölməsində olur.
+`.github/workflows/build-android.yml` `main`-ə hər push-dan sonra APK-ni GitHub-da avtomatik yığır və **Releases** səhifəsinə qoyur (ən son buraxılış həmişə ən təzə APK-dır):
+- https://github.com/aytac-pixel/chevir-app/releases/latest
+- Birbaşa yükləmə: https://github.com/aytac-pixel/chevir-app/releases/latest/download/Cevir.apk
+
+Bunun üçün bir dəfə repozitoriyada *Settings > Secrets and variables > Actions* bölməsinə `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD` əlavə et (pulsuz Unity Personal lisenziyası olar; game.ci/docs/github/activation). Əl ilə yenidən yığmaq üçün: *Actions > Build Android APK > Run workflow*.
 
 ## Hazırda nə işləyir, nə yox
 

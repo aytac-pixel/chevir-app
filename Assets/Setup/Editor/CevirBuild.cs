@@ -39,8 +39,23 @@ namespace Cevir.Setup.Editor
         /// <summary>Entry point for batch mode: -executeMethod Cevir.Setup.Editor.CevirBuild.CiBuildAndroid</summary>
         public static void CiBuildAndroid()
         {
-            bool ok = CevirProjectSetup.Run(false) && BuildAndroid(false);
+            bool ok = CevirProjectSetup.Run(false);
+            if (ok) ApplyCiBuildNumber();
+            ok = ok && BuildAndroid(false);
             EditorApplication.Exit(ok ? 0 : 1);
+        }
+
+        /// <summary>CI passes its run number so every APK gets a higher version code (0.1.N) than the one before.</summary>
+        private static void ApplyCiBuildNumber()
+        {
+            string[] args = System.Environment.GetCommandLineArgs();
+            int index = System.Array.IndexOf(args, "-cevirBuildNumber");
+            if (index < 0 || index + 1 >= args.Length) return;
+            if (!int.TryParse(args[index + 1], out int number) || number < 1) return;
+
+            PlayerSettings.bundleVersion = "0.1." + number;
+            PlayerSettings.Android.bundleVersionCode = number;
+            Debug.Log("[Çevir] Version " + PlayerSettings.bundleVersion + " (code " + number + ").");
         }
 
         public static void CiBuildIos()
