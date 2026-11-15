@@ -44,7 +44,8 @@ Assets/
                                 Curriculum/, Signs/{Dictionary,References,Clips}, NonManualRules/, Models/
 Packages/manifest.json          Unity packages (the MediaPipe plugin is added by Tools/setup)
 Tools/setup/                    MediaPipe plugin installer (bash + PowerShell)
-Tools/landmark_extraction/      Python: dataset videos -> raw landmark JSON
+Tools/landmark_extraction/      Python: dataset videos / pack media -> raw landmark JSON
+Tools/references/azsld/         landmark JSON extracted from the AzSLD lesson media (imported by the pack bootstrapper)
 Tools/supabase/schema.sql       database tables, access rules and league functions
 .github/workflows/              cloud APK build (game-ci)
 ```
@@ -62,7 +63,7 @@ Short version (step-by-step guide in Azerbaijani: `QURASDIRMA.md`):
 5. **Çevir > Build > Android APK** (writes `Builds/Android/Cevir.apk`), **Android App Bundle** or **iOS Xcode Project**.
 6. CI: `.github/workflows/build-android.yml` builds the APK with game-ci from a fresh clone (`Cevir.Setup.Editor.CevirBuild.CiBuildAndroid` runs the setup, then the build). It needs `UNITY_LICENSE`, `UNITY_EMAIL` and `UNITY_PASSWORD` secrets.
 
-Signs without reference landmark data are checked only for a clearly visible hand (the screen says so). Real handshape scoring takes over once references are imported (see "Reference data pipeline"). Lessons without any signs show "Tezliklə" instead of completing for free.
+Signs without reference landmark data are checked only for a clearly visible hand (the screen says so). Real handshape scoring takes over once references are imported (see "Reference data pipeline"). References for every lesson video and letter picture are already extracted into `Tools/references/azsld/` (one recording per sign, by `Tools/landmark_extraction/extract_pack_media.py`) and are imported automatically by *Çevir > AzSLD > Create Or Update Pack Skeleton*. Re-run the script after adding media. One recording per sign is a starting point: more signers per sign and thresholds tuned on real phones will make the check fairer. Lessons without any signs show "Tezliklə" instead of completing for free.
 
 ## Screens
 

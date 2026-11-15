@@ -95,6 +95,12 @@ namespace Cevir.Core.LanguagePacks
             if (picture != null) thumbnail = picture;
         }
 
+        /// <summary>Two-handed signs are compared on both hands; set from the reference recordings.</summary>
+        public void EditorSetTwoHanded(bool isTwoHanded)
+        {
+            twoHanded = isTwoHanded;
+        }
+
         public void EditorAddReference(SignReference reference)
         {
             if (!references.Contains(reference)) references.Add(reference);

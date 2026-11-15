@@ -23,6 +23,16 @@ namespace Cevir.Core.Editor
             public string signerId;
             public float imageAspect = 1f;
             public string dominantHand = "Right";
+
+            /// <summary>Optional: the media file name ("salam", "herf_a") when the sign id is not known offline.</summary>
+            public string mediaSlug;
+
+            /// <summary>Optional: true when the recording uses both hands for most of the sign.</summary>
+            public bool twoHanded;
+
+            /// <summary>Optional: when set, each frame's face array holds only these landmark indices, in this order.</summary>
+            public int[] faceIndices = new int[0];
+
             public List<RawFrame> frames = new List<RawFrame>();
         }
 
@@ -60,8 +70,20 @@ namespace Cevir.Core.Editor
             Debug.Log("[Çevir] Imported " + count + " sign references.");
         }
 
-        public static int ImportFolder(string jsonFolder, SignDictionary dictionary, string outputFolder)
+        /// <param name="slugOf">Optional: the pack's media naming rule, to resolve files that carry a mediaSlug instead of a sign id.</param>
+        public static int ImportFolder(string jsonFolder, SignDictionary dictionary, string outputFolder, Func<SignDefinition, string> slugOf = null)
         {
+            Dictionary<string, SignDefinition> bySlug = null;
+            if (slugOf != null)
+            {
+                bySlug = new Dictionary<string, SignDefinition>(StringComparer.OrdinalIgnoreCase);
+                foreach (SignDefinition s in dictionary.Signs)
+                {
+                    string slug = s != null ? slugOf(s) : null;
+                    if (!string.IsNullOrEmpty(slug) && !bySlug.ContainsKey(slug)) bySlug[slug] = s;
+                }
+            }
+
             CevirAssetUtility.EnsureFolder(outputFolder);
             var extractor = new SignFeatureExtractor();
             var frame = new LandmarkFrame();
@@ -74,14 +96,17 @@ namespace Cevir.Core.Editor
                 {
                     EditorUtility.DisplayProgressBar("Çevir", Path.GetFileName(files[i]), i / (float)files.Length);
                     RawFile raw = JsonUtility.FromJson<RawFile>(File.ReadAllText(files[i]));
-                    if (raw == null || string.IsNullOrEmpty(raw.signId) || raw.frames.Count < 2) continue;
+                    if (raw == null || raw.frames.Count < 2) continue;
 
-                    SignDefinition sign = dictionary.Find(raw.signId);
+                    SignDefinition sign = string.IsNullOrEmpty(raw.signId) ? null : dictionary.Find(raw.signId);
+                    if (sign == null && bySlug != null && !string.IsNullOrEmpty(raw.mediaSlug)) bySlug.TryGetValue(raw.mediaSlug, out sign);
                     if (sign == null)
                     {
-                        Debug.LogWarning("[Çevir] No sign '" + raw.signId + "' in dictionary; skipped " + files[i]);
+                        Debug.LogWarning("[Çevir] No sign '" + (raw.signId ?? raw.mediaSlug) + "' in dictionary; skipped " + files[i]);
                         continue;
                     }
+
+                    raw.signId = sign.SignId;
 
                     extractor.DominantHand = raw.dominantHand == "Left" ? HandSide.Left : HandSide.Right;
                     var features = new List<SignFeatureFrame>(raw.frames.Count);
@@ -92,7 +117,8 @@ namespace Cevir.Core.Editor
                         frame.ImageAspect = raw.imageAspect;
                         Load(rf.left, frame.LeftHand.Points, out frame.LeftHand.IsPresent);
                         Load(rf.right, frame.RightHand.Points, out frame.RightHand.IsPresent);
-                        Load(rf.face, frame.Face.Points, out frame.Face.IsPresent);
+                        if (raw.faceIndices != null && raw.faceIndices.Length > 0) LoadSparse(rf.face, raw.faceIndices, frame.Face.Points, out frame.Face.IsPresent);
+                        else Load(rf.face, frame.Face.Points, out frame.Face.IsPresent);
 
                         var f = new SignFeatureFrame();
                         extractor.Extract(frame, f);
@@ -106,6 +132,7 @@ namespace Cevir.Core.Editor
                     EditorUtility.SetDirty(reference);
 
                     sign.EditorAddReference(reference);
+                    if (raw.twoHanded && !sign.TwoHanded) sign.EditorSetTwoHanded(true);
                     EditorUtility.SetDirty(sign);
                     imported++;
                 }
@@ -117,6 +144,18 @@ namespace Cevir.Core.Editor
             }
 
             return imported;
+        }
+
+        private static void LoadSparse(float[] flat, int[] indices, Vector3[] target, out bool present)
+        {
+            present = flat != null && flat.Length >= indices.Length * 3;
+            if (!present) return;
+            for (int i = 0; i < target.Length; i++) target[i] = Vector3.zero;
+            for (int k = 0; k < indices.Length; k++)
+            {
+                int index = indices[k];
+                if (index >= 0 && index < target.Length) target[index] = new Vector3(flat[k * 3], flat[k * 3 + 1], flat[k * 3 + 2]);
+            }
         }
 
         private static void Load(float[] flat, Vector3[] target, out bool present)

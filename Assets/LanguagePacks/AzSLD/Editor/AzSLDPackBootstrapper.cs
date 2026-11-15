@@ -349,6 +349,20 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
             SignMediaImporter.Report report = SignMediaImporter.Import(dictionary, MediaRoot, AzSLDLanguagePack.MediaSlug);
             Debug.Log("[Çevir] AzSLD media: " + report);
+            ImportReferencesInternal(dictionary);
+        }
+
+        /// <summary>
+        /// Landmark references extracted from the lesson media (Tools/landmark_extraction/extract_pack_media.py), kept
+        /// outside Assets in Tools/references/azsld. With them the camera compares the learner's sign with the video
+        /// instead of only checking that a hand is visible.
+        /// </summary>
+        private static void ImportReferencesInternal(SignDictionary dictionary)
+        {
+            string folder = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "../Tools/references/azsld"));
+            if (!System.IO.Directory.Exists(folder)) return;
+            int count = SignReferenceImporter.ImportFolder(folder, dictionary, Root + "/Signs/References", AzSLDLanguagePack.MediaSlug);
+            Debug.Log("[Çevir] AzSLD sign references: " + count + " imported from " + folder);
         }
 
         /// <summary>Signs no longer in A1: Unit 1 facial expressions and the words taken out of Unit 2.</summary>
