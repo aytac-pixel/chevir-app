@@ -65,11 +65,12 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             "O kimdir?", "Sən haradasan?", "Bu nədir?",
             "Bu mənim anamdır", "Mənim bir qardaşım var", "Sənin bacın varmı?",
             "Saat neçədir?", "Saat beşdir",
-            "Qırmızı çanta", "Bu kitabdır", "Telefonum yoxdur"
+            "Qırmızı çanta", "Bu kitabdır", "Telefonum yoxdur",
+            "Mən evdəyəm", "Aptek haradadır?"
         };
 
         /// <summary>Signs taken out of the course; their assets are deleted on the next run.</summary>
-        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin", "On", "İyirmi", "Yüz", "Sabah", "Dünən", "Ağ", "Qara" };
+        private static readonly string[] DroppedGlosses = { "Xoş gəldin", "Dəyməz", "Mən", "Sən", "Mənim", "Sənin", "On", "İyirmi", "Yüz", "Sabah", "Dünən", "Ağ", "Qara", "Küçə", "Park", "Tualet" };
 
         // Unit 2 as in kurikulum (L01–L05 + review), without "Xoş gəldin" and "Dəyməz" (removed 2026-11-14).
         private static readonly LessonSpec[] Unit2Lessons =
@@ -148,6 +149,15 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new LessonSpec("Colour + thing", "Rəng + əşya", "Qırmızı çanta", "Bu kitabdır", "Telefonum yoxdur")
         };
 
+        // Unit 9 as in kurikulum, without Küçə, Park, Tualet and «Tualet haradadır?» (not recorded).
+        private static readonly LessonSpec[] Unit9Lessons =
+        {
+            new LessonSpec("Home, school, work", "Ev, məktəb, iş", "Ev", "Məktəb", "İş", "Universitet"),
+            new LessonSpec("Shop, café, bank", "Mağaza, kafe, bank", "Mağaza", "Kafe", "Bank"),
+            new LessonSpec("Hospital, pharmacy, police", "Xəstəxana, aptek, polis", "Xəstəxana", "Aptek", "Polis"),
+            new LessonSpec("Bus, metro, where?", "Avtobus, metro, harada?", "Avtobus", "Metro", "Mən evdəyəm", "Aptek haradadır?")
+        };
+
         private static readonly UnitSpec[] Units =
         {
             // Unit 1 teaches the 32 letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
@@ -169,7 +179,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new UnitSpec { En = "Daily Objects & Colors", Az = "Gündəlik əşyalar və rənglər", Category = "əşyalar",
                 Lessons = Unit8Lessons },
             new UnitSpec { En = "Essential Places", Az = "Vacib yerlər", Category = "yerlər",
-                Words = new[] { "Ev", "Məktəb", "Xəstəxana", "Mağaza", "Kafe", "Park", "İş", "Küçə", "Avtobus", "Aptek" } },
+                Lessons = Unit9Lessons },
             new UnitSpec { En = "A1 Review & Final Checkpoint", Az = "A1 təkrar və yekun imtahan", Category = "təkrar",
                 GuideEn = "Review the whole level, then pass the checkpoint (20 random signs, 80% correct) to enter A2.",
                 GuideAz = "Bütün səviyyəni təkrarla, sonra A2-yə keçmək üçün imtahanı (20 təsadüfi işarə, 80% düzgün) keç." }
