@@ -46,9 +46,12 @@ namespace Cevir.Core.UI
             bool sideways = rotation % 180 != 0;
             image.rectTransform.localEulerAngles = new Vector3(0f, 0f, -rotation);
 
-            // Mirror horizontally for a selfie view; flip vertically when the camera delivers bottom-up rows.
-            float uvW = _source.PreviewMirrored ? -1f : 1f;
-            float uvH = _source.PreviewVerticallyFlipped ? -1f : 1f;
+            // Flip vertically when the camera delivers bottom-up rows. The selfie mirror must be left-right on the
+            // screen; when the picture is turned sideways, the screen's left-right is the texture's up-down.
+            bool flipU = !sideways && _source.PreviewMirrored;
+            bool flipV = _source.PreviewVerticallyFlipped ^ (sideways && _source.PreviewMirrored);
+            float uvW = flipU ? -1f : 1f;
+            float uvH = flipV ? -1f : 1f;
             image.uvRect = new Rect(uvW < 0 ? 1f : 0f, uvH < 0 ? 1f : 0f, uvW, uvH);
 
             // Cover-fit: scale the (possibly rotated) texture so it fills the frame with no bars.

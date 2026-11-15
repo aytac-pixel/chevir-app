@@ -1,0 +1,6 @@
+<linker>
+  <!-- MediaPipe and Protobuf use reflection; keep them whole so IL2CPP stripping cannot break detection. -->
+  <assembly fullname="Mediapipe.Runtime" preserve="all" ignoreIfMissing="1"/>
+  <assembly fullname="Google.Protobuf" preserve="all" ignoreIfMissing="1"/>
+  <assembly fullname="Cevir.Integrations.MediaPipe" preserve="all" ignoreIfMissing="1"/>
+</linker>

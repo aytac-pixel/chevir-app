@@ -56,15 +56,14 @@ namespace Cevir.Integrations.MediaPipe
         [SerializeField] private bool enableFace = true;
 
         [Header("Orientation")]
-        [Tooltip("Unity textures are bottom-up; MediaPipe expects top-down. Flipping y fixes landmarks.")]
-        [SerializeField] private bool flipVertically = true;
-
         [Tooltip("Extra Left/Right swap for devices whose front camera already delivers a mirrored image. Verify per device.")]
         [SerializeField] private bool invertHandedness;
 
         private WebCamTexture _camera;
         private Texture2D _cpuTexture;
         private Color32[] _pixels;
+        private Color32[] _upright;
+        private int _uprightRotation = -1;
 
         private HandLandmarker _hands;
         private FaceLandmarker _face;
@@ -192,10 +191,21 @@ namespace Cevir.Integrations.MediaPipe
                 yield break;
             }
 
-            _cpuTexture = new Texture2D(_camera.width, _camera.height, TextureFormat.RGBA32, false);
             _pixels = new Color32[_camera.width * _camera.height];
+            _upright = new Color32[_pixels.Length];
+            _uprightRotation = -1;
 
-            CreateLandmarkers();
+            try
+            {
+                CreateLandmarkers();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[Chevir] MediaPipe could not start: " + e);
+                CloseLandmarkers();
+            }
+
+            if (_hands == null) yield break;
             _clock.Restart();
             _lastSentTimestamp = -1;
             IsRunning = true;
@@ -270,23 +280,78 @@ namespace Cevir.Integrations.MediaPipe
             if (timestamp <= _lastSentTimestamp) return; // MediaPipe requires strictly increasing timestamps.
             _lastSentTimestamp = timestamp;
 
+            if (_camera.width * _camera.height != _pixels.Length) return; // resolution changed mid-stream
+
+            // Build the picture exactly as the learner sees it standing upright (not mirrored, rows top-down,
+            // which is what MediaPipe expects). Landmarks then come back in upright image space directly.
+            int rotation = NormalizeRotation(_camera.videoRotationAngle);
+            int width, height;
             _camera.GetPixels32(_pixels);
-            _cpuTexture.SetPixels32(_pixels);
+            UprightPixels(_pixels, _camera.width, _camera.height, rotation, _camera.videoVerticallyMirrored, _upright,
+                out width, out height);
 
-            // Rotation so the landmarker sees an upright face on phones held in portrait.
-            var processing = new ImageProcessingOptions(rotationDegrees: NormalizeRotation(-_camera.videoRotationAngle));
-
-            using (var image = new MpImage(MpImageFormat.Types.Format.Srgba, _cpuTexture.width, _cpuTexture.height,
-                       _cpuTexture.width * 4, _cpuTexture.GetPixelData<byte>(0)))
+            if (_cpuTexture == null || _cpuTexture.width != width || _cpuTexture.height != height || _uprightRotation != rotation)
             {
-                _hands.DetectAsync(image, timestamp, processing);
-                if (_face != null) _face.DetectAsync(image, timestamp, processing);
+                if (_cpuTexture != null) Destroy(_cpuTexture);
+                _cpuTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+                _uprightRotation = rotation;
+            }
+
+            _cpuTexture.SetPixels32(_upright);
+
+            var processing = new ImageProcessingOptions(rotationDegrees: 0);
+            try
+            {
+                using (var image = new MpImage(MpImageFormat.Types.Format.Srgba, width, height, width * 4,
+                           _cpuTexture.GetPixelData<byte>(0)))
+                {
+                    _hands.DetectAsync(image, timestamp, processing);
+                    if (_face != null) _face.DetectAsync(image, timestamp, processing);
+                }
+            }
+            catch (Exception e)
+            {
+                if (!_loggedDetectError) Debug.LogError("[Chevir] MediaPipe detection failed: " + e);
+                _loggedDetectError = true;
+                return;
             }
 
             lock (_lock)
             {
-                bool rotated = (_camera.videoRotationAngle % 180) != 0;
-                _back.ImageAspect = rotated ? _camera.height / (float)_camera.width : _camera.width / (float)_camera.height;
+                _back.ImageAspect = width / (float)height;
+            }
+        }
+
+        private bool _loggedDetectError;
+
+        /// <summary>
+        /// Copies Unity's bottom-up camera pixels into a top-down buffer turned upright (the camera's clockwise
+        /// <paramref name="rotation"/> applied), so row 0 is the top of the picture as the learner holds the phone.
+        /// </summary>
+        public static void UprightPixels(Color32[] source, int w, int h, int rotation, bool verticallyMirrored,
+            Color32[] target, out int outW, out int outH)
+        {
+            bool sideways = rotation == 90 || rotation == 270;
+            outW = sideways ? h : w;
+            outH = sideways ? w : h;
+            int index = 0;
+            for (int row = 0; row < outH; row++)
+            {
+                int y = outH - 1 - row; // y-up coordinate in the upright picture
+                for (int x = 0; x < outW; x++)
+                {
+                    int u, v;
+                    switch (rotation)
+                    {
+                        case 90: u = w - 1 - y; v = x; break;
+                        case 180: u = w - 1 - x; v = h - 1 - y; break;
+                        case 270: u = y; v = h - 1 - x; break;
+                        default: u = x; v = y; break;
+                    }
+
+                    if (verticallyMirrored) v = h - 1 - v;
+                    target[index++] = source[v * w + u];
+                }
             }
         }
 
@@ -318,11 +383,9 @@ namespace Cevir.Integrations.MediaPipe
                             score = result.handedness[h].categories[0].score;
                         }
 
-                        // MediaPipe labels hands assuming a mirrored (selfie) image. The raw front-camera image
-                        // is not mirrored, so its labels come out swapped; a vertical flip is itself a reflection
-                        // and cancels that. Net: labels are right when flipping, swapped otherwise.
-                        bool isLeft = label == "Left";
-                        if (!flipVertically) isLeft = !isLeft;
+                        // MediaPipe labels hands assuming a mirrored (selfie) image. The picture it gets here is
+                        // not mirrored (as another person would see the learner), so its labels come out swapped.
+                        bool isLeft = label != "Left";
                         if (invertHandedness) isLeft = !isLeft;
 
                         HandLandmarks target = isLeft ? _back.LeftHand : _back.RightHand;
@@ -332,7 +395,7 @@ namespace Cevir.Integrations.MediaPipe
                         for (int i = 0; i < HandLandmarks.Count && i < points.Count; i++)
                         {
                             NormalizedLandmark p = points[i];
-                            target.Points[i] = new Vector3(p.x, flipVertically ? 1f - p.y : p.y, p.z);
+                            target.Points[i] = new Vector3(p.x, p.y, p.z);
                         }
 
                         target.IsPresent = true;
@@ -357,7 +420,7 @@ namespace Cevir.Integrations.MediaPipe
                 for (int i = 0; i < FaceLandmarks.Count && i < points.Count; i++)
                 {
                     NormalizedLandmark p = points[i];
-                    face.Points[i] = new Vector3(p.x, flipVertically ? 1f - p.y : p.y, p.z);
+                    face.Points[i] = new Vector3(p.x, p.y, p.z);
                 }
 
                 face.IsPresent = points.Count >= 468;
@@ -378,7 +441,7 @@ namespace Cevir.Integrations.MediaPipe
                 {
                     Matrix4x4 m = result.facialTransformationMatrixes[0];
                     Vector3 euler = m.rotation.eulerAngles;
-                    face.HeadEuler = flipVertically ? new Vector3(-euler.x, euler.y, -euler.z) : euler;
+                    face.HeadEuler = euler;
                     face.HasHeadPose = true;
                 }
             }

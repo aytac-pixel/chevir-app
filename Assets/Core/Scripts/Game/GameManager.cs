@@ -412,8 +412,7 @@ namespace Cevir.Core.Game
                 return false;
             }
 
-            bool heartFree = node.Kind == PathNodeKind.GateTest || node.Lesson.IsHeartFree;
-            if (!heartFree && !Hearts.HasHearts)
+            if (!Hearts.HasHearts)
             {
                 reason = "no_hearts";
                 return false;

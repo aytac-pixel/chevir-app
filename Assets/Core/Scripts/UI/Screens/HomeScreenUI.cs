@@ -300,10 +300,9 @@ namespace Cevir.Core.UI
 
         private void ShowNoHearts()
         {
-            PathNode practice = FindPracticeNode();
             if (sheet == null) return;
             sheet.Show(null, UIStrings.OutOfHeartsTitle, string.Format(UIStrings.NoHeartsToStart, UIStrings.Duration(_game.Hearts.TimeToNextHeart())), UIPalette.Heart,
-                practice != null ? UIStrings.Practice : null, () => StartNode(practice), UIStrings.Close, null);
+                null, null, UIStrings.Close, null);
         }
 
         /// <summary>Practice lessons cost no hearts, so they are the way back in.</summary>

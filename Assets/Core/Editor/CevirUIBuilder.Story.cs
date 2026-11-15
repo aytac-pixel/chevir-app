@@ -141,11 +141,6 @@ namespace Cevir.Core.Editor
             footerRow.childForceExpandWidth = true;
             Layout(footer.gameObject, preferredHeight: 96f, minHeight: 96f);
             Button skipLetter = ToggleButton(footer, "SkipLetterButton", "Skip letter", "Hərfi keç");
-            TextMeshProUGUI cantLabel;
-            Button cantUse = MakeButton(footer, "CantUseCameraButton", UIStrings.SkipCamera, new Color(1f, 1f, 1f, 0f), UIPalette.TextSecondary, 96f, out cantLabel);
-            cantLabel.fontSize = 28f;
-            cantLabel.gameObject.AddComponent<LocalizedLabel>().Set("Can't use the camera now", "İndi kamera istifadə edə bilmirəm");
-            Layout(cantUse.gameObject, flexibleWidth: 1f);
             skipLetter.gameObject.SetActive(false);
 
             hudRoot.gameObject.SetActive(false);
@@ -186,7 +181,6 @@ namespace Cevir.Core.Editor
             Set(ui, "selfCheckNote", selfCheck);
             Set(ui, "skipLetterButton", skipLetter);
             Set(ui, "closeCameraButton", closeCamera);
-            Set(ui, "cantUseCameraButton", cantUse);
             Set(ui, "nameCard", nameCard);
             Set(ui, "firstNameField", firstName);
             Set(ui, "lastNameField", lastName);

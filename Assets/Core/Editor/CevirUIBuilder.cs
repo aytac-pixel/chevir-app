@@ -406,9 +406,6 @@ namespace Cevir.Core.Editor
 
             TextMeshProUGUI primaryLabel;
             Button primary = MakeButton(screen, "PrimaryButton", UIStrings.Start, UIPalette.Blue, Color.white, 130f, out primaryLabel);
-            TextMeshProUGUI skipLabel;
-            Button skip = MakeButton(screen, "SkipButton", UIStrings.SkipCamera, Color.white, UIPalette.TextSecondary, 70f, out skipLabel);
-            skipLabel.fontSize = 30f;
 
             // Overlay sits on top and ignores the column layout.
             FeedbackOverlayUI overlay = BuildFeedbackOverlay(screen, heartIcon);
@@ -435,7 +432,6 @@ namespace Cevir.Core.Editor
             SetList(ui, "choiceButtons", choiceButtons);
             Set(ui, "primaryButton", primary);
             Set(ui, "primaryLabel", primaryLabel);
-            Set(ui, "skipButton", skip);
             return ui;
         }
 

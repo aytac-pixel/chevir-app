@@ -59,7 +59,7 @@ namespace Cevir.Core.Lesson
 
         public Phase CurrentPhase { get; private set; }
         public ILandmarkProvider Provider => _provider;
-        public bool IsCalibrated => _baseline.SampleCount > 0;
+        public bool IsCalibrated { get; private set; }
 
         /// <summary>Raised after every scored attempt (for analytics and debug overlays).</summary>
         public event Action<MatchResult> AttemptScored;
@@ -175,7 +175,12 @@ namespace Cevir.Core.Lesson
         {
             // Timeouts are checked here as well, so they fire even if the camera stops delivering frames.
             double now = Time.realtimeSinceStartupAsDouble;
-            if (CurrentPhase == Phase.WaitingForHand && now - _phaseStart > waitForHandTimeout)
+            if (CurrentPhase == Phase.Calibrating && now - _phaseStart > calibrationSeconds + CalibrationGrace)
+            {
+                // No face frames arrived in time: carry on with a neutral baseline so the lesson never stalls.
+                FinishCalibration();
+            }
+            else if (CurrentPhase == Phase.WaitingForHand && now - _phaseStart > waitForHandTimeout)
             {
                 Score();
             }
@@ -193,14 +198,7 @@ namespace Cevir.Core.Lesson
             {
                 case Phase.Calibrating:
                     _baseline.Add(_extractor.ComputeNonManual(frame, _extractor.DominantHand == HandSide.Left));
-                    if (now - _phaseStart >= calibrationSeconds)
-                    {
-                        _extractor.Baseline = _baseline.Average();
-                        SetPhase(Phase.Idle);
-                        Action done = _calibrationDone;
-                        _calibrationDone = null;
-                        if (done != null) done();
-                    }
+                    if (now - _phaseStart >= calibrationSeconds) FinishCalibration();
 
                     break;
 
@@ -229,6 +227,18 @@ namespace Cevir.Core.Lesson
             }
 
             if (FrameProcessed != null && _attempt.Count > 0) FrameProcessed(frame, _attempt[_attempt.Count - 1]);
+        }
+
+        private const float CalibrationGrace = 2f;
+
+        private void FinishCalibration()
+        {
+            if (_baseline.SampleCount > 0) _extractor.Baseline = _baseline.Average();
+            IsCalibrated = true;
+            SetPhase(Phase.Idle);
+            Action done = _calibrationDone;
+            _calibrationDone = null;
+            if (done != null) done();
         }
 
         private void Capture(LandmarkFrame frame)

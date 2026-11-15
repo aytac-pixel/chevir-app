@@ -24,7 +24,6 @@ namespace Cevir.Core.UI
             return value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "x";
         }
         public static string Normal => Loc.Pick("Normal", "Normal");
-        public static string SkipCamera => Loc.Pick("Can't use the camera now", "İndi kamera istifadə edə bilmirəm");
 
         public static string WatchPrompt => Loc.Pick("Watch and remember", "Bax və yadda saxla");
         public static string GotIt => Loc.Pick("GOT IT", "ANLADIM");

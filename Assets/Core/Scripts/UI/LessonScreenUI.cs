@@ -366,6 +366,7 @@ namespace Cevir.Core.UI
             AttemptOutcome outcome = _session.SubmitChoice(exercise.Choices[index]);
             Play(outcome.Passed ? SfxId.Correct : SfxId.Incorrect);
             if (outcome.HeartLost) Play(SfxId.HeartLost);
+            RefreshHud();
 
             if (overlay != null) overlay.ShowChoiceResult(outcome.Passed, exercise.Sign.Gloss, outcome.HeartLost, ContinueAfterFeedback);
             else ContinueAfterFeedback();

@@ -58,8 +58,8 @@ namespace Cevir.Core.Lesson
             _packProgress = packProgress;
             _utcNow = utcNow;
 
-            // Gate tests are exams and practice lessons are how hearts come back; neither costs hearts.
-            _usesHearts = kind == SessionKind.Lesson && lesson != null && !lesson.IsHeartFree;
+            // Every mistake costs a heart, in lessons, practice and gate tests alike.
+            _usesHearts = true;
         }
 
         public SessionKind Kind { get; private set; }
@@ -169,6 +169,8 @@ namespace Cevir.Core.Lesson
             e.SoftFailures++;
             if (Kind == SessionKind.GateTest)
             {
+                if (_usesHearts && _hearts.RegisterSoftFailure(e.SoftFailures)) outcome.HeartLost = true;
+                if (CheckOutOfHearts(ref outcome)) return outcome;
                 if (e.SoftFailures >= _hearts.SoftFailuresPerHeart)
                 {
                     Record(e, false);
