@@ -307,6 +307,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
             units = new List<UnitData>();
             var everything = new List<SignDefinition>();
+            var taught = new List<List<SignDefinition>>(); // signs taught in each unit, for the Unit 10 review
             for (int u = 0; u < Units.Length; u++)
             {
                 UnitSpec spec = Units[u];
@@ -328,17 +329,24 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 List<LessonData> lessons;
                 if (u == 0) lessons = CreateUnit1Lessons(unitId, letters);
                 else if (spec.Lessons != null) lessons = CreateFixedLessons(unitId, u, spec, unitSigns[u]);
-                else if (checkpoint) lessons = CreateReviewLessons(unitId, u, everything);
+                else if (checkpoint) lessons = CreateReviewLessons(unitId, u, taught, everything);
                 else
                 {
                     var signs = new List<SignDefinition>(unitSigns[u]);
                     lessons = CreateTeachingLessons(unitId, u, spec, signs);
                 }
 
+                var inUnit = new List<SignDefinition>();
                 foreach (LessonData lesson in lessons)
                 {
-                    foreach (SignDefinition s in lesson.TargetSigns) if (!everything.Contains(s)) everything.Add(s);
+                    foreach (SignDefinition s in lesson.TargetSigns)
+                    {
+                        if (!everything.Contains(s)) everything.Add(s);
+                        if (!inUnit.Contains(s)) inUnit.Add(s);
+                    }
                 }
+
+                taught.Add(inUnit);
 
                 unit.EditorSetContent(theme, lessons);
                 EditorUtility.SetDirty(unit);
@@ -421,14 +429,46 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             return lessons;
         }
 
-        private static List<LessonData> CreateReviewLessons(string unitId, int unitIndex, List<SignDefinition> everything)
+        /// <summary>Unit 10 review lessons: (title EN, title AZ, unit numbers reviewed). Only already recorded videos are used.</summary>
+        private static readonly object[][] ReviewPlan =
         {
-            int half = everything.Count / 2;
-            return new List<LessonData>
+            new object[] { "Alphabet review", "Əlifba təkrarı", new[] { 1 } },
+            new object[] { "Greetings and pronouns", "Salamlaşma və əvəzliklər", new[] { 2, 3 } },
+            new object[] { "Questions and family", "Suallar və ailə", new[] { 4, 5 } },
+            new object[] { "Numbers and time", "Rəqəmlər və zaman", new[] { 6, 7 } },
+            new object[] { "Things and places", "Əşyalar və yerlər", new[] { 8, 9 } }
+        };
+
+        /// <summary>
+        /// Unit 10 (A1 review): one review per pair of units, then a mixed review of the whole level. Each review is
+        /// sampled (12 signs, the ones due for review first), so a session stays short. The checkpoint follows.
+        /// </summary>
+        private static List<LessonData> CreateReviewLessons(string unitId, int unitIndex, List<List<SignDefinition>> taught,
+            List<SignDefinition> everything)
+        {
+            int unitNumber = unitIndex + 1;
+            var lessons = new List<LessonData>();
+            foreach (object[] row in ReviewPlan)
             {
-                Lesson(unitId, unitIndex + 1, 1, LessonType.Practice, everything.GetRange(0, half), "A1 review 1", "A1 təkrar 1", true),
-                Lesson(unitId, unitIndex + 1, 2, LessonType.Practice, everything.GetRange(half, everything.Count - half), "A1 review 2", "A1 təkrar 2", true)
-            };
+                var signs = new List<SignDefinition>();
+                foreach (int n in (int[])row[2])
+                {
+                    if (n - 1 < taught.Count) signs.AddRange(taught[n - 1]);
+                }
+
+                if (signs.Count == 0) continue;
+                lessons.Add(Lesson(unitId, unitNumber, lessons.Count + 1, LessonType.Practice, signs, (string)row[0], (string)row[1], true));
+            }
+
+            lessons.Add(Lesson(unitId, unitNumber, lessons.Count + 1, LessonType.Practice, everything, "A1 mixed review", "A1 qarışıq təkrar", true));
+
+            for (int n = lessons.Count + 1; n <= 12; n++)
+            {
+                string stale = A1 + "/Lessons/U" + unitNumber.ToString("00") + "_L" + n.ToString("00") + ".asset";
+                if (AssetDatabase.LoadAssetAtPath<LessonData>(stale) != null) AssetDatabase.DeleteAsset(stale);
+            }
+
+            return lessons;
         }
 
         private static LessonData Lesson(string unitId, int unitNumber, int number, LessonType type, List<SignDefinition> signs, string en, string az,
