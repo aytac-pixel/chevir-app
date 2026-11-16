@@ -241,7 +241,10 @@ namespace Cevir.Core.UI
 
         private static bool IsSelfCheck(Exercise exercise)
         {
-            return exercise.Sign == null || !exercise.Sign.HasRecognitionData;
+            if (exercise.Sign == null) return true;
+            bool letterModel = exercise.Sign.Kind == SignKind.Fingerspelling && Recognition.Letters.AzslLetterRecognizer.Available &&
+                               Recognition.Letters.AzslLetterRecognizer.LabelIndex(exercise.Sign.Gloss) >= 0;
+            return !exercise.Sign.HasRecognitionData && !letterModel;
         }
 
         private string PromptFor(Exercise exercise)

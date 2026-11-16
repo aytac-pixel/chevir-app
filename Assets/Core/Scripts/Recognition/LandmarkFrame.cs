@@ -24,6 +24,11 @@ namespace Cevir.Core.Recognition
         public const int PinkyMcp = 17, PinkyPip = 18, PinkyDip = 19, PinkyTip = 20;
 
         public readonly Vector3[] Points = new Vector3[Count];
+
+        /// <summary>Metric 3D hand shape (MediaPipe world landmarks, metres, origin near the hand centre).</summary>
+        public readonly Vector3[] WorldPoints = new Vector3[Count];
+
+        public bool HasWorld;
         public bool IsPresent;
 
         /// <summary>Handedness classification score from the landmarker, 0..1.</summary>
@@ -32,6 +37,8 @@ namespace Cevir.Core.Recognition
         public void CopyFrom(HandLandmarks other)
         {
             System.Array.Copy(other.Points, Points, Count);
+            System.Array.Copy(other.WorldPoints, WorldPoints, Count);
+            HasWorld = other.HasWorld;
             IsPresent = other.IsPresent;
             Confidence = other.Confidence;
         }
@@ -39,6 +46,7 @@ namespace Cevir.Core.Recognition
         public void Clear()
         {
             IsPresent = false;
+            HasWorld = false;
             Confidence = 0f;
         }
     }
@@ -100,6 +108,11 @@ namespace Cevir.Core.Recognition
         public const int LowerLipInner = 14;
 
         public readonly Vector3[] Points = new Vector3[Count];
+
+        /// <summary>Metric 3D hand shape (MediaPipe world landmarks, metres, origin near the hand centre).</summary>
+        public readonly Vector3[] WorldPoints = new Vector3[Count];
+
+        public bool HasWorld;
         public bool IsPresent;
 
         public FaceBlendshapes Blendshapes;
@@ -112,6 +125,8 @@ namespace Cevir.Core.Recognition
         public void CopyFrom(FaceLandmarks other)
         {
             System.Array.Copy(other.Points, Points, Count);
+            System.Array.Copy(other.WorldPoints, WorldPoints, Count);
+            HasWorld = other.HasWorld;
             IsPresent = other.IsPresent;
             Blendshapes = other.Blendshapes;
             HasBlendshapes = other.HasBlendshapes;

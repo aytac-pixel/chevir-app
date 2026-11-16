@@ -44,7 +44,7 @@ namespace Cevir.Integrations.MediaPipe
         [SerializeField] private int requestedFps = 30;
 
         [Tooltip("Frames per second sent to MediaPipe. 15+ is the plan's target on mid-range phones.")]
-        [SerializeField, Range(5, 30)] private int inferenceFps = 20;
+        [SerializeField, Range(5, 30)] private int inferenceFps = 30;
 
         [Tooltip("GPU needs extra GL context setup in the plugin on Android; CPU works everywhere and is fast enough at 640x480.")]
         [SerializeField] private bool useGpuDelegate;
@@ -448,6 +448,18 @@ namespace Cevir.Integrations.MediaPipe
                         {
                             NormalizedLandmark p = points[i];
                             target.Points[i] = new Vector3(p.x, p.y, p.z);
+                        }
+
+                        target.HasWorld = false;
+                        if (result.handWorldLandmarks != null && h < result.handWorldLandmarks.Count)
+                        {
+                            var world = result.handWorldLandmarks[h].landmarks;
+                            for (int i = 0; i < HandLandmarks.Count && i < world.Count; i++)
+                            {
+                                target.WorldPoints[i] = new Vector3(world[i].x, world[i].y, world[i].z);
+                            }
+
+                            target.HasWorld = world.Count >= HandLandmarks.Count;
                         }
 
                         target.IsPresent = true;

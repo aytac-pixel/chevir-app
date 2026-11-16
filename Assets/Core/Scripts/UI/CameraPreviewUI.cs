@@ -118,7 +118,8 @@ namespace Cevir.Core.UI
             }
 
             _diagnostics.transform.parent.gameObject.SetActive(true);
-            _diagnostics.text = source.DiagnosticText;
+            string guess = Cevir.Core.Recognition.Letters.AzslLetterRecognizer.LastGuessText;
+            _diagnostics.text = source.DiagnosticText + (string.IsNullOrEmpty(guess) ? string.Empty : " | model: " + guess);
         }
     }
 }

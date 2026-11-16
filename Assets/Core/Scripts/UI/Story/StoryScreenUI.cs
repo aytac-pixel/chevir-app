@@ -383,7 +383,7 @@ namespace Cevir.Core.UI
                 if (letterLabel != null) letterLabel.text = target != null ? Loc.ToUpperAz(target.Gloss) : string.Empty;
             }
 
-            bool checkable = target != null && target.HasRecognitionData;
+            bool checkable = target != null && (target.HasRecognitionData || Recognition.Letters.AzslLetterRecognizer.LabelIndex(target.Gloss) >= 0 && Recognition.Letters.AzslLetterRecognizer.Available && target.Kind == LanguagePacks.SignKind.Fingerspelling);
             if (selfCheckNote != null)
             {
                 selfCheckNote.gameObject.SetActive(!checkable);

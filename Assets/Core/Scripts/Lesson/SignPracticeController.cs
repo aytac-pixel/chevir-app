@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cevir.Core.Game;
 using Cevir.Core.LanguagePacks;
 using Cevir.Core.Recognition;
+using Cevir.Core.Recognition.Letters;
 using UnityEngine;
 
 namespace Cevir.Core.Lesson
@@ -39,6 +40,27 @@ namespace Cevir.Core.Lesson
         [SerializeField, Min(0.2f)] private float calibrationSeconds = 1f;
 
         private const int MaxFrames = 240;
+
+        [Header("Fingerspelling (letter model)")]
+        [Tooltip("A letter passes when the model names it with at least this probability...")]
+        [SerializeField, Range(0.2f, 0.95f)] private float letterMinProbability = 0.5f;
+
+        [Tooltip("...on this many evaluations in a row.")]
+        [SerializeField, Min(1)] private int letterHitsNeeded = 2;
+
+        [Tooltip("Longest a letter attempt may last once the hand is seen.")]
+        [SerializeField, Min(2f)] private float letterMaxSeconds = 8f;
+
+        private readonly AzslLetterRecognizer _letters = new AzslLetterRecognizer();
+        private int _letterIndex = -1;
+        private int _letterHits;
+        private int _letterEvalTick;
+        private int _letterHandFrames;
+        private float _letterBest;
+        private bool _letterPassed;
+
+        /// <summary>True while the current attempt is judged by the letter model.</summary>
+        public bool LetterMode => _letterIndex >= 0;
 
         private readonly SignFeatureExtractor _extractor = new SignFeatureExtractor();
         private readonly NonManualBaseline _baseline = new NonManualBaseline();
@@ -168,6 +190,18 @@ namespace Cevir.Core.Lesson
             }
 
             _attempt.Clear();
+            _letterIndex = -1;
+            if (_target != null && _candidates == null && _target.Kind == SignKind.Fingerspelling && AzslLetterRecognizer.Available)
+            {
+                _letterIndex = AzslLetterRecognizer.LabelIndex(_target.Gloss);
+            }
+
+            _letters.Reset();
+            _letterHits = 0;
+            _letterEvalTick = 0;
+            _letterHandFrames = 0;
+            _letterBest = 0f;
+            _letterPassed = false;
             SetPhase(Phase.WaitingForHand);
         }
 
@@ -184,7 +218,7 @@ namespace Cevir.Core.Lesson
             {
                 Score();
             }
-            else if (CurrentPhase == Phase.Recording && now - _phaseStart > maxAttemptSeconds)
+            else if (CurrentPhase == Phase.Recording && now - _phaseStart > (LetterMode ? letterMaxSeconds : maxAttemptSeconds))
             {
                 Score();
             }
@@ -193,6 +227,12 @@ namespace Cevir.Core.Lesson
         private void OnFrame(LandmarkFrame frame)
         {
             double now = Time.realtimeSinceStartupAsDouble;
+
+            if (LetterMode && (CurrentPhase == Phase.WaitingForHand || CurrentPhase == Phase.Recording))
+            {
+                LetterFrame(frame, now);
+                return;
+            }
 
             switch (CurrentPhase)
             {
@@ -241,6 +281,60 @@ namespace Cevir.Core.Lesson
             if (done != null) done();
         }
 
+        private void LetterFrame(LandmarkFrame frame, double now)
+        {
+            _letters.Push(frame);
+            if (frame.AnyHandPresent)
+            {
+                _lastHandSeen = now;
+                _letterHandFrames++;
+                if (CurrentPhase == Phase.WaitingForHand) SetPhase(Phase.Recording);
+            }
+
+            if (CurrentPhase != Phase.Recording) return;
+
+            if (frame.AnyHandPresent && _letters.FrameCount >= 8 && ++_letterEvalTick % 3 == 0)
+            {
+                float[] probs = _letters.Evaluate();
+                if (probs != null)
+                {
+                    int best = 0;
+                    for (int i = 1; i < probs.Length; i++) if (probs[i] > probs[best]) best = i;
+                    float p = probs[_letterIndex];
+                    if (p > _letterBest) _letterBest = p;
+                    _letterHits = best == _letterIndex && p >= letterMinProbability ? _letterHits + 1 : 0;
+                    if (_letterHits >= letterHitsNeeded)
+                    {
+                        _letterPassed = true;
+                        Score();
+                        return;
+                    }
+                }
+            }
+
+            // The hand left for a while: end the attempt.
+            if (now - _lastHandSeen >= 1.5) Score();
+        }
+
+        private MatchResult ScoreLetter()
+        {
+            bool shown = _letterHandFrames >= 8;
+            SignFeedback feedback = _letterPassed ? SignFeedback.Correct : shown ? SignFeedback.AdjustHandShape : SignFeedback.ShowHandToCamera;
+            return new MatchResult
+            {
+                SignId = _target != null ? _target.SignId : null,
+                Feedback = feedback,
+                Severity = _letterPassed ? FeedbackSeverity.None : shown ? FeedbackSeverity.Soft : FeedbackSeverity.Neutral,
+                ManualScore = _letterBest,
+                HandShapeScore = _letterBest,
+                ClassifierProbability = _letterBest,
+                HandVisibleRatio = shown ? 1f : 0f,
+                NonManualScore = 1f,
+                BestReferenceIndex = -1,
+                IsPerfect = _letterPassed && _letterBest >= 0.8f
+            };
+        }
+
         private void Capture(LandmarkFrame frame)
         {
             if (_attempt.Count >= MaxFrames) return;
@@ -260,7 +354,12 @@ namespace Cevir.Core.Lesson
             }
 
             MatchResult result;
-            if (_presenceOnly)
+            if (LetterMode)
+            {
+                result = ScoreLetter();
+                _letterIndex = -1;
+            }
+            else if (_presenceOnly)
             {
                 result = ScorePresence();
             }
