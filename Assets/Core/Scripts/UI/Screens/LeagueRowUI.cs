@@ -30,7 +30,7 @@ namespace Cevir.Core.UI
             if (background != null)
             {
                 background.sprite = you ? theme.buttonGradient : theme.panel;
-                background.color = you ? Color.white : entry.Zone == LeagueZone.Demote ? UIPalette.DemoteRow : new Color(1f, 1f, 1f, 0f);
+                background.color = you ? Color.white : entry.Zone == LeagueZone.Demote ? UIPalette.DemoteRow : Color.white;
             }
 
             if (youGlow != null) youGlow.gameObject.SetActive(you);

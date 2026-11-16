@@ -34,23 +34,23 @@ namespace Cevir.Core.UI
             bool done = entry.State == StoryState.Completed;
             bool playable = entry.Story.IsPlayable;
 
-            if (background != null) background.color = locked ? (Color)new Color32(0xEE, 0xF3, 0xFA, 0xFF) : Color.white;
+            if (background != null) background.color = Color.white;
             if (numberBox != null)
             {
                 numberBox.sprite = locked ? theme.panel : theme.tileGradient;
-                numberBox.color = locked ? (Color)new Color32(0xE2, 0xE7, 0xEF, 0xFF) : Color.white;
+                numberBox.color = locked ? UIPalette.Background : Color.white;
             }
 
             if (numberLabel != null)
             {
                 numberLabel.text = entry.Story.Number.ToString();
-                numberLabel.color = locked ? UIPalette.TextMuted : Color.white;
+                numberLabel.color = locked ? UIPalette.TextSecondary : Color.white;
             }
 
             if (titleLabel != null)
             {
                 titleLabel.text = entry.Story.Title;
-                titleLabel.color = locked ? (Color)new Color32(0x8A, 0x97, 0xAB, 0xFF) : UIPalette.TextPrimary;
+                titleLabel.color = UIPalette.TextPrimary;
             }
 
             if (statusLabel != null)
@@ -59,11 +59,12 @@ namespace Cevir.Core.UI
                 statusLabel.color = locked ? UIPalette.TextMuted : done ? UIPalette.Green : UIPalette.Cyan;
             }
 
-            if (badge != null) badge.color = locked ? (Color)new Color32(0xE0, 0xE5, 0xEC, 0xFF) : done ? UIPalette.GreenLight : UIPalette.CyanLight;
+            // Locked: a bare padlock; open stories get a bordered square with play / check.
+            if (badge != null) badge.color = locked ? new Color(1f, 1f, 1f, 0f) : done ? UIPalette.GreenLight : UIPalette.CyanLight;
             if (badgeIcon != null)
             {
                 badgeIcon.sprite = locked ? theme.iconLock : done ? theme.iconCheck : theme.iconPlay;
-                badgeIcon.color = locked ? UIPalette.TextMuted : done ? UIPalette.Green : UIPalette.Primary;
+                badgeIcon.color = locked ? UIPalette.LockedIcon : done ? UIPalette.Green : UIPalette.Primary;
             }
         }
     }

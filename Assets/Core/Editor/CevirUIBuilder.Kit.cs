@@ -7,7 +7,10 @@ using UnityEngine.UI;
 
 namespace Cevir.Core.Editor
 {
-    /// <summary>Building blocks for the glass theme: sprites from Assets/Core/Sprites, glass cards, icons, labels.</summary>
+    /// <summary>
+    /// Building blocks for the pixel theme: sprites from Assets/Core/Sprites (square panels with a dark border, see
+    /// Tools/ui_art/make_pixel_sprites.py), cards with a hard offset shadow, icons, labels.
+    /// </summary>
     public static partial class CevirUIBuilder
     {
         private const string SpriteFolder = "Assets/Core/Sprites";
@@ -113,7 +116,7 @@ namespace Cevir.Core.Editor
             return label;
         }
 
-        /// <summary>Glass card: translucent white rounded panel, a light border and a soft drop shadow.</summary>
+        /// <summary>Card: square panel with a dark border (in the sprite) and a hard offset shadow.</summary>
         private static Image Glass(Transform parent, string name, int radius, Color fill)
         {
             RectTransform rt = Rect(name, parent);
@@ -123,15 +126,33 @@ namespace Cevir.Core.Editor
             image.pixelsPerUnitMultiplier = 1f;
             image.color = fill;
             image.raycastTarget = false;
-
-            Shadow shadow = rt.gameObject.AddComponent<Shadow>();
-            shadow.effectColor = UIPalette.Shadow;
-            shadow.effectDistance = new Vector2(0f, -8f);
-
-            Image border = Img(rt, "Border", Sprite("UI", "outline_r" + (radius >= 48 ? 48 : 36)), UIPalette.GlassBorder, true);
-            Stretch(border.rectTransform);
-            Layout(border.gameObject).ignoreLayout = true;
+            HardShadow(rt.gameObject);
             return image;
+        }
+
+        /// <summary>Pixel-style shadow: a solid dark copy offset down and to the right.</summary>
+        private static Shadow HardShadow(GameObject go)
+        {
+            Shadow shadow = go.GetComponent<Shadow>();
+            if (shadow == null || shadow is Outline) shadow = go.AddComponent<Shadow>();
+            shadow.effectColor = UIPalette.Ink;
+            shadow.effectDistance = UIPalette.ShadowOffset;
+            shadow.useGraphicAlpha = true;
+            return shadow;
+        }
+
+        /// <summary>
+        /// Turns every soft drop shadow under <paramref name="root"/> into the hard pixel shadow, so older building code
+        /// matches the design. Outlines are left alone.
+        /// </summary>
+        private static void HardenShadows(GameObject root)
+        {
+            foreach (Shadow shadow in root.GetComponentsInChildren<Shadow>(true))
+            {
+                if (shadow.GetType() != typeof(Shadow)) continue;
+                shadow.effectColor = UIPalette.Ink;
+                shadow.effectDistance = UIPalette.ShadowOffset;
+            }
         }
 
         /// <summary>Blue gradient pill button with an optional icon before the label.</summary>
@@ -143,9 +164,7 @@ namespace Cevir.Core.Editor
             image.sprite = Sprite("UI", "button_gradient");
             image.type = Image.Type.Sliced;
             image.pixelsPerUnitMultiplier = 1f;
-            Shadow shadow = rt.gameObject.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0.06f, 0.37f, 0.82f, 0.35f);
-            shadow.effectDistance = new Vector2(0f, -8f);
+            HardShadow(rt.gameObject);
             Button button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             Layout(rt.gameObject, preferredHeight: height, minHeight: height);
@@ -159,7 +178,7 @@ namespace Cevir.Core.Editor
             row.childForceExpandWidth = false;
             row.childForceExpandHeight = false;
             if (!string.IsNullOrEmpty(icon)) Icon(rt, "Icon", icon, height * 0.36f, Color.white);
-            label = Label(rt, "Label", en, az, Mathf.Min(38f, height * 0.32f), Color.white, TextAlignmentOptions.Center, true);
+            label = Label(rt, "Label", en, az, Mathf.Min(40f, height * 0.34f), Color.white, TextAlignmentOptions.Center, true);
             return button;
         }
 
@@ -173,9 +192,7 @@ namespace Cevir.Core.Editor
             image.type = round ? Image.Type.Simple : Image.Type.Sliced;
             image.pixelsPerUnitMultiplier = 1f;
             image.color = fill;
-            Shadow shadow = rt.gameObject.AddComponent<Shadow>();
-            shadow.effectColor = UIPalette.Shadow;
-            shadow.effectDistance = new Vector2(0f, -6f);
+            HardShadow(rt.gameObject);
             Button button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             Layout(rt.gameObject, preferredWidth: size, preferredHeight: size, minHeight: size);

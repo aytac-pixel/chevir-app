@@ -188,25 +188,29 @@ namespace Cevir.Core.UI
     /// </summary>
     public static class UIPalette
     {
-        public static readonly Color Background = new Color32(0xF4, 0xF9, 0xFF, 0xFF);
-        public static readonly Color Surface = new Color32(0xF1, 0xF6, 0xFC, 0xFF);
+        public static readonly Color Background = new Color32(0xF0, 0xF6, 0xFF, 0xFF);
+        public static readonly Color Surface = new Color32(0xE8, 0xF0, 0xFF, 0xFF);
         public static readonly Color Border = new Color32(0xDD, 0xE8, 0xF5, 0xFF);
-        public static readonly Color TextPrimary = new Color32(0x1E, 0x2A, 0x3B, 0xFF);
-        public static readonly Color TextSecondary = new Color32(0x7A, 0x86, 0x99, 0xFF);
-        public static readonly Color TextMuted = new Color32(0xA3, 0xAF, 0xC0, 0xFF);
+        public static readonly Color TextPrimary = new Color32(0x0A, 0x19, 0x31, 0xFF);
+        public static readonly Color TextSecondary = new Color32(0x4A, 0x5B, 0x78, 0xFF);
+        public static readonly Color TextMuted = new Color32(0x88, 0x97, 0xB0, 0xFF);
 
-        public static readonly Color Primary = new Color32(0x00, 0x6E, 0xF0, 0xFF); // logo blue
+        public static readonly Color Primary = new Color32(0x00, 0x43, 0xE6, 0xFF); // design blue
         public static readonly Color PrimaryDark = new Color32(0x00, 0x26, 0xC4, 0xFF); // logo deep blue
-        public static readonly Color Cyan = new Color32(0x1E, 0xB9, 0xF0, 0xFF);
-        public static readonly Color CyanLight = new Color32(0xE4, 0xF6, 0xFE, 0xFF);
-        public static readonly Color Glass = new Color(1f, 1f, 1f, 0.82f);
-        public static readonly Color GlassBorder = new Color32(0xDC, 0xEB, 0xFA, 0xFF);
-        public static readonly Color Shadow = new Color(0.36f, 0.55f, 0.82f, 0.16f);
-        public static readonly Color PathDot = new Color32(0xD3, 0xE5, 0xF6, 0xFF);
+        public static readonly Color Cyan = new Color32(0x00, 0x52, 0xFF, 0xFF);
+        public static readonly Color CyanLight = new Color32(0xDF, 0xE8, 0xFD, 0xFF);
+        public static readonly Color Glass = Color.white;
+        public static readonly Color GlassBorder = new Color32(0x0A, 0x19, 0x31, 0xFF);
+        public static readonly Color Shadow = new Color32(0x0A, 0x19, 0x31, 0xFF); // hard pixel shadow
+        public static readonly Color PathDot = new Color32(0xB4, 0xC3, 0xDA, 0xFF);
 
-        public static readonly Color LockedFill = new Color32(0xE3, 0xE9, 0xF1, 0xFF);
-        public static readonly Color LockedEdge = new Color32(0xC9, 0xD4, 0xE2, 0xFF);
-        public static readonly Color LockedIcon = new Color32(0x7D, 0x8C, 0xA3, 0xFF);
+        /// <summary>Dark ink of the pixel style: borders, hard shadows, main text.</summary>
+        public static readonly Color Ink = new Color32(0x0A, 0x19, 0x31, 0xFF);
+        public static readonly Vector2 ShadowOffset = new Vector2(8f, -8f);
+
+        public static readonly Color LockedFill = new Color32(0xE8, 0xF0, 0xFF, 0xFF);
+        public static readonly Color LockedEdge = new Color32(0x0A, 0x19, 0x31, 0xFF);
+        public static readonly Color LockedIcon = new Color32(0x60, 0x77, 0x92, 0xFF);
         public static readonly Color DemoteRow = new Color32(0xFD, 0xEC, 0xEE, 0xFF);
 
         public static readonly Color Green = new Color32(0x2B, 0xB6, 0x73, 0xFF);

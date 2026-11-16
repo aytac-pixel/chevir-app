@@ -99,13 +99,13 @@ namespace Cevir.Core.UI
             return image;
         }
 
-        /// <summary>White rounded card with a soft shadow and a padded column inside.</summary>
+        /// <summary>White square card (dark border in the sprite) with a hard pixel shadow and a padded column inside.</summary>
         public RectTransform Card(Transform parent, string name, int padding = 44, float spacing = 22f)
         {
-            Image card = Image(parent, name, _theme != null ? _theme.panel : null, new Color(1f, 1f, 1f, 0.94f), true);
+            Image card = Image(parent, name, _theme != null ? _theme.panel : null, Color.white, true);
             Shadow shadow = card.gameObject.AddComponent<Shadow>();
-            shadow.effectColor = UIPalette.Shadow;
-            shadow.effectDistance = new Vector2(0f, -8f);
+            shadow.effectColor = UIPalette.Ink;
+            shadow.effectDistance = UIPalette.ShadowOffset;
             Column(card.gameObject, padding, spacing);
             return card.rectTransform;
         }

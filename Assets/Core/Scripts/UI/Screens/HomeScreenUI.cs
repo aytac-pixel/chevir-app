@@ -41,7 +41,7 @@ namespace Cevir.Core.UI
         [SerializeField] private float unitSpacing = 330f;
         [SerializeField] private float bottomPadding = 260f;
         [SerializeField] private float dotSpacing = 34f;
-        [SerializeField] private float dotSize = 22f;
+        [SerializeField] private float dotSize = 16f;
         [SerializeField] private float tileClearance = 115f;
 
         [Tooltip("Horizontal offset of each unit from the centre, repeated along the path (matches the design).")]
@@ -227,7 +227,7 @@ namespace Cevir.Core.UI
                 go.transform.SetParent(layer, false);
                 go.transform.SetAsFirstSibling(); // behind the nodes
                 dot = go.GetComponent<Image>();
-                dot.sprite = theme != null ? theme.circle : null;
+                dot.sprite = null; // square pixel dots
                 dot.color = UIPalette.PathDot;
                 dot.raycastTarget = false;
                 _dots.Add(dot);

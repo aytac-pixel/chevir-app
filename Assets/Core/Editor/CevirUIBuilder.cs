@@ -88,6 +88,7 @@ namespace Cevir.Core.Editor
             BuildAuthScreen(canvasGo.transform);
             toast.transform.SetParent(canvasGo.transform, false); // above the full-screen panels, so their messages show
             toast.transform.SetAsLastSibling();
+            HardenShadows(canvasGo);
 
             CevirUIRoot root = canvasGo.AddComponent<CevirUIRoot>();
             Set(root, "tabBar", tabBar);
@@ -130,8 +131,8 @@ namespace Cevir.Core.Editor
             _circle = Sprite("UI", "circle") ?? AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
 
             // A project font in Assets/Core/Fonts wins: the TMP default (LiberationSans) has no Ə/ə glyph.
-            // Nunito (the design's font) first, then any other font asset there.
-            _font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontFolder + "/Nunito SDF.asset");
+            // VT323 (the design's pixel font) first, then any other font asset there.
+            _font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontFolder + "/VT323 SDF.asset");
             string[] fonts = _font == null ? AssetDatabase.FindAssets("t:TMP_FontAsset", new[] { FontFolder }) : new string[0];
             foreach (string guid in fonts)
             {
@@ -523,6 +524,7 @@ namespace Cevir.Core.Editor
         private static GameObject SavePrefab(GameObject root, string name)
         {
             SetLayerRecursively(root, LayerMask.NameToLayer("UI"));
+            HardenShadows(root);
             string path = PrefabFolder + "/" + name + ".prefab";
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
@@ -599,7 +601,8 @@ namespace Cevir.Core.Editor
         {
             RectTransform rt = Rect(name, parent);
             rt.sizeDelta = new Vector2(400f, height);
-            Image image = AddImage(rt, _rounded, fill, true);
+            Image image = AddImage(rt, Panel(24), fill, true);
+            image.pixelsPerUnitMultiplier = 1f; // square panel with the 6-unit dark border
             Button button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             ColorBlock colors = button.colors;
@@ -644,7 +647,9 @@ namespace Cevir.Core.Editor
             card.pivot = anchor;
             card.anchoredPosition = anchor.y < 0.01f ? new Vector2(0f, 40f) : Vector2.zero;
             card.sizeDelta = new Vector2(width, 400f);
-            AddImage(card, _rounded, Color.white, true);
+            Image cardImage = AddImage(card, Panel(36), Color.white, true);
+            cardImage.pixelsPerUnitMultiplier = 1f;
+            HardShadow(card.gameObject);
             VerticalLayoutGroup layout = card.gameObject.AddComponent<VerticalLayoutGroup>();
             int p = Mathf.RoundToInt(padding);
             layout.padding = new RectOffset(p, p, p, p);
@@ -655,9 +660,6 @@ namespace Cevir.Core.Editor
             layout.childForceExpandHeight = false;
             ContentSizeFitter fit = card.gameObject.AddComponent<ContentSizeFitter>();
             fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            Outline outline = card.gameObject.AddComponent<Outline>();
-            outline.effectColor = UIPalette.Border;
-            outline.effectDistance = new Vector2(4f, -4f);
             return card;
         }
 

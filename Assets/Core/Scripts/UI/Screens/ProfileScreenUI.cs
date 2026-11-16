@@ -180,7 +180,7 @@ namespace Cevir.Core.UI
 
             Color tier = LeagueTiers.Color(progress.leagueTier);
             if (leagueBadgeIcon != null) leagueBadgeIcon.color = tier;
-            if (leagueBadgeBackdrop != null) leagueBadgeBackdrop.color = new Color(tier.r, tier.g, tier.b, 0.16f);
+            if (leagueBadgeBackdrop != null) leagueBadgeBackdrop.color = new Color(1f, 1f, 1f, 0f); // pixel design: the cup alone
             if (leagueBadgeLabel != null) leagueBadgeLabel.text = LeagueTiers.Name(progress.leagueTier);
 
             if (streakValue != null) streakValue.text = _game.Streak.State.current.ToString();

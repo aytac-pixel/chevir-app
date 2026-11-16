@@ -28,8 +28,8 @@ namespace Cevir.Core.UI
         }
 
         [SerializeField] private List<TabView> tabs = new List<TabView>();
-        [SerializeField] private Color selectedLabel = new Color32(0x00, 0x6E, 0xF0, 0xFF);
-        [SerializeField] private Color idle = new Color32(0x9A, 0xA6, 0xB8, 0xFF);
+        [SerializeField] private Color selectedLabel = Color.white; // on the blue selected square
+        [SerializeField] private Color idle = new Color32(0x0A, 0x19, 0x31, 0xFF);
 
         public event Action<MainTab> TabSelected;
 
@@ -52,7 +52,7 @@ namespace Cevir.Core.UI
                 if (view.label != null)
                 {
                     view.label.color = on ? selectedLabel : idle;
-                    view.label.fontStyle = on ? FontStyles.Bold : FontStyles.Normal;
+                    view.label.fontStyle = FontStyles.Bold;
                 }
             }
         }

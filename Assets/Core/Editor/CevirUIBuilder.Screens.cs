@@ -22,15 +22,14 @@ namespace Cevir.Core.Editor
             bar.anchoredPosition = Vector2.zero;
             bar.sizeDelta = new Vector2(0f, TabBarHeight);
             Image background = bar.gameObject.AddComponent<Image>();
-            background.color = new Color(1f, 1f, 1f, 0.96f);
-            Shadow shadow = bar.gameObject.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0.36f, 0.55f, 0.82f, 0.10f);
-            shadow.effectDistance = new Vector2(0f, 4f);
-            Image line = Img(bar, "TopLine", null, UIPalette.Border);
-            Place(line.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(2000f, 2f));
+            background.color = Color.white;
+            Image line = Img(bar, "TopLine", null, UIPalette.Ink);
+            Place(line.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(4000f, 6f));
+            Layout(line.gameObject).ignoreLayout = true;
 
             HorizontalLayoutGroup row = Row(bar.gameObject, 0f, TextAnchor.UpperCenter);
-            row.padding = new RectOffset(20, 20, 18, 0);
+            row.padding = new RectOffset(28, 28, 24, 0);
+            row.spacing = 24f;
             row.childForceExpandWidth = true;
 
             TabBarUI ui = bar.gameObject.AddComponent<TabBarUI>();
@@ -52,13 +51,13 @@ namespace Cevir.Core.Editor
                 Button button = tab.gameObject.AddComponent<Button>();
                 button.transition = Selectable.Transition.None;
 
+                // Selected tab: blue square with a dark border behind a white icon and label (pixel design).
                 Image selected = Img(tab, "Selected", Sprite("UI", "navsel_gradient"), Color.white, true);
-                Place(selected.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -4f), new Vector2(128f, 104f));
-                selected.gameObject.AddComponent<Shadow>().effectColor = new Color(0.06f, 0.37f, 0.82f, 0.3f);
-                Image icon = Img(tab, "Icon", IconSprite(specs[i][0]), UIPalette.TextMuted);
-                Place(icon.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0f, -56f), new Vector2(60f, 60f));
-                TextMeshProUGUI label = Label(tab, "Label", specs[i][1], specs[i][2], 26f, UIPalette.TextMuted, TextAlignmentOptions.Center, true);
-                Place(label.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -116f), new Vector2(240f, 40f));
+                Place(selected.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(210f, 150f));
+                Image icon = Img(tab, "Icon", IconSprite(specs[i][0]), UIPalette.Ink);
+                Place(icon.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0f, -54f), new Vector2(64f, 64f));
+                TextMeshProUGUI label = Label(tab, "Label", specs[i][1], specs[i][2], 28f, UIPalette.Ink, TextAlignmentOptions.Center, true);
+                Place(label.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(240f, 40f));
 
                 UnityEditor.SerializedProperty element = tabs.GetArrayElementAtIndex(i);
                 element.FindPropertyRelative("tab").enumValueIndex = i;
@@ -160,33 +159,35 @@ namespace Cevir.Core.Editor
             RectTransform bar = Rect("TopBar", screen);
             AnchorTop(bar, topBar);
             Image barBg = bar.gameObject.AddComponent<Image>();
-            barBg.color = new Color(1f, 1f, 1f, 0.9f);
-            Image barLine = Img(bar, "BottomLine", null, UIPalette.Border);
-            Place(barLine.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(4000f, 2f));
-            Layout(barLine.gameObject).ignoreLayout = true;
+            barBg.color = UIPalette.Background;
             HorizontalLayoutGroup barRow = Row(bar.gameObject, 12f, TextAnchor.MiddleCenter);
             barRow.padding = new RectOffset(36, 36, 0, 0);
 
-            Image badge = Img(bar, "Badge", Sprite("UI", "tile_gradient"), Color.white);
-            badge.preserveAspect = false;
-            Layout(badge.gameObject, preferredWidth: 100f, preferredHeight: 100f).minWidth = 100f;
-            badge.gameObject.AddComponent<Shadow>().effectColor = new Color(0.06f, 0.37f, 0.82f, 0.3f);
-            TextMeshProUGUI badgeLabel = Text(badge.transform, "Code", "AZ", 38f, Color.white, TextAlignmentOptions.Center, true);
-            Stretch(badgeLabel.rectTransform);
+            // Language badge: flag + "AZ" in a white box with a dark border.
+            Image badge = Img(bar, "Badge", Panel(24), Color.white, true);
+            Layout(badge.gameObject, preferredWidth: 150f, preferredHeight: 90f).minWidth = 150f;
+            HorizontalLayoutGroup badgeRow = Row(badge.gameObject, 8f, TextAnchor.MiddleCenter);
+            badgeRow.padding = new RectOffset(14, 14, 0, 0);
+            Image flag = Img(badge.transform, "Flag", Sprite("UI", "flag_az"), Color.white);
+            Layout(flag.gameObject, preferredWidth: 48f, preferredHeight: 33f);
+            TextMeshProUGUI badgeLabel = Text(badge.transform, "Code", "AZ", 38f, UIPalette.Ink, TextAlignmentOptions.Center, true);
+            badgeLabel.enableWordWrapping = false;
+            Layout(badgeLabel.gameObject, preferredWidth: 56f, preferredHeight: 60f);
 
             // Level pill ("A1": the level the learner is on now).
             RectTransform levelCell = StatCell(bar, "Level");
-            Image levelPill = Img(levelCell, "Pill", Sprite("UI", "pill"), UIPalette.Primary, true);
-            Layout(levelPill.gameObject, preferredWidth: 112f, preferredHeight: 72f).minWidth = 112f;
-            TextMeshProUGUI levelBadge = Text(levelPill.transform, "Value", "A1", 36f, Color.white, TextAlignmentOptions.Center, true);
+            Image levelPill = Img(levelCell, "Pill", Sprite("UI", "white"), UIPalette.CyanLight, false);
+            levelPill.preserveAspect = false;
+            Layout(levelPill.gameObject, preferredWidth: 100f, preferredHeight: 72f).minWidth = 100f;
+            TextMeshProUGUI levelBadge = Text(levelPill.transform, "Value", "A1", 38f, UIPalette.Primary, TextAlignmentOptions.Center, true);
             levelBadge.enableWordWrapping = false;
             Stretch(levelBadge.rectTransform);
 
             Image streakIcon;
-            TextMeshProUGUI streak = StatChip(bar, "Streak", "flame", UIPalette.Streak, "0", out streakIcon);
+            TextMeshProUGUI streak = StatChip(bar, "Streak", "flame", UIPalette.Primary, "0", out streakIcon);
             Image ignoredIcon;
             TextMeshProUGUI hearts = StatChip(bar, "Hearts", "heart", UIPalette.Heart, "10", out ignoredIcon);
-            TextMeshProUGUI xp = StatChip(bar, "Xp", "zap", UIPalette.Xp, "0", out ignoredIcon);
+            TextMeshProUGUI xp = StatChip(bar, "Xp", "zap", UIPalette.Primary, "0", out ignoredIcon);
             // Scrollable path with the level header at its top.
             RectTransform scroll = Rect("PathScroll", screen);
             Stretch(scroll, 0f, 0f, topBar, 0f);
@@ -211,18 +212,19 @@ namespace Cevir.Core.Editor
 
             RectTransform header = Rect("LevelHeader", content);
             Place(header, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -50f), new Vector2(980f, 200f));
-            TextMeshProUGUI kicker = Label(header, "Kicker", "LEVEL", "SƏVİYYƏ", 28f, UIPalette.Cyan);
-            Place(kicker.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), Vector2.zero, new Vector2(500f, 40f));
-            kicker.characterSpacing = 8f;
+            TextMeshProUGUI kicker = Label(header, "Kicker", "LEARNING PATH", "ÖYRƏNMƏ YOLU", 30f, UIPalette.Primary);
+            Place(kicker.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), Vector2.zero, new Vector2(600f, 40f));
+            kicker.characterSpacing = 4f;
             TextMeshProUGUI levelTitle = Text(header, "Title", "A1 Level", 66f, UIPalette.TextPrimary, TextAlignmentOptions.BottomLeft, true);
             Place(levelTitle.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, -40f), new Vector2(640f, 90f));
             TextMeshProUGUI units = Text(header, "Units", "0 / 10 units", 30f, UIPalette.TextSecondary, TextAlignmentOptions.BottomRight, true);
             Place(units.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(0f, -40f), new Vector2(340f, 80f));
-            Image track = Img(header, "ProgressTrack", Sprite("UI", "pill"), new Color32(0xE3, 0xEE, 0xF9, 0xFF), true);
-            Place(track.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), new Vector2(980f, 28f));
-            Image fill = Img(track.transform, "Fill", Sprite("UI", "button_gradient"), Color.white, false);
+            // Thin bar with a dark border; the blue fill sits inside the border.
+            Image track = Img(header, "ProgressTrack", Sprite("UI", "pill"), Color.white, true);
+            Place(track.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), new Vector2(980f, 30f));
+            Image fill = Img(track.transform, "Fill", Sprite("UI", "white"), UIPalette.Primary, false);
             fill.preserveAspect = false;
-            Stretch(fill.rectTransform);
+            Stretch(fill.rectTransform, 6f, 6f, 6f, 6f);
             fill.type = Image.Type.Filled;
             fill.fillMethod = Image.FillMethod.Horizontal;
             fill.fillOrigin = (int)Image.OriginHorizontal.Left;
@@ -264,7 +266,7 @@ namespace Cevir.Core.Editor
         {
             RectTransform chip = StatCell(parent, name);
             iconImage = Icon(chip, "Icon", icon, 48f, color);
-            TextMeshProUGUI label = Text(chip, "Value", value, 38f, color, TextAlignmentOptions.MidlineLeft, true);
+            TextMeshProUGUI label = Text(chip, "Value", value, 40f, UIPalette.Ink, TextAlignmentOptions.MidlineLeft, true);
             label.enableWordWrapping = false;
             label.overflowMode = TextOverflowModes.Overflow;
             Layout(label.gameObject, preferredHeight: 56f);
@@ -288,14 +290,13 @@ namespace Cevir.Core.Editor
             Place(glow.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(380f, 380f));
             glow.gameObject.AddComponent<UIPulse>().Configure(0.08f, 0.35f, 1.8f);
 
-            Image rim = Img(rt, "Rim", theme.panel, Color.white, true);
-            Place(rim.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -4f), new Vector2(192f, 196f));
-            Shadow rimShadow = rim.gameObject.AddComponent<Shadow>();
-            rimShadow.effectColor = new Color(0.36f, 0.55f, 0.82f, 0.22f);
-            rimShadow.effectDistance = new Vector2(0f, -10f);
+            // Pixel style has no rim; it stays (invisible) for the node script.
+            Image rim = Img(rt, "Rim", theme.panel, new Color(1f, 1f, 1f, 0f), true);
+            Place(rim.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(164f, 164f));
 
-            Image edge = Img(rt, "Edge", theme.panel, UIPalette.PrimaryDark, true);
-            Place(edge.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(164f, 164f));
+            // Hard shadow: a dark square offset down and to the right of the tile.
+            Image edge = Img(rt, "Edge", theme.panel, UIPalette.Ink, true);
+            Place(edge.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(10f, -10f), new Vector2(164f, 164f));
             Image face = Img(rt, "Face", theme.tileGradient, Color.white, false);
             face.preserveAspect = false;
             face.type = Image.Type.Simple;
@@ -309,16 +310,15 @@ namespace Cevir.Core.Editor
             VerticalLayoutGroup captionColumn = Column(caption.gameObject, 0, 2f, TextAnchor.LowerCenter);
             captionColumn.padding = new RectOffset(0, 0, 0, 0);
             caption.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            TextMeshProUGUI kicker = Text(caption, "Kicker", "UNIT 1", 24f, UIPalette.TextMuted, TextAlignmentOptions.Center, true);
-            kicker.characterSpacing = 6f;
-            TextMeshProUGUI title = Text(caption, "Title", "Unit", 32f, UIPalette.TextPrimary, TextAlignmentOptions.Center, true);
-            title.lineSpacing = -14f;
+            TextMeshProUGUI kicker = Text(caption, "Kicker", "UNIT 1", 26f, UIPalette.TextMuted, TextAlignmentOptions.Center, true);
+            kicker.characterSpacing = 4f;
+            TextMeshProUGUI title = Text(caption, "Title", "Unit", 36f, UIPalette.TextPrimary, TextAlignmentOptions.Center, true);
+            title.lineSpacing = -10f;
 
             // START pill under the active tile.
             Image pill = Img(rt, "StartPill", theme.buttonGradient, Color.white, true);
-            Place(pill.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, -108f), new Vector2(200f, 68f));
-            pill.gameObject.AddComponent<Shadow>().effectColor = new Color(0.06f, 0.37f, 0.82f, 0.35f);
-            TextMeshProUGUI startLabel = Text(pill.transform, "Label", "START", 30f, Color.white, TextAlignmentOptions.Center, true);
+            Place(pill.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(250f, 72f));
+            TextMeshProUGUI startLabel = Text(pill.transform, "Label", "START", 34f, Color.white, TextAlignmentOptions.Center, true);
             Stretch(startLabel.rectTransform);
             pill.gameObject.AddComponent<UIPulse>().Configure(0.04f, 0f, 1.8f);
 
@@ -352,8 +352,8 @@ namespace Cevir.Core.Editor
             ScrollRect scrollRect;
             RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(48, 48, 70, 80), 26f, out scrollRect);
 
-            TextMeshProUGUI kicker = Label(content, "Kicker", "STORIES", "HEKAYƏLƏR", 28f, UIPalette.Cyan);
-            kicker.characterSpacing = 8f;
+            TextMeshProUGUI kicker = Label(content, "Kicker", "STORIES", "HEKAYƏLƏR", 30f, UIPalette.Primary);
+            kicker.characterSpacing = 4f;
             Label(content, "Title", "Sign Language Stories", "İşarə Dili Hekayələri", 60f, UIPalette.TextPrimary);
             RectTransform levelRow = Rect("LevelRow", content);
             Row(levelRow.gameObject, 22f);
@@ -362,15 +362,13 @@ namespace Cevir.Core.Editor
             TextMeshProUGUI count = Text(levelRow, "Count", "0 / 10", 34f, UIPalette.Primary, TextAlignmentOptions.MidlineLeft, true);
             count.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            Image banner = Glass(content, "Banner", 36, new Color32(0xE6, 0xF7, 0xFE, 0xF2));
+            // Blue banner with a yellow star and white text.
+            Image banner = Img(content, "Banner", Sprite("UI", "button_gradient"), Color.white, true);
+            HardShadow(banner.gameObject);
             HorizontalLayoutGroup bannerRow = Row(banner.gameObject, 30f);
-            bannerRow.padding = new RectOffset(34, 34, 30, 30);
-            Image star = Img(banner.transform, "StarTile", Sprite("UI", "tile_gradient"), Color.white);
-            star.preserveAspect = false;
-            Layout(star.gameObject, preferredWidth: 104f, preferredHeight: 104f);
-            Image starIcon = Img(star.transform, "Icon", IconSprite("star"), Color.white);
-            Place(starIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(56f, 56f));
-            TextMeshProUGUI bannerText = Label(banner.transform, "Text", UIStrings.StoriesBanner, null, 32f, new Color32(0x0B, 0x4A, 0x8F, 0xFF), TextAlignmentOptions.MidlineLeft, false);
+            bannerRow.padding = new RectOffset(34, 34, 34, 34);
+            Image star = Icon(banner.transform, "StarIcon", "star", 80f, UIPalette.Gold);
+            TextMeshProUGUI bannerText = Label(banner.transform, "Text", UIStrings.StoriesBanner, null, 34f, Color.white, TextAlignmentOptions.MidlineLeft, false);
             bannerText.gameObject.AddComponent<LocalizedLabel>().Set(
                 "Complete lessons on the Home screen\n<b>to unlock new stories!</b>",
                 "Əsas ekranda dərsləri tamamla\n<b>və yeni hekayələr aç!</b>");
@@ -397,12 +395,7 @@ namespace Cevir.Core.Editor
             background.sprite = Panel(36);
             background.type = Image.Type.Sliced;
             background.pixelsPerUnitMultiplier = 1f;
-            Shadow shadow = root.AddComponent<Shadow>();
-            shadow.effectColor = UIPalette.Shadow;
-            shadow.effectDistance = new Vector2(0f, -6f);
-            Image border = Img(rt, "Border", Sprite("UI", "outline_r36"), UIPalette.GlassBorder, true);
-            Stretch(border.rectTransform);
-            Layout(border.gameObject).ignoreLayout = true;
+            HardShadow(root);
             Button button = root.AddComponent<Button>();
             button.targetGraphic = background;
             Layout(root, preferredHeight: 176f, minHeight: 176f);
@@ -410,9 +403,9 @@ namespace Cevir.Core.Editor
             HorizontalLayoutGroup row = Row(root, 30f);
             row.padding = new RectOffset(32, 32, 0, 0);
 
-            Image numberBox = Img(rt, "NumberBox", Panel(24), new Color32(0xE2, 0xE7, 0xEF, 0xFF), true);
-            Layout(numberBox.gameObject, preferredWidth: 96f, preferredHeight: 96f);
-            TextMeshProUGUI number = Text(numberBox.transform, "Number", "1", 38f, UIPalette.TextMuted, TextAlignmentOptions.Center, true);
+            Image numberBox = Img(rt, "NumberBox", Panel(24), Color.white, true);
+            Layout(numberBox.gameObject, preferredWidth: 90f, preferredHeight: 90f);
+            TextMeshProUGUI number = Text(numberBox.transform, "Number", "1", 40f, UIPalette.Ink, TextAlignmentOptions.Center, true);
             Stretch(number.rectTransform);
 
             RectTransform texts = Rect("Texts", rt);
@@ -421,13 +414,13 @@ namespace Cevir.Core.Editor
             TextMeshProUGUI title = Text(texts, "Title", "Hello, my name is...", 38f, UIPalette.TextPrimary, TextAlignmentOptions.MidlineLeft, true);
             title.enableWordWrapping = false;
             title.overflowMode = TextOverflowModes.Ellipsis;
-            TextMeshProUGUI status = Text(texts, "Status", "LOCKED", 25f, UIPalette.TextMuted, TextAlignmentOptions.MidlineLeft, true);
+            TextMeshProUGUI status = Text(texts, "Status", "LOCKED", 26f, UIPalette.TextMuted, TextAlignmentOptions.MidlineLeft, true);
             status.characterSpacing = 4f;
 
-            Image badge = Img(rt, "Badge", Sprite("UI", "circle"), new Color32(0xE0, 0xE5, 0xEC, 0xFF));
-            Layout(badge.gameObject, preferredWidth: 92f, preferredHeight: 92f);
-            Image badgeIcon = Img(badge.transform, "Icon", IconSprite("lock"), UIPalette.TextMuted);
-            Place(badgeIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(42f, 42f));
+            Image badge = Img(rt, "Badge", Panel(24), new Color(1f, 1f, 1f, 0f), true);
+            Layout(badge.gameObject, preferredWidth: 88f, preferredHeight: 88f);
+            Image badgeIcon = Img(badge.transform, "Icon", IconSprite("lock"), UIPalette.LockedIcon);
+            Place(badgeIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(48f, 48f));
 
             StoryCardUI card = root.AddComponent<StoryCardUI>();
             Set(card, "button", button);
@@ -452,37 +445,43 @@ namespace Cevir.Core.Editor
             ScrollRect scrollRect;
             RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(40, 40, 70, 80), 22f, out scrollRect);
 
-            RectTransform header = Rect("Header", content);
-            Row(header.gameObject, 40f);
-            header.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(20, 0, 0, 20);
-            Layout(header.gameObject, preferredHeight: 300f);
-            Image cupBackdrop = Img(header, "CupBackdrop", Sprite("UI", "circle"), new Color(0.75f, 0.48f, 0.27f, 0.14f));
-            Layout(cupBackdrop.gameObject, preferredWidth: 250f, preferredHeight: 250f);
+            // Weekly ranking card: kicker, cup in a square, league name and the time left, all centred.
+            Image header = Glass(content, "Header", 48, Color.white);
+            VerticalLayoutGroup headerColumn = Column(header.gameObject, 44, 22f, TextAnchor.UpperCenter);
+            headerColumn.childControlWidth = true;
+            TextMeshProUGUI kicker = Label(header.transform, "Kicker", "WEEKLY RANKING", "HƏFTƏLİK REYTİNQ", 28f, new Color32(0xB0, 0x5A, 0x1E, 0xFF),
+                TextAlignmentOptions.Center);
+            kicker.characterSpacing = 4f;
+            RectTransform cupRow = Rect("CupRow", header.transform);
+            Row(cupRow.gameObject, 0f, TextAnchor.MiddleCenter);
+            Image cupBackdrop = Img(cupRow, "CupBackdrop", Panel(24), UIPalette.AmberLight, true);
+            Layout(cupBackdrop.gameObject, preferredWidth: 170f, preferredHeight: 170f);
             Image cup = Img(cupBackdrop.transform, "Cup", Sprite("UI", "league_cup"), LeagueTiers.Color(0));
-            Place(cup.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(170f, 170f));
-
-            RectTransform texts = Rect("Texts", header);
-            Column(texts.gameObject, 0, 10f, TextAnchor.MiddleLeft);
-            Layout(texts.gameObject, flexibleWidth: 1f);
-            TextMeshProUGUI kicker = Label(texts, "Kicker", "WEEKLY RANKING", "HƏFTƏLİK REYTİNQ", 28f, new Color32(0xB8, 0x6B, 0x3A, 0xFF));
-            kicker.characterSpacing = 6f;
-            TextMeshProUGUI name = Text(texts, "LeagueName", "Bronze League", 62f, UIPalette.TextPrimary, TextAlignmentOptions.MidlineLeft, true);
-            RectTransform pillRow = Rect("PillRow", texts);
-            Row(pillRow.gameObject, 0f);
+            Place(cup.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(120f, 120f));
+            TextMeshProUGUI name = Text(header.transform, "LeagueName", "Bronze League", 66f, UIPalette.TextPrimary, TextAlignmentOptions.Center, true);
+            RectTransform pillRow = Rect("PillRow", header.transform);
+            Row(pillRow.gameObject, 0f, TextAnchor.MiddleCenter);
             Image timePill = Img(pillRow, "TimePill", Sprite("UI", "pill"), UIPalette.AmberLight, true);
             HorizontalLayoutGroup pillLayout = Row(timePill.gameObject, 0f, TextAnchor.MiddleCenter);
             pillLayout.padding = new RectOffset(30, 30, 12, 12);
             TextMeshProUGUI time = Text(timePill.transform, "Label", "2 days left", 28f, new Color32(0x8A, 0x5A, 0x00, 0xFF), TextAlignmentOptions.Center, true);
             time.enableWordWrapping = false;
 
-            Image divider = Img(content, "Divider", null, UIPalette.Border);
-            Layout(divider.gameObject, preferredHeight: 3f);
-
             TextMeshProUGUI promote = NoteRow(content, "PromoteNote", "arrow_up", UIPalette.Primary);
+            TextMeshProUGUI rankingTitle = Label(content, "RankingTitle", "RANKING", "SIRALAMA", 28f, UIPalette.Ink);
+            rankingTitle.characterSpacing = 4f;
             RectTransform list = Rect("Rows", content);
-            Column(list.gameObject, 0, 10f);
+            Column(list.gameObject, 0, 18f);
+            list.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(0, 10, 0, 10); // room for the hard shadow
             list.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             TextMeshProUGUI demote = NoteRow(content, "DemoteNote", "arrow_down", UIPalette.Red);
+
+            // Encouragement card under the ranking.
+            Image goal = Glass(content, "GoalCard", 36, UIPalette.Surface);
+            Column(goal.gameObject, 40, 12f);
+            Label(goal.transform, "Title", "First step to the top!", "Zirvəyə ilk addım!", 46f, UIPalette.Primary);
+            Label(goal.transform, "Body", "Finish lessons, earn XP and keep your place in the league.",
+                "Dərsləri tamamla, XP topla və liqada yerini qoru.", 32f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
 
             Set(ui, "tierCup", cup);
             Set(ui, "tierCupBackdrop", cupBackdrop);
@@ -498,12 +497,16 @@ namespace Cevir.Core.Editor
 
         private static TextMeshProUGUI NoteRow(Transform parent, string name, string icon, Color color)
         {
+            // Light blue strip with an arrow and the note.
             RectTransform row = Rect(name, parent);
-            HorizontalLayoutGroup layout = Row(row.gameObject, 14f);
-            layout.padding = new RectOffset(16, 0, 10, 10);
-            Icon(row, "Icon", icon, 36f, color);
-            TextMeshProUGUI label = Text(row, "Label", "", 26f, color, TextAlignmentOptions.MidlineLeft, true);
-            label.characterSpacing = 4f;
+            Image strip = row.gameObject.AddComponent<Image>();
+            strip.sprite = Sprite("UI", "white");
+            strip.color = UIPalette.CyanLight;
+            strip.raycastTarget = false;
+            HorizontalLayoutGroup layout = Row(row.gameObject, 18f);
+            layout.padding = new RectOffset(26, 26, 22, 22);
+            Icon(row, "Icon", icon, 40f, color);
+            TextMeshProUGUI label = Text(row, "Label", "", 30f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
             Layout(label.gameObject, flexibleWidth: 1f);
             return label;
         }
@@ -515,8 +518,9 @@ namespace Cevir.Core.Editor
             rt.sizeDelta = new Vector2(1000f, 140f);
             Layout(root, preferredHeight: 140f, minHeight: 140f);
 
-            Image glow = Img(rt, "YouGlow", Sprite("UI", "shadow_r48"), new Color(0.1f, 0.55f, 1f, 0.45f), true);
-            Stretch(glow.rectTransform, -40f, -40f, -30f, -50f);
+            // The learner's row gets the hard pixel shadow (a dark copy offset down-right).
+            Image glow = Img(rt, "YouGlow", Sprite("UI", "shadow_r48"), UIPalette.Ink, true);
+            Stretch(glow.rectTransform, 8f, -8f, 8f, -8f);
             Layout(glow.gameObject).ignoreLayout = true;
 
             Image background = Img(rt, "Background", Panel(36), new Color(1f, 1f, 1f, 0f), true);
@@ -528,7 +532,7 @@ namespace Cevir.Core.Editor
 
             RectTransform rank = Rect("Rank", rt);
             Layout(rank.gameObject, preferredWidth: 64f, preferredHeight: 80f);
-            TextMeshProUGUI rankLabel = Text(rank, "Number", "4", 36f, UIPalette.TextSecondary, TextAlignmentOptions.Center, true);
+            TextMeshProUGUI rankLabel = Text(rank, "Number", "4", 44f, UIPalette.TextSecondary, TextAlignmentOptions.Center, true);
             Stretch(rankLabel.rectTransform);
             Image cup = Img(rank, "Cup", IconSprite("trophy"), UIPalette.Gold);
             Place(cup.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(52f, 52f));
@@ -583,13 +587,13 @@ namespace Cevir.Core.Editor
             Image header = Img(content, "Header", Sprite("UI", "profile_header"), Color.white);
             header.preserveAspect = false;
             Layout(header.gameObject, preferredHeight: 330f);
-            header.gameObject.AddComponent<Shadow>().effectColor = new Color(0.06f, 0.37f, 0.82f, 0.25f);
-            Image avatarRing = Img(header.transform, "AvatarRing", Sprite("UI", "circle"), new Color(1f, 1f, 1f, 0.95f));
-            Place(avatarRing.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(46f, 0f), new Vector2(230f, 230f));
-            Image avatar = Img(avatarRing.transform, "Avatar", Sprite("UI", "tile_active_gradient"), Color.white);
-            avatar.sprite = Sprite("UI", "circle");
-            avatar.color = new Color32(0x3E, 0x9B, 0xF7, 0xFF);
-            Place(avatar.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(204f, 204f));
+            HardShadow(header.gameObject);
+            // Square avatar: white frame, blue face, white person icon (or the photo, cut to the square).
+            Image avatarRing = Img(header.transform, "AvatarRing", Sprite("UI", "outline_r36"), Color.white, true);
+            Place(avatarRing.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(46f, 0f), new Vector2(220f, 220f));
+            Image avatar = Img(avatarRing.transform, "Avatar", Sprite("UI", "white"), UIPalette.Primary);
+            avatar.preserveAspect = false;
+            Place(avatar.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(208f, 208f));
             Image avatarIcon = Img(avatar.transform, "Icon", IconSprite("user"), Color.white);
             Place(avatarIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(120f, 120f));
             // Profile photo, cut to the circle by the avatar's mask.
@@ -599,10 +603,6 @@ namespace Cevir.Core.Editor
             RawImage photo = photoRt.gameObject.AddComponent<RawImage>();
             photo.raycastTarget = false;
             photoRt.gameObject.SetActive(false);
-            Image dot = Img(avatarRing.transform, "Online", Sprite("UI", "circle"), Color.white);
-            Place(dot.rectTransform, new Vector2(1f, 0f), new Vector2(0.5f, 0.5f), new Vector2(-28f, 34f), new Vector2(54f, 54f));
-            Image dotInner = Img(dot.transform, "Inner", Sprite("UI", "circle"), UIPalette.Primary);
-            Place(dotInner.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(34f, 34f));
 
             TextMeshProUGUI name = Text(header.transform, "Name", "User", 64f, Color.white, TextAlignmentOptions.BottomLeft, true);
             Place(name.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(310f, 0f), new Vector2(330f, 90f));
@@ -617,15 +617,12 @@ namespace Cevir.Core.Editor
             editBg.sprite = Panel(24);
             editBg.type = Image.Type.Sliced;
             editBg.pixelsPerUnitMultiplier = 1f;
-            editBg.color = new Color(1f, 1f, 1f, 0.2f);
-            Image editBorder = Img(edit, "Border", Sprite("UI", "outline_r36"), new Color(1f, 1f, 1f, 0.55f), true);
-            Stretch(editBorder.rectTransform);
-            Layout(editBorder.gameObject).ignoreLayout = true;
+            editBg.color = Color.white;
             Button editButton = edit.gameObject.AddComponent<Button>();
             editButton.targetGraphic = editBg;
             Row(edit.gameObject, 12f, TextAnchor.MiddleCenter);
-            Icon(edit, "Icon", "pencil", 36f, Color.white);
-            Label(edit, "Label", "Edit profile", "Profili dəyiş", 26f, Color.white, TextAlignmentOptions.MidlineLeft, true);
+            Icon(edit, "Icon", "pencil", 36f, UIPalette.Primary);
+            Label(edit, "Label", "Edit profile", "Profili dəyiş", 30f, UIPalette.Primary, TextAlignmentOptions.MidlineLeft, true);
 
             // This week's XP · place in the league · league badge.
             Image metrics = Glass(content, "Metrics", 36, UIPalette.Glass);
@@ -637,7 +634,7 @@ namespace Cevir.Core.Editor
             RectTransform badgeCell = Rect("League", metrics.transform);
             Column(badgeCell.gameObject, 0, 10f, TextAnchor.MiddleCenter).childControlWidth = false;
             Layout(badgeCell.gameObject, flexibleWidth: 1f);
-            Image badgeBackdrop = Img(badgeCell, "Backdrop", Panel(24), new Color(0.75f, 0.48f, 0.27f, 0.16f), true);
+            Image badgeBackdrop = Img(badgeCell, "Backdrop", Sprite("UI", "white"), new Color(1f, 1f, 1f, 0f), false);
             Layout(badgeBackdrop.gameObject, preferredWidth: 76f, preferredHeight: 76f);
             Image badgeIcon = Img(badgeBackdrop.transform, "Icon", IconSprite("trophy"), LeagueTiers.Color(0));
             Place(badgeIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(46f, 46f));
@@ -664,8 +661,8 @@ namespace Cevir.Core.Editor
             Image notifications = Glass(content, "NotificationsCard", 36, UIPalette.Glass);
             HorizontalLayoutGroup notificationsRow = Row(notifications.gameObject, 24f);
             notificationsRow.padding = new RectOffset(30, 30, 28, 28);
-            Image bellTile = Img(notifications.transform, "IconTile", Panel(24), UIPalette.CyanLight, true);
-            Layout(bellTile.gameObject, preferredWidth: 104f, preferredHeight: 104f).minWidth = 104f;
+            Image bellTile = Img(notifications.transform, "IconTile", Sprite("UI", "white"), new Color(1f, 1f, 1f, 0f), false);
+            Layout(bellTile.gameObject, preferredWidth: 80f, preferredHeight: 104f).minWidth = 80f;
             Image bell = Img(bellTile.transform, "Icon", IconSprite("bell"), UIPalette.Primary);
             Place(bell.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(58f, 58f));
             RectTransform notificationTexts = Rect("Texts", notifications.transform);
@@ -680,7 +677,7 @@ namespace Cevir.Core.Editor
 
             // Invite.
             Label(content, "FriendsTitle", "Friends", "Dostlar", 44f, UIPalette.TextPrimary);
-            Image friends = Glass(content, "FriendsCard", 48, new Color32(0xE9, 0xF3, 0xFE, 0xF2));
+            Image friends = Glass(content, "FriendsCard", 48, Color.white);
             Column(friends.gameObject, 44, 18f);
 
             Label(friends.transform, "Title", "Learning together is more fun!", "Birlikdə öyrənmək daha maraqlıdır!", 36f, UIPalette.TextPrimary);
@@ -845,8 +842,8 @@ namespace Cevir.Core.Editor
             Image card = Glass(parent, name, 36, UIPalette.Glass);
             HorizontalLayoutGroup row = Row(card.gameObject, 26f);
             row.padding = new RectOffset(30, 20, 0, 0);
-            Image tile = Img(card.transform, "IconTile", Panel(24), UIPalette.CyanLight, true);
-            Layout(tile.gameObject, preferredWidth: 110f, preferredHeight: 110f);
+            Image tile = Img(card.transform, "IconTile", Sprite("UI", "white"), new Color(1f, 1f, 1f, 0f), false);
+            Layout(tile.gameObject, preferredWidth: 80f, preferredHeight: 110f);
             Image glyph = Img(tile.transform, "Icon", IconSprite(icon), UIPalette.Primary);
             Place(glyph.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(62f, 62f));
             RectTransform texts = Rect("Texts", card.transform);

@@ -26,10 +26,14 @@ namespace Cevir.Setup.Editor
 
         private const string FontSource = "Assets/Core/Fonts/DejaVuSans.ttf";
         private const string FontAssetPath = "Assets/Core/Fonts/DejaVuSans SDF.asset";
-        private const string MainFontSource = "Assets/Core/Fonts/Nunito-SemiBold.ttf";
-        private const string MainFontAssetPath = "Assets/Core/Fonts/Nunito SDF.asset";
-        private const string BoldFontSource = "Assets/Core/Fonts/Nunito-ExtraBold.ttf";
-        private const string BoldFontAssetPath = "Assets/Core/Fonts/Nunito ExtraBold SDF.asset";
+        private const string MainFontSource = "Assets/Core/Fonts/VT323-Regular.ttf";
+        private const string MainFontAssetPath = "Assets/Core/Fonts/VT323 SDF.asset";
+
+        /// <summary>
+        /// VT323 draws smaller than the old Nunito at the same point size (cap height 0.56 vs 0.705 em), so the font
+        /// asset is scaled up once and every label keeps its designed size.
+        /// </summary>
+        private const float MainFontScale = 1.25f;
 
         /// <summary>Letters the UI needs up front; anything else is added to the dynamic atlas on demand.</summary>
         private const string Prewarm =
@@ -80,32 +84,28 @@ namespace Cevir.Setup.Editor
         }
 
         /// <summary>
-        /// Nunito (the app's typeface, SemiBold for body text and ExtraBold for bold) with DejaVu Sans as the fallback
-        /// for anything Nunito lacks (arrows, symbols). All atlases are dynamic.
+        /// VT323 (the pixel typeface of the design; covers every Azerbaijani letter, Ə/ə included) with DejaVu Sans as
+        /// the fallback for anything VT323 lacks (arrows, symbols). VT323 has one weight, so bold text is TMP's faux
+        /// bold. All atlases are dynamic.
         /// </summary>
         private static void EnsureFontAsset()
         {
             TMP_FontAsset fallback = CreateFontAsset(FontSource, FontAssetPath, "DejaVuSans SDF");
-            TMP_FontAsset bold = CreateFontAsset(BoldFontSource, BoldFontAssetPath, "Nunito ExtraBold SDF");
-            TMP_FontAsset main = CreateFontAsset(MainFontSource, MainFontAssetPath, "Nunito SDF");
+            TMP_FontAsset main = CreateFontAsset(MainFontSource, MainFontAssetPath, "VT323 SDF");
             if (main == null) return;
 
-            // Bold text (FontStyles.Bold) uses the real ExtraBold face instead of a faked thicker outline.
-            if (bold != null && main.fontWeightTable != null && main.fontWeightTable.Length > 7)
+            var so = new SerializedObject(main);
+            SerializedProperty scale = so.FindProperty("m_FaceInfo.m_Scale");
+            if (scale != null && !Mathf.Approximately(scale.floatValue, MainFontScale))
             {
-                main.fontWeightTable[7].regularTypeface = bold;
+                scale.floatValue = MainFontScale;
+                so.ApplyModifiedPropertiesWithoutUndo();
             }
 
             if (fallback != null)
             {
                 if (main.fallbackFontAssetTable == null) main.fallbackFontAssetTable = new System.Collections.Generic.List<TMP_FontAsset>();
                 if (!main.fallbackFontAssetTable.Contains(fallback)) main.fallbackFontAssetTable.Add(fallback);
-                if (bold != null)
-                {
-                    if (bold.fallbackFontAssetTable == null) bold.fallbackFontAssetTable = new System.Collections.Generic.List<TMP_FontAsset>();
-                    if (!bold.fallbackFontAssetTable.Contains(fallback)) bold.fallbackFontAssetTable.Add(fallback);
-                    EditorUtility.SetDirty(bold);
-                }
             }
 
             EditorUtility.SetDirty(main);

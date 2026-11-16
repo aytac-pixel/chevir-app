@@ -25,6 +25,9 @@ namespace Cevir.Core.UI
         [SerializeField] private TextMeshProUGUI startLabel;
         [SerializeField] private TextMeshProUGUI entranceLabel;
 
+        private const float TileSize = 164f;
+        private const float LockedTileSize = 104f;
+
         private Action<UnitPathEntry> _onTap;
         private UnitPathEntry _entry;
 
@@ -58,14 +61,19 @@ namespace Cevir.Core.UI
 
             Sprite tileShape = entry.IsCheckpoint ? theme.circle : theme.panel;
             if (rim != null) rim.sprite = tileShape;
+            // Pixel style: locked units are smaller tiles; the edge is the tile's hard dark shadow.
+            float size = locked ? LockedTileSize : TileSize;
             if (edge != null)
             {
                 edge.sprite = tileShape;
-                edge.color = locked ? UIPalette.LockedEdge : UIPalette.PrimaryDark;
+                edge.color = UIPalette.Ink;
+                edge.rectTransform.sizeDelta = new Vector2(size, size);
+                edge.rectTransform.anchoredPosition = locked ? new Vector2(6f, -6f) : new Vector2(10f, -10f);
             }
 
             if (face != null)
             {
+                face.rectTransform.sizeDelta = new Vector2(size, size);
                 if (locked)
                 {
                     face.sprite = tileShape;
@@ -85,9 +93,11 @@ namespace Cevir.Core.UI
                 else if (active) icon.sprite = theme.iconHand;
                 else icon.sprite = entry.Unit != null && entry.Unit.Icon != null ? entry.Unit.Icon : theme.iconBook;
                 icon.color = locked ? UIPalette.LockedIcon : Color.white;
+                float iconSize = locked ? 52f : 84f;
+                icon.rectTransform.sizeDelta = new Vector2(iconSize, iconSize);
             }
 
-            if (glow != null) glow.gameObject.SetActive(active);
+            if (glow != null) glow.gameObject.SetActive(false); // no glow in the pixel design
             if (startPill != null) startPill.SetActive(active);
             if (startLabel != null) startLabel.text = done ? UIStrings.PracticeAgain : UIStrings.Start;
             if (entranceLabel != null)

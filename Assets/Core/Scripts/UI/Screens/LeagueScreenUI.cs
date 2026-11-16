@@ -60,7 +60,8 @@ namespace Cevir.Core.UI
             Color tierColor = LeagueTiers.Color(snapshot.Tier);
 
             if (tierCup != null) tierCup.color = tierColor;
-            if (tierCupBackdrop != null) tierCupBackdrop.color = new Color(tierColor.r, tierColor.g, tierColor.b, 0.14f);
+            // Opaque tint, so the square's dark border stays solid.
+            if (tierCupBackdrop != null) tierCupBackdrop.color = Color.Lerp(Color.white, tierColor, 0.22f);
             if (leagueName != null) leagueName.text = LeagueTiers.LeagueName(snapshot.Tier);
             if (timeLeft != null) timeLeft.text = LocalLeagueService.FormatTimeLeft(snapshot.TimeLeft);
             // Real ranking only: offline, or alone in the league, say so instead of inventing rivals.
