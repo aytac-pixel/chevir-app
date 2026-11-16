@@ -245,6 +245,9 @@ namespace Cevir.Integrations.MediaPipe
             catch (Exception e)
             {
                 Debug.LogError("[Chevir] MediaPipe could not start: " + e);
+                Exception inner = e;
+                while (inner.InnerException != null) inner = inner.InnerException;
+                _lastError = inner.GetType().Name + ": " + inner.Message;
                 CloseLandmarkers();
             }
 

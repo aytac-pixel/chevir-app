@@ -50,6 +50,28 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      # MediaPipe's OpenCV library (libopencv_java4.so) needs the C++ runtime libc++_shared.so, which Unity does not
+      # ship. Without it MediaPipe cannot load on the phone. Copy it from the runner's Android NDK (before the disk
+      # cleanup removes the SDK); download an NDK only if none is installed.
+      - name: Add libc++_shared.so for MediaPipe
+        run: |
+          dest=Assets/Plugins/Android/libs/arm64-v8a
+          mkdir -p "$dest"
+          lib=""
+          for ndk in "$ANDROID_NDK_LATEST_HOME" "$ANDROID_NDK_HOME" "$ANDROID_NDK_ROOT" "$ANDROID_SDK_ROOT"/ndk/*; do
+            f="$ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so"
+            if [ -n "$ndk" ] && [ -f "$f" ]; then lib="$f"; break; fi
+          done
+          if [ -z "$lib" ]; then
+            curl -fsSL -o /tmp/ndk.zip https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
+            unzip -q /tmp/ndk.zip 'android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so' -d /tmp
+            lib=/tmp/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so
+            rm /tmp/ndk.zip
+          fi
+          cp "$lib" "$dest/libc++_shared.so"
+          echo "Copied $lib"
+          ls -l "$dest"
+
       - name: Free disk space
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
