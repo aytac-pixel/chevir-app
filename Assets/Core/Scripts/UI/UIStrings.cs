@@ -202,7 +202,7 @@ namespace Cevir.Core.UI
         public static readonly Color Glass = Color.white;
         public static readonly Color GlassBorder = new Color32(0x0A, 0x19, 0x31, 0xFF);
         public static readonly Color Shadow = new Color32(0x0A, 0x19, 0x31, 0xFF); // hard pixel shadow
-        public static readonly Color PathDot = new Color32(0xB4, 0xC3, 0xDA, 0xFF);
+        public static readonly Color PathDot = new Color32(0x00, 0x43, 0xE6, 0xFF); // blue dotted path between units
 
         /// <summary>Dark ink of the pixel style: borders, hard shadows, main text.</summary>
         public static readonly Color Ink = new Color32(0x0A, 0x19, 0x31, 0xFF);

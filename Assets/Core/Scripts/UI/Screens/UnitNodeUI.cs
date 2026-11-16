@@ -50,13 +50,13 @@ namespace Cevir.Core.UI
             if (kicker != null)
             {
                 kicker.text = string.Format(UIStrings.UnitKicker, entry.Number);
-                kicker.color = active ? UIPalette.Primary : UIPalette.TextMuted;
+                kicker.color = UIPalette.Primary; // every unit name is blue (design)
             }
 
             if (title != null)
             {
                 title.text = entry.Unit != null ? entry.Unit.Title : (entry.Level != null ? entry.Level.Title : string.Empty);
-                title.color = active ? UIPalette.Primary : (locked ? UIPalette.TextSecondary : UIPalette.TextPrimary);
+                title.color = UIPalette.Primary;
             }
 
             Sprite tileShape = entry.IsCheckpoint ? theme.circle : theme.panel;
@@ -90,15 +90,14 @@ namespace Cevir.Core.UI
             {
                 if (entry.IsCheckpoint) icon.sprite = theme.iconTrophy;
                 else if (locked) icon.sprite = theme.iconLock;
-                else if (active) icon.sprite = theme.iconHand;
-                else icon.sprite = entry.Unit != null && entry.Unit.Icon != null ? entry.Unit.Icon : theme.iconBook;
+                else icon.sprite = theme.iconHand; // an opened unit looks like unit 1: blue tile with the hand
                 icon.color = locked ? UIPalette.LockedIcon : Color.white;
                 float iconSize = locked ? 52f : 84f;
                 icon.rectTransform.sizeDelta = new Vector2(iconSize, iconSize);
             }
 
             if (glow != null) glow.gameObject.SetActive(false); // no glow in the pixel design
-            if (startPill != null) startPill.SetActive(active);
+            if (startPill != null) startPill.SetActive(!locked && !entry.IsCheckpoint);
             if (startLabel != null) startLabel.text = done ? UIStrings.PracticeAgain : UIStrings.Start;
             if (entranceLabel != null)
             {

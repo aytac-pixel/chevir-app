@@ -249,6 +249,7 @@ namespace Cevir.Core.Editor
             content.anchorMax = new Vector2(1f, 1f);
             content.pivot = new Vector2(0.5f, 1f);
             content.anchoredPosition = Vector2.zero;
+            content.sizeDelta = Vector2.zero; // exactly the viewport width (a new RectTransform is 100 wider, which hid the side margins)
             VerticalLayoutGroup column = Column(content.gameObject, 0, spacing);
             column.padding = padding;
             ContentSizeFitter fit = content.gameObject.AddComponent<ContentSizeFitter>();

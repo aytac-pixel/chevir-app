@@ -38,7 +38,7 @@ namespace Cevir.Core.UI
         [SerializeField] private UnitNodeUI nodePrefab;
         [SerializeField] private CevirTheme theme;
         [SerializeField] private float headerHeight = 300f;
-        [SerializeField] private float unitSpacing = 330f;
+        [SerializeField] private float unitSpacing = 380f;
         [SerializeField] private float bottomPadding = 260f;
         [SerializeField] private float dotSpacing = 34f;
         [SerializeField] private float dotSize = 16f;

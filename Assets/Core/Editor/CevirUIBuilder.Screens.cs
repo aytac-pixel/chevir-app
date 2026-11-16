@@ -161,7 +161,7 @@ namespace Cevir.Core.Editor
             Image barBg = bar.gameObject.AddComponent<Image>();
             barBg.color = UIPalette.Background;
             HorizontalLayoutGroup barRow = Row(bar.gameObject, 12f, TextAnchor.MiddleCenter);
-            barRow.padding = new RectOffset(36, 36, 0, 0);
+            barRow.padding = new RectOffset(60, 60, 0, 0);
 
             // Language badge: flag + "AZ" in a white box with a dark border.
             Image badge = Img(bar, "Badge", Panel(24), Color.white, true);
@@ -211,7 +211,7 @@ namespace Cevir.Core.Editor
             Stretch(pathLayer);
 
             RectTransform header = Rect("LevelHeader", content);
-            Place(header, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -50f), new Vector2(980f, 200f));
+            Place(header, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -50f), new Vector2(960f, 200f));
             TextMeshProUGUI kicker = Label(header, "Kicker", "LEARNING PATH", "ÖYRƏNMƏ YOLU", 30f, UIPalette.Primary);
             Place(kicker.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), Vector2.zero, new Vector2(600f, 40f));
             kicker.characterSpacing = 4f;
@@ -221,7 +221,7 @@ namespace Cevir.Core.Editor
             Place(units.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(0f, -40f), new Vector2(340f, 80f));
             // Thin bar with a dark border; the blue fill sits inside the border.
             Image track = Img(header, "ProgressTrack", Sprite("UI", "pill"), Color.white, true);
-            Place(track.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), new Vector2(980f, 30f));
+            Place(track.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), new Vector2(960f, 30f));
             Image fill = Img(track.transform, "Fill", Sprite("UI", "white"), UIPalette.Primary, false);
             fill.preserveAspect = false;
             Stretch(fill.rectTransform, 6f, 6f, 6f, 6f);
@@ -317,7 +317,7 @@ namespace Cevir.Core.Editor
 
             // START pill under the active tile.
             Image pill = Img(rt, "StartPill", theme.buttonGradient, Color.white, true);
-            Place(pill.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(250f, 72f));
+            Place(pill.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(290f, 72f));
             TextMeshProUGUI startLabel = Text(pill.transform, "Label", "START", 34f, Color.white, TextAlignmentOptions.Center, true);
             Stretch(startLabel.rectTransform);
             pill.gameObject.AddComponent<UIPulse>().Configure(0.04f, 0f, 1.8f);
@@ -350,7 +350,7 @@ namespace Cevir.Core.Editor
             StoriesScreenUI ui = screen.gameObject.AddComponent<StoriesScreenUI>();
 
             ScrollRect scrollRect;
-            RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(48, 48, 70, 80), 26f, out scrollRect);
+            RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(60, 60, 70, 80), 26f, out scrollRect);
 
             TextMeshProUGUI kicker = Label(content, "Kicker", "STORIES", "HEKAYƏLƏR", 30f, UIPalette.Primary);
             kicker.characterSpacing = 4f;
@@ -443,7 +443,7 @@ namespace Cevir.Core.Editor
             LeagueScreenUI ui = screen.gameObject.AddComponent<LeagueScreenUI>();
 
             ScrollRect scrollRect;
-            RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(40, 40, 70, 80), 22f, out scrollRect);
+            RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(60, 60, 70, 80), 26f, out scrollRect);
 
             // Weekly ranking card: kicker, cup in a square, league name and the time left, all centred.
             Image header = Glass(content, "Header", 48, Color.white);
@@ -581,7 +581,7 @@ namespace Cevir.Core.Editor
             ProfileScreenUI ui = screen.gameObject.AddComponent<ProfileScreenUI>();
 
             ScrollRect scrollRect;
-            RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(40, 40, 60, 80), 34f, out scrollRect);
+            RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(60, 60, 60, 80), 34f, out scrollRect);
 
             // Header card.
             Image header = Img(content, "Header", Sprite("UI", "profile_header"), Color.white);

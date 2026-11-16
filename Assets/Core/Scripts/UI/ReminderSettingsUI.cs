@@ -192,7 +192,7 @@ namespace Cevir.Core.UI
             RectTransform safe = UIKit.Rect("SafeArea", panel);
             UIKit.Stretch(safe);
             safe.gameObject.AddComponent<SafeAreaFitter>();
-            RectTransform content = kit.Scroll(safe, new RectOffset(48, 48, 40, 80), 30f);
+            RectTransform content = kit.Scroll(safe, new RectOffset(60, 60, 40, 80), 30f);
 
             RectTransform top = UIKit.Rect("Top", content);
             UIKit.Row(top.gameObject, 20f);
