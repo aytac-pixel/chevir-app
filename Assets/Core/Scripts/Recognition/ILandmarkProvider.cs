@@ -29,6 +29,12 @@ namespace Cevir.Core.Recognition
     }
 
     /// <summary>Providers that own a camera expose it for the lesson screen's preview.</summary>
+    /// <summary>Optional: a one-line live status of the recognizer (frames, results, hands, last error) for testing.</summary>
+    public interface IRecognitionDiagnostics
+    {
+        string DiagnosticText { get; }
+    }
+
     public interface ICameraPreviewSource
     {
         /// <summary>Live camera texture, or null before the camera has started.</summary>

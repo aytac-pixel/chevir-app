@@ -376,6 +376,11 @@ namespace Cevir.Core.Editor
             Set(cameraPreview, "frame", cameraFrame);
             Set(cameraPreview, "placeholder", placeholder.gameObject);
             Set(cameraPreview, "placeholderLabel", placeholder);
+            RectTransform landmarksRt = Rect("Landmarks", cameraFrame);
+            Stretch(landmarksRt);
+            LandmarkOverlayUI landmarks = landmarksRt.gameObject.AddComponent<LandmarkOverlayUI>();
+            Set(landmarks, "preview", cameraPreview);
+            Set(landmarks, "dotSprite", Sprite("UI", "circle"));
             cameraPanel.gameObject.SetActive(false);
 
             // Live recognition status ("Əlini kameraya göstər", "Barmaq bucağını düzəlt", ...).
@@ -413,6 +418,7 @@ namespace Cevir.Core.Editor
             Set(ui, "practice", practice);
             Set(ui, "overlay", overlay);
             Set(ui, "cameraPreview", cameraPreview);
+            Set(ui, "landmarkOverlay", landmarks);
             Set(ui, "closeButton", close);
             Set(ui, "progressFill", fill);
             Set(ui, "heartsLabel", hearts);

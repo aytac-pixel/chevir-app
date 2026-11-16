@@ -16,6 +16,7 @@ namespace Cevir.Core.UI
         [SerializeField] private TMPro.TextMeshProUGUI placeholderLabel;
 
         private ICameraPreviewSource _source;
+        private TMPro.TextMeshProUGUI _diagnostics;
 
         public ICameraPreviewSource Source => _source;
 
@@ -29,6 +30,7 @@ namespace Cevir.Core.UI
 
         private void LateUpdate()
         {
+            UpdateDiagnostics();
             Texture texture = _source != null ? _source.PreviewTexture : null;
             bool ready = texture != null && texture.width > 16;
             if (image != null) image.enabled = ready;
@@ -66,6 +68,57 @@ namespace Cevir.Core.UI
             image.rectTransform.anchorMin = image.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
             image.rectTransform.sizeDelta = sideways ? new Vector2(h, w) : new Vector2(w, h);
             UprightSize = new Vector2(w, h);
+        }
+
+        /// <summary>Small status line at the bottom of the camera (test builds): shows whether the recognizer runs.</summary>
+        private void UpdateDiagnostics()
+        {
+            var source = _source as IRecognitionDiagnostics;
+            if (source == null)
+            {
+                if (_diagnostics != null) _diagnostics.transform.parent.gameObject.SetActive(false);
+                return;
+            }
+
+            if (_diagnostics == null)
+            {
+                RectTransform parent = frame != null ? frame : (RectTransform)transform;
+                var go = new GameObject("Diagnostics", typeof(RectTransform));
+                go.transform.SetParent(parent, false);
+                var rt = (RectTransform)go.transform;
+                rt.anchorMin = new Vector2(0f, 0f);
+                rt.anchorMax = new Vector2(1f, 0f);
+                rt.pivot = new Vector2(0.5f, 0f);
+                rt.anchoredPosition = new Vector2(0f, 8f);
+                rt.sizeDelta = new Vector2(-24f, 90f);
+                var bg = new GameObject("Background", typeof(RectTransform), typeof(Image));
+                bg.transform.SetParent(rt, false);
+                var bgRt = (RectTransform)bg.transform;
+                bgRt.anchorMin = Vector2.zero;
+                bgRt.anchorMax = Vector2.one;
+                bgRt.offsetMin = bgRt.offsetMax = Vector2.zero;
+                Image bgImage = bg.GetComponent<Image>();
+                bgImage.color = new Color(0f, 0f, 0f, 0.55f);
+                bgImage.raycastTarget = false;
+                var textGo = new GameObject("Text", typeof(RectTransform));
+                textGo.transform.SetParent(rt, false);
+                _diagnostics = textGo.AddComponent<TMPro.TextMeshProUGUI>();
+                var textRt = _diagnostics.rectTransform;
+                textRt.anchorMin = Vector2.zero;
+                textRt.anchorMax = Vector2.one;
+                textRt.offsetMin = new Vector2(12f, 4f);
+                textRt.offsetMax = new Vector2(-12f, -4f);
+                if (placeholderLabel != null) _diagnostics.font = placeholderLabel.font;
+                _diagnostics.fontSize = 22f;
+                _diagnostics.enableWordWrapping = true;
+                _diagnostics.color = Color.white;
+                _diagnostics.alignment = TMPro.TextAlignmentOptions.MidlineLeft;
+                _diagnostics.raycastTarget = false;
+                rt.SetAsLastSibling();
+            }
+
+            _diagnostics.transform.parent.gameObject.SetActive(true);
+            _diagnostics.text = source.DiagnosticText;
         }
     }
 }

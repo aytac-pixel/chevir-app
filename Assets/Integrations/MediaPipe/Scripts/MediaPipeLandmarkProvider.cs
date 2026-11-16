@@ -28,7 +28,8 @@ namespace Cevir.Integrations.MediaPipe
     /// back buffers under a lock and published on the main thread in Update. A frame is published when a
     /// hand result arrives; the face data in it is the latest face result (at most one inference step older).
     /// </summary>
-    public sealed class MediaPipeLandmarkProvider : MonoBehaviour, ILandmarkProvider, IPackAwareLandmarkProvider, ICameraPreviewSource
+    public sealed class MediaPipeLandmarkProvider : MonoBehaviour, ILandmarkProvider, IPackAwareLandmarkProvider, ICameraPreviewSource,
+        IRecognitionDiagnostics
     {
         [Header("Models (.task files renamed to .bytes)")]
         [SerializeField] private TextAsset handLandmarkerModel;
@@ -90,6 +91,46 @@ namespace Cevir.Integrations.MediaPipe
 
         public event Action<LandmarkFrame> FrameReady;
 
+        // ---------------------------------------------------------------- diagnostics (test builds)
+
+        private string _stage = "başlamayıb";
+        private int _framesSent;
+        private int _handResults;
+        private int _faceResults;
+        private int _handsInLast;
+        private bool _faceInLast;
+        private volatile string _lastError;
+
+        public string DiagnosticText
+        {
+            get
+            {
+                string camera = _camera != null ? _camera.width + "x" + _camera.height + " " + _camera.videoRotationAngle + "°" : "-";
+                string text = "MP: " + _stage + " | kamera " + camera + " | kadr " + _framesSent + " | əl nəticə " + _handResults +
+                              " (əl " + _handsInLast + ") | üz " + _faceResults + (_faceInLast ? "+" : "-");
+                string error = _lastError;
+                if (!string.IsNullOrEmpty(error)) text += "\nXəta: " + error;
+                return text;
+            }
+        }
+
+        private void OnEnable()
+        {
+            Application.logMessageReceivedThreaded += OnLog;
+        }
+
+        private void OnDisable()
+        {
+            Application.logMessageReceivedThreaded -= OnLog;
+        }
+
+        private void OnLog(string condition, string stackTrace, LogType type)
+        {
+            if (type != LogType.Error && type != LogType.Exception && type != LogType.Assert) return;
+            if (string.IsNullOrEmpty(condition)) return;
+            _lastError = condition.Length > 160 ? condition.Substring(0, 160) : condition;
+        }
+
         public void ApplyPack(ILanguagePack pack)
         {
             if (!allowPackOverrides || pack == null) return;
@@ -130,6 +171,7 @@ namespace Cevir.Integrations.MediaPipe
         private IEnumerator StartRoutine()
         {
             CameraDenied = false;
+            _stage = "kamera açılır";
 #if UNITY_ANDROID && !UNITY_EDITOR
             if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
             {
@@ -145,7 +187,7 @@ namespace Cevir.Integrations.MediaPipe
             if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
             {
                 CameraDenied = true;
-                Debug.LogWarning("[Chevir] Camera permission denied.");
+                Debug.LogWarning("[Chevir] Camera permission denied."); _stage = "kamera icazəsi yoxdur";
                 yield break;
             }
 #else
@@ -155,7 +197,7 @@ namespace Cevir.Integrations.MediaPipe
                 if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
                 {
                     CameraDenied = true;
-                    Debug.LogWarning("[Chevir] Camera permission denied.");
+                    Debug.LogWarning("[Chevir] Camera permission denied."); _stage = "kamera icazəsi yoxdur";
                     yield break;
                 }
             }
@@ -175,7 +217,7 @@ namespace Cevir.Integrations.MediaPipe
             if (deviceName == null && WebCamTexture.devices.Length > 0) deviceName = WebCamTexture.devices[0].name;
             if (deviceName == null)
             {
-                Debug.LogError("[Chevir] No camera found.");
+                Debug.LogError("[Chevir] No camera found."); _stage = "kamera tapılmadı";
                 yield break;
             }
 
@@ -187,10 +229,11 @@ namespace Cevir.Integrations.MediaPipe
             while (_camera.width <= 16 && Time.realtimeSinceStartup < timeout) yield return null;
             if (_camera.width <= 16)
             {
-                Debug.LogError("[Chevir] Camera did not start.");
+                Debug.LogError("[Chevir] Camera did not start."); _stage = "kamera açılmadı";
                 yield break;
             }
 
+            _stage = "model yüklənir";
             _pixels = new Color32[_camera.width * _camera.height];
             _upright = new Color32[_pixels.Length];
             _uprightRotation = -1;
@@ -205,7 +248,13 @@ namespace Cevir.Integrations.MediaPipe
                 CloseLandmarkers();
             }
 
-            if (_hands == null) yield break;
+            if (_hands == null)
+            {
+                _stage = "MediaPipe açılmadı";
+                yield break;
+            }
+
+            _stage = "işləyir";
             _clock.Restart();
             _lastSentTimestamp = -1;
             IsRunning = true;
@@ -313,8 +362,11 @@ namespace Cevir.Integrations.MediaPipe
             {
                 if (!_loggedDetectError) Debug.LogError("[Chevir] MediaPipe detection failed: " + e);
                 _loggedDetectError = true;
+                _lastError = e.GetType().Name + ": " + e.Message;
                 return;
             }
+
+            _framesSent++;
 
             lock (_lock)
             {
@@ -405,6 +457,8 @@ namespace Cevir.Integrations.MediaPipe
 
                 _back.TimestampSeconds = timestampMillisec / 1000.0;
                 _handsDirty = true;
+                _handResults++;
+                _handsInLast = (_back.LeftHand.IsPresent ? 1 : 0) + (_back.RightHand.IsPresent ? 1 : 0);
             }
         }
 
@@ -414,7 +468,9 @@ namespace Cevir.Integrations.MediaPipe
             {
                 FaceLandmarks face = _back.Face;
                 face.Clear();
-                if (result.faceLandmarks == null || result.faceLandmarks.Count == 0) return;
+                _faceResults++;
+                _faceInLast = result.faceLandmarks != null && result.faceLandmarks.Count > 0;
+                if (!_faceInLast) return;
 
                 var points = result.faceLandmarks[0].landmarks;
                 for (int i = 0; i < FaceLandmarks.Count && i < points.Count; i++)

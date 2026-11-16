@@ -25,6 +25,7 @@ namespace Cevir.Core.UI
         [SerializeField] private SignPracticeController practice;
         [SerializeField] private FeedbackOverlayUI overlay;
         [SerializeField] private CameraPreviewUI cameraPreview;
+        [SerializeField] private LandmarkOverlayUI landmarkOverlay;
 
         [Header("HUD")]
         [SerializeField] private Button closeButton;
@@ -154,6 +155,11 @@ namespace Cevir.Core.UI
             {
                 practice.Configure(_game.ActivePack);
                 if (cameraPreview != null) cameraPreview.SetSource(practice.Provider as ICameraPreviewSource);
+                if (landmarkOverlay != null)
+                {
+                    landmarkOverlay.DominantHand = _game.Progress.leftHanded ? HandSide.Left : HandSide.Right;
+                    landmarkOverlay.Bind(practice.Provider);
+                }
             }
 
             RefreshHud();
