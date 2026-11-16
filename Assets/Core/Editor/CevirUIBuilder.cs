@@ -185,6 +185,7 @@ namespace Cevir.Core.Editor
                 if (provider == null) provider = (MonoBehaviour)systems.AddComponent(providerType);
                 Set(provider, "handLandmarkerModel", FindTextAsset("hand_landmarker"), "hand_landmarker(.bytes) model not found; assign it on the provider.");
                 Set(provider, "faceLandmarkerModel", FindTextAsset("face_landmarker"), "face_landmarker(.bytes) model not found; assign it on the provider.");
+                Set(provider, "poseLandmarkerModel", FindTextAsset("pose_landmarker_lite"), "pose_landmarker_lite(.bytes) model not found; assign it on the provider.");
             }
             else
             {

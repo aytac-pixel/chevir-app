@@ -10,6 +10,7 @@ using Mediapipe.Tasks.Core;
 using Mediapipe.Tasks.Vision.Core;
 using Mediapipe.Tasks.Vision.FaceLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
+using Mediapipe.Tasks.Vision.PoseLandmarker;
 using UnityEngine;
 #if UNITY_ANDROID && !UNITY_EDITOR
 using UnityEngine.Android;
@@ -35,6 +36,9 @@ namespace Cevir.Integrations.MediaPipe
         [SerializeField] private TextAsset handLandmarkerModel;
         [SerializeField] private TextAsset faceLandmarkerModel;
 
+        [Tooltip("pose_landmarker_lite: shoulders, arms and hips for the word model.")]
+        [SerializeField] private TextAsset poseLandmarkerModel;
+
         [Tooltip("Uses the active pack's model overrides when it has them.")]
         [SerializeField] private bool allowPackOverrides = true;
 
@@ -55,6 +59,7 @@ namespace Cevir.Integrations.MediaPipe
         [SerializeField, Range(0f, 1f)] private float minHandPresenceConfidence = 0.5f;
         [SerializeField, Range(0f, 1f)] private float minTrackingConfidence = 0.5f;
         [SerializeField] private bool enableFace = true;
+        [SerializeField] private bool enablePose = true;
 
         [Header("Orientation")]
         [Tooltip("Extra Left/Right swap for devices whose front camera already delivers a mirrored image. Verify per device.")]
@@ -68,6 +73,7 @@ namespace Cevir.Integrations.MediaPipe
 
         private HandLandmarker _hands;
         private FaceLandmarker _face;
+        private PoseLandmarker _pose;
 
         private readonly object _lock = new object();
         private readonly LandmarkFrame _back = new LandmarkFrame();
@@ -97,6 +103,8 @@ namespace Cevir.Integrations.MediaPipe
         private int _framesSent;
         private int _handResults;
         private int _faceResults;
+        private int _poseResults;
+        private bool _poseInLast;
         private int _handsInLast;
         private bool _faceInLast;
         private volatile string _lastError;
@@ -107,7 +115,8 @@ namespace Cevir.Integrations.MediaPipe
             {
                 string camera = _camera != null ? _camera.width + "x" + _camera.height + " " + _camera.videoRotationAngle + "°" : "-";
                 string text = "MP: " + _stage + " | kamera " + camera + " | kadr " + _framesSent + " | əl nəticə " + _handResults +
-                              " (əl " + _handsInLast + ") | üz " + _faceResults + (_faceInLast ? "+" : "-");
+                              " (əl " + _handsInLast + ") | üz " + _faceResults + (_faceInLast ? "+" : "-") +
+                              " | bədən " + _poseResults + (_poseInLast ? "+" : "-");
                 string error = _lastError;
                 if (!string.IsNullOrEmpty(error)) text += "\nXəta: " + error;
                 return text;
@@ -296,6 +305,25 @@ namespace Cevir.Integrations.MediaPipe
                     resultCallback: OnFaceResult);
                 _face = FaceLandmarker.CreateFromOptions(faceOptions);
             }
+
+            if (enablePose && poseLandmarkerModel != null)
+            {
+                // A missing body model only costs the word model; hands and face keep working.
+                try
+                {
+                    var poseOptions = new PoseLandmarkerOptions(
+                        new BaseOptions(delegateType, modelAssetBuffer: poseLandmarkerModel.bytes),
+                        runningMode: RunningMode.LIVE_STREAM,
+                        numPoses: 1,
+                        resultCallback: OnPoseResult);
+                    _pose = PoseLandmarker.CreateFromOptions(poseOptions);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("[Chevir] Pose landmarker could not start: " + e.Message);
+                    _pose = null;
+                }
+            }
         }
 
         private void CloseLandmarkers()
@@ -310,6 +338,12 @@ namespace Cevir.Integrations.MediaPipe
             {
                 _face.Close();
                 _face = null;
+            }
+
+            if (_pose != null)
+            {
+                _pose.Close();
+                _pose = null;
             }
         }
 
@@ -359,6 +393,7 @@ namespace Cevir.Integrations.MediaPipe
                 {
                     _hands.DetectAsync(image, timestamp, processing);
                     if (_face != null) _face.DetectAsync(image, timestamp, processing);
+                    if (_pose != null) _pose.DetectAsync(image, timestamp, processing);
                 }
             }
             catch (Exception e)
@@ -515,6 +550,33 @@ namespace Cevir.Integrations.MediaPipe
                     face.HeadEuler = euler;
                     face.HasHeadPose = true;
                 }
+            }
+        }
+
+        private void OnPoseResult(PoseLandmarkerResult result, MpImage image, long timestampMillisec)
+        {
+            lock (_lock)
+            {
+                PoseLandmarks pose = _back.Pose;
+                pose.Clear();
+                _poseResults++;
+                _poseInLast = result.poseLandmarks != null && result.poseLandmarks.Count > 0;
+                if (!_poseInLast) return;
+
+                var points = result.poseLandmarks[0].landmarks;
+                if (points == null || points.Count < PoseLandmarks.Count)
+                {
+                    _poseInLast = false;
+                    return;
+                }
+
+                for (int i = 0; i < PoseLandmarks.Count; i++)
+                {
+                    NormalizedLandmark p = points[i];
+                    pose.Points[i] = new Vector3(p.x, p.y, p.z);
+                }
+
+                pose.IsPresent = true;
             }
         }
 

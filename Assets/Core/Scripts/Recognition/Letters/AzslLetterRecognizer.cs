@@ -5,15 +5,25 @@ namespace Cevir.Core.Recognition.Letters
 {
     /// <summary>
     /// Live fingerspelling check with the web translator's letter model: keeps the last
-    /// <see cref="AzslLetterModel.Window"/> frames and classifies them on request.
+    /// <see cref="Window"/> frames and classifies them on request.
     /// </summary>
     public sealed class AzslLetterRecognizer
     {
         public const string ResourceName = "azsl_letters";
-        private const int Window = AzslLetterModel.Window;
+        /// <summary>Frames the web translator classifies at a time (0.8 s at 30 fps).</summary>
+        public const int Window = 24;
+
+        /// <summary>Model labels in output order; the last one is "no letter".</summary>
+        public static readonly string[] Labels =
+        {
+            "a", "b", "c", "ç", "d", "e", "ə", "f", "g", "ğ", "h", "ı", "i", "j", "k", "l", "m", "n", "o", "ö",
+            "p", "q", "r", "s", "ş", "t", "u", "ü", "v", "x", "y", "z", "<none>"
+        };
+
+        public const int NoneIndex = 32;
         private const int Per = AzslLetterFeatures.PerFrame;
 
-        private static AzslLetterModel _model;
+        private static SignNet _model;
         private static bool _loadFailed;
 
         private readonly float[] _hand = new float[Window * Per];
@@ -24,10 +34,10 @@ namespace Cevir.Core.Recognition.Letters
         private int _head;
         private float _aspect = 0.75f;
 
-        /// <summary>The latest guess, for the test status line ("r 92%").</summary>
-        public static string LastGuessText { get; private set; }
+        /// <summary>The latest model guess (letters or words), for the test status line ("R 92%").</summary>
+        public static string LastGuessText { get; set; }
 
-        public static AzslLetterModel Model
+        public static SignNet Model
         {
             get
             {
@@ -36,7 +46,10 @@ namespace Cevir.Core.Recognition.Letters
                 {
                     var asset = Resources.Load<TextAsset>(ResourceName);
                     if (asset == null) throw new InvalidOperationException("Resources/" + ResourceName + ".bytes is missing");
-                    _model = AzslLetterModel.Load(asset.bytes);
+                    SignNet model = SignNet.Load(asset.bytes);
+                    if (model.Features != AzslLetterFeatures.Features || model.Labels.Length != Labels.Length)
+                        throw new InvalidOperationException("unexpected letter model shape");
+                    _model = model;
                 }
                 catch (Exception e)
                 {
@@ -57,7 +70,7 @@ namespace Cevir.Core.Recognition.Letters
         {
             if (string.IsNullOrEmpty(gloss) || gloss.Length != 1) return -1;
             string letter = gloss == "İ" ? "i" : gloss == "I" ? "ı" : gloss.ToLowerInvariant();
-            return Array.IndexOf(AzslLetterModel.Labels, letter);
+            return Array.IndexOf(Labels, letter);
         }
 
         public void Reset()
@@ -116,10 +129,10 @@ namespace Cevir.Core.Recognition.Letters
             return letter == "i" ? "İ" : letter == "ı" ? "I" : letter.ToUpperInvariant();
         }
 
-        /// <summary>Probabilities over <see cref="AzslLetterModel.Labels"/> for the buffered frames, or null.</summary>
+        /// <summary>Probabilities over <see cref="Labels"/> for the buffered frames, or null.</summary>
         public float[] Evaluate()
         {
-            AzslLetterModel model = Model;
+            SignNet model = Model;
             if (model == null || _count == 0) return null;
 
             int start = (_head - _count + Window) % Window;
@@ -133,7 +146,7 @@ namespace Cevir.Core.Recognition.Letters
             float[] probs = model.Predict(AzslLetterFeatures.Build(_flatHand, _flatWorld, _count, _aspect), _count);
             int best = 0;
             for (int i = 1; i < probs.Length; i++) if (probs[i] > probs[best]) best = i;
-            string label = best == AzslLetterModel.NoneIndex ? "—" : Upper(AzslLetterModel.Labels[best]);
+            string label = best == NoneIndex ? "—" : Upper(Labels[best]);
             LastGuessText = label + " " + Mathf.RoundToInt(probs[best] * 100f) + "%";
             return probs;
         }

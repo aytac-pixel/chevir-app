@@ -4,33 +4,26 @@ using System.IO;
 namespace Cevir.Core.Recognition.Letters
 {
     /// <summary>
-    /// The AzSL fingerspelling classifier from the Chevir web translator (chevirapp.com/tercume, letter_model),
-    /// run on the phone in plain C#. Input: a window of frames × 252 hand features
-    /// (<see cref="AzslLetterFeatures"/>); output: probabilities for 32 letters and "no letter".
-    /// Network: linear stem, 2 × (3 depthwise-conv blocks + 1 transformer block), mean pooling, linear head.
-    /// Weights come from the web model's ONNX file (see Tools/letter_model/export_weights.py).
+    /// The sign classifiers of the Chevir web translator (chevirapp.com/tercume: letter_model, word_model), run on
+    /// the phone in plain C#. Input: frames × features (<see cref="AzslLetterFeatures"/>, <see cref="AzslFeatures"/>);
+    /// output: class probabilities. Network: linear stem, 2 × (3 depthwise-conv blocks + 1 transformer block),
+    /// mean pooling, linear head. Weights and labels come from the web model's ONNX file and manifest
+    /// (Tools/letter_model/export_weights.py), and match onnxruntime to about 1e-6.
     /// </summary>
-    public sealed class AzslLetterModel
+    public sealed class SignNet
     {
-        public const int Features = 252;
-        public const int Window = 24;
-        private const int Dim = 128;
-        private const int Hidden = 256;
         private const int Kernel = 17;
         private const int Heads = 4;
         private const float Eps = 1e-5f;
 
-        /// <summary>Labels in output order; the last one is "no letter".</summary>
-        public static readonly string[] Labels =
-        {
-            "a", "b", "c", "ç", "d", "e", "ə", "f", "g", "ğ", "h", "ı", "i", "j", "k", "l", "m", "n", "o", "ö",
-            "p", "q", "r", "s", "ş", "t", "u", "ü", "v", "x", "y", "z", "<none>"
-        };
+        private readonly int Dim;
+        private readonly int Hidden;
 
-        public const int NoneIndex = 32;
+        /// <summary>Input columns per frame.</summary>
+        public int Features { get; private set; }
 
-        /// <summary>Letters that move (judge these without a "hold still" rule).</summary>
-        public static bool IsDynamic(string letter) => "çdgkyzöü".IndexOf(letter, StringComparison.Ordinal) >= 0 && letter.Length == 1;
+        /// <summary>Class names in output order.</summary>
+        public string[] Labels { get; private set; }
 
         private sealed class ConvBlock
         {
@@ -45,13 +38,17 @@ namespace Cevir.Core.Recognition.Letters
         private readonly float[] _stemW, _stemB, _stemG, _stemBeta, _normG, _normB, _headW, _headB;
         private readonly object[] _blocks = new object[8];
 
-        private AzslLetterModel(BinaryReader r)
+        private SignNet(BinaryReader r)
         {
-            if (new string(r.ReadChars(4)) != "CHVL") throw new InvalidDataException("not a Chevir letter model");
+            if (System.Text.Encoding.ASCII.GetString(r.ReadBytes(4)) != "CHVL") throw new InvalidDataException("not a Chevir sign model");
             int version = r.ReadInt32();
-            if (version != 1) throw new InvalidDataException("letter model version " + version);
+            if (version != 2) throw new InvalidDataException("sign model version " + version);
+            Features = r.ReadInt32();
+            Dim = r.ReadInt32();
+            Hidden = 2 * Dim;
+            int classes = r.ReadInt32();
             int count = r.ReadInt32();
-            if (count != 86) throw new InvalidDataException("letter model has " + count + " tensors");
+            if (count != 86) throw new InvalidDataException("sign model has " + count + " tensors");
 
             Func<int, float[]> next = expected =>
             {
@@ -90,16 +87,19 @@ namespace Cevir.Core.Recognition.Letters
 
             _normG = next(Dim);
             _normB = next(Dim);
-            _headW = next(Dim * Labels.Length);
-            _headB = next(Labels.Length);
+            _headW = next(Dim * classes);
+            _headB = next(classes);
+
+            Labels = new string[classes];
+            for (int i = 0; i < classes; i++) Labels[i] = System.Text.Encoding.UTF8.GetString(r.ReadBytes(r.ReadInt32()));
         }
 
-        public static AzslLetterModel Load(byte[] bytes)
+        public static SignNet Load(byte[] bytes)
         {
             using (var stream = new MemoryStream(bytes))
             using (var reader = new BinaryReader(stream))
             {
-                return new AzslLetterModel(reader);
+                return new SignNet(reader);
             }
         }
 

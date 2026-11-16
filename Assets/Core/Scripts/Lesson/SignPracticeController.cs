@@ -62,6 +62,37 @@ namespace Cevir.Core.Lesson
         /// <summary>True while the current attempt is judged by the letter model.</summary>
         public bool LetterMode => _letterIndex >= 0;
 
+        [Header("Words (word model)")]
+        [Tooltip("A word passes when the model's top word is the target with at least this probability.")]
+        [SerializeField, Range(0.1f, 0.95f)] private float wordMinProbability = 0.3f;
+
+        [Tooltip("Below the pass line but at least this sure: 'not sure', which costs no heart.")]
+        [SerializeField, Range(0.05f, 0.9f)] private float wordUnsureProbability = 0.15f;
+
+        [Tooltip("Longest a word may be signed before it is checked anyway.")]
+        [SerializeField, Min(2f)] private float wordMaxSeconds = 10f;
+
+        [Tooltip("Give up when no word was signed in this long.")]
+        [SerializeField, Min(2f)] private float wordWaitSeconds = 12f;
+
+        private readonly AzslWordRecognizer _words = new AzslWordRecognizer();
+        private int _wordClass = -1;
+        private int _wordHandFrames;
+        private double _wordStart;
+        private AzslWordRecognizer.Job _wordJob;
+
+        /// <summary>True while the current attempt is judged by the word model.</summary>
+        public bool WordMode => _wordClass >= 0;
+
+        /// <summary>True when one of the web translator's models can judge this sign (letters or words).</summary>
+        public static bool ModelCanJudge(SignDefinition sign)
+        {
+            if (sign == null) return false;
+            if (sign.Kind == SignKind.Fingerspelling)
+                return AzslLetterRecognizer.Available && AzslLetterRecognizer.LabelIndex(sign.Gloss) >= 0;
+            return AzslWordRecognizer.Available && AzslWordRecognizer.ClassIndex(sign.Gloss) >= 0;
+        }
+
         private readonly SignFeatureExtractor _extractor = new SignFeatureExtractor();
         private readonly NonManualBaseline _baseline = new NonManualBaseline();
         private readonly SignFeatureFrame[] _pool = new SignFeatureFrame[MaxFrames];
@@ -172,6 +203,8 @@ namespace Cevir.Core.Lesson
         public void Cancel()
         {
             _callback = null;
+            _wordClass = -1;
+            _wordJob = null;
             SetPhase(Phase.Idle);
         }
 
@@ -196,6 +229,17 @@ namespace Cevir.Core.Lesson
                 _letterIndex = AzslLetterRecognizer.LabelIndex(_target.Gloss);
             }
 
+            _wordClass = -1;
+            if (_target != null && _candidates == null && !_presenceOnly && _target.Kind != SignKind.Fingerspelling && AzslWordRecognizer.Available)
+            {
+                _wordClass = AzslWordRecognizer.ClassIndex(_target.Gloss);
+            }
+
+            _words.Reset();
+            _wordHandFrames = 0;
+            _wordJob = null;
+            _wordStart = Time.realtimeSinceStartupAsDouble;
+
             _letters.Reset();
             _letterHits = 0;
             _letterEvalTick = 0;
@@ -209,6 +253,12 @@ namespace Cevir.Core.Lesson
         {
             // Timeouts are checked here as well, so they fire even if the camera stops delivering frames.
             double now = Time.realtimeSinceStartupAsDouble;
+            if (WordMode)
+            {
+                WordUpdate(now);
+                return;
+            }
+
             if (CurrentPhase == Phase.Calibrating && now - _phaseStart > calibrationSeconds + CalibrationGrace)
             {
                 // No face frames arrived in time: carry on with a neutral baseline so the lesson never stalls.
@@ -231,6 +281,12 @@ namespace Cevir.Core.Lesson
             if (LetterMode && (CurrentPhase == Phase.WaitingForHand || CurrentPhase == Phase.Recording))
             {
                 LetterFrame(frame, now);
+                return;
+            }
+
+            if (WordMode && (CurrentPhase == Phase.WaitingForHand || CurrentPhase == Phase.Recording))
+            {
+                WordFrame(frame);
                 return;
             }
 
@@ -316,6 +372,85 @@ namespace Cevir.Core.Lesson
             if (now - _lastHandSeen >= 1.5) Score();
         }
 
+        private void WordFrame(LandmarkFrame frame)
+        {
+            if (frame.AnyHandPresent) _wordHandFrames++;
+            AzslWordRecognizer.Span span;
+            bool ended = _words.Push(frame, out span);
+            if (ended)
+            {
+                StartWordJudge(span);
+                return;
+            }
+
+            // A sign starts when a hand rises above the rest line; a too short one goes back to waiting.
+            if (_words.Open && CurrentPhase == Phase.WaitingForHand) SetPhase(Phase.Recording);
+            else if (!_words.Open && CurrentPhase == Phase.Recording) SetPhase(Phase.WaitingForHand);
+        }
+
+        private void StartWordJudge(AzslWordRecognizer.Span span)
+        {
+            SetPhase(Phase.Scoring);
+            _wordJob = _words.Judge(span, _wordClass, wordMinProbability);
+        }
+
+        private void WordUpdate(double now)
+        {
+            switch (CurrentPhase)
+            {
+                case Phase.WaitingForHand:
+                    if (now - _wordStart > wordWaitSeconds) Score();
+                    break;
+                case Phase.Recording:
+                    if (now - _phaseStart > wordMaxSeconds)
+                    {
+                        AzslWordRecognizer.Span span;
+                        if (_words.Flush(out span)) StartWordJudge(span);
+                        else SetPhase(Phase.WaitingForHand);
+                    }
+
+                    break;
+                case Phase.Scoring:
+                    if (_wordJob != null && _wordJob.Done) Score();
+                    break;
+            }
+        }
+
+        private MatchResult ScoreWord()
+        {
+            AzslWordRecognizer.Job job = _wordJob;
+            bool judged = job != null && job.Done;
+            bool passed = judged && job.Passed;
+            if (judged)
+            {
+                if (!string.IsNullOrEmpty(job.Error)) Debug.LogError("[Chevir] Word check failed: " + job.Error);
+                AzslLetterRecognizer.LastGuessText = (job.Guess ?? "-") + " " + Mathf.RoundToInt(job.GuessP * 100f) + "% · " +
+                                                     AzslWordRecognizer.ClassName(_wordClass) + " " + Mathf.RoundToInt(job.BestTarget * 100f) + "%";
+            }
+
+            float p = judged ? job.BestTarget : 0f;
+            SignFeedback feedback;
+            FeedbackSeverity severity;
+            if (passed) { feedback = SignFeedback.Correct; severity = FeedbackSeverity.None; }
+            else if (!judged) { feedback = SignFeedback.ShowHandToCamera; severity = FeedbackSeverity.Neutral; }
+            else if (p >= wordUnsureProbability) { feedback = SignFeedback.Unsure; severity = FeedbackSeverity.Neutral; }
+            else { feedback = SignFeedback.AdjustMovement; severity = FeedbackSeverity.Soft; }
+
+            return new MatchResult
+            {
+                SignId = _target != null ? _target.SignId : null,
+                Feedback = feedback,
+                Severity = severity,
+                ManualScore = p,
+                HandShapeScore = p,
+                ClassifierProbability = p,
+                HandVisibleRatio = _wordHandFrames >= 8 ? 1f : 0f,
+                NonManualScore = 1f,
+                BestReferenceIndex = -1,
+                IsPerfect = passed && p >= 0.8f
+            };
+        }
+
         private MatchResult ScoreLetter()
         {
             bool shown = _letterHandFrames >= 8;
@@ -358,6 +493,12 @@ namespace Cevir.Core.Lesson
             {
                 result = ScoreLetter();
                 _letterIndex = -1;
+            }
+            else if (WordMode)
+            {
+                result = ScoreWord();
+                _wordClass = -1;
+                _wordJob = null;
             }
             else if (_presenceOnly)
             {

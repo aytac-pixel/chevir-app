@@ -15,6 +15,9 @@ namespace Cevir.Core.Recognition.Letters
     {
         public const int Slot = 63;
         public const int PerFrame = 2 * Slot;
+
+        /// <summary>Columns per frame: hand_shape (126) + hand_vel (126).</summary>
+        public const int Features = 252;
         private const float Unit = 0.3f;
 
         /// <returns>T × 252 features (hand_shape then hand_vel), row by row.</returns>
@@ -73,7 +76,7 @@ namespace Cevir.Core.Recognition.Letters
                 handN[i * 3 + 2] = img[i * 3 + 2] / Unit;
             }
 
-            const int F = AzslLetterModel.Features;
+            const int F = Features;
             var x0 = new float[T * F];
             for (int t = 0; t < T; t++)
             {

@@ -144,6 +144,30 @@ namespace Cevir.Core.Recognition
     }
 
     /// <summary>
+    /// 33 MediaPipe Pose landmarks in normalized image space (x, y in [0, 1], y down). The word model reads
+    /// the nose (0), shoulders (11, 12), elbows (13, 14), wrists (15 = left, 16 = right) and hips (23, 24).
+    /// </summary>
+    public sealed class PoseLandmarks
+    {
+        public const int Count = 33;
+        public const int LeftWrist = 15, RightWrist = 16;
+
+        public readonly Vector3[] Points = new Vector3[Count];
+        public bool IsPresent;
+
+        public void CopyFrom(PoseLandmarks other)
+        {
+            System.Array.Copy(other.Points, Points, Count);
+            IsPresent = other.IsPresent;
+        }
+
+        public void Clear()
+        {
+            IsPresent = false;
+        }
+    }
+
+    /// <summary>
     /// One camera frame worth of landmarks. Instances are pooled and reused by providers and
     /// buffers, so consumers must copy what they keep.
     /// Hand slots follow the landmarker's handedness labels after the provider's own correction.
@@ -158,6 +182,7 @@ namespace Cevir.Core.Recognition
         public readonly HandLandmarks LeftHand = new HandLandmarks();
         public readonly HandLandmarks RightHand = new HandLandmarks();
         public readonly FaceLandmarks Face = new FaceLandmarks();
+        public readonly PoseLandmarks Pose = new PoseLandmarks();
 
         public HandLandmarks GetHand(HandSide side) => side == HandSide.Left ? LeftHand : RightHand;
 
@@ -170,6 +195,7 @@ namespace Cevir.Core.Recognition
             LeftHand.CopyFrom(other.LeftHand);
             RightHand.CopyFrom(other.RightHand);
             Face.CopyFrom(other.Face);
+            Pose.CopyFrom(other.Pose);
         }
 
         public void Clear()
@@ -177,6 +203,7 @@ namespace Cevir.Core.Recognition
             LeftHand.Clear();
             RightHand.Clear();
             Face.Clear();
+            Pose.Clear();
         }
     }
 }
