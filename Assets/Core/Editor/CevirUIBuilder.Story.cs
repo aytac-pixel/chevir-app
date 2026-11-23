@@ -146,10 +146,10 @@ namespace Cevir.Core.Editor
             hudRoot.gameObject.SetActive(false);
 
             // ---------------------------------------------------------------- name card, celebration, results
-            TMP_InputField firstName, lastName, nameSign;
+            TMP_InputField firstName, lastName;
             TextMeshProUGUI nameTitle, nameBody;
             Button nameContinue;
-            GameObject nameCard = BuildNameCard(screen, out firstName, out lastName, out nameSign, out nameTitle, out nameBody, out nameContinue);
+            GameObject nameCard = BuildNameCard(screen, out firstName, out lastName, out nameTitle, out nameBody, out nameContinue);
             CelebrationUI celebration = BuildCelebration(screen);
             FeedbackOverlayUI overlay = BuildFeedbackOverlay(screen, null);
 
@@ -185,7 +185,6 @@ namespace Cevir.Core.Editor
             Set(ui, "nameCard", nameCard);
             Set(ui, "firstNameField", firstName);
             Set(ui, "lastNameField", lastName);
-            Set(ui, "nameSignField", nameSign);
             Set(ui, "nameCardTitle", nameTitle);
             Set(ui, "nameCardBody", nameBody);
             Set(ui, "nameContinueButton", nameContinue);
@@ -372,7 +371,7 @@ namespace Cevir.Core.Editor
         }
 
         private static GameObject BuildNameCard(Transform parent, out TMP_InputField firstName, out TMP_InputField lastName,
-            out TMP_InputField nameSign, out TextMeshProUGUI title, out TextMeshProUGUI body, out Button next)
+            out TextMeshProUGUI title, out TextMeshProUGUI body, out Button next)
         {
             RectTransform root = Rect("NameCard", parent);
             Stretch(root);
@@ -388,9 +387,6 @@ namespace Cevir.Core.Editor
                 32f, UIPalette.TextSecondary, TextAlignmentOptions.TopLeft, false);
             firstName = InputField(card.transform, "FirstName", "Name", "Ad");
             lastName = InputField(card.transform, "LastName", "Surname", "Soyad");
-            nameSign = InputField(card.transform, "NameSign", "Nickname or feature (e.g. glasses)", "Ləqəb və ya xüsusiyyət (məs. eynək)");
-            nameSign.characterLimit = 40;
-            nameSign.gameObject.SetActive(false);
             TextMeshProUGUI nextLabel;
             next = GradientButton(card.transform, "ContinueButton", "CONTINUE", "DAVAM ET", 130f, null, out nextLabel);
 

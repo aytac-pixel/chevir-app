@@ -207,7 +207,7 @@ namespace Cevir.Core.Tests
         }
 
         [Test]
-        public void NameSignBeatAsksForTheNameSignAndMatchesAKnownFeature()
+        public void NameSignBeatAsksForAListedFeatureAndChecksThatSign()
         {
             StoryTestPack pack = StoryTestPack.WithAlphabet();
             var glasses = ScriptableObject.CreateInstance<SignDefinition>();
@@ -218,7 +218,7 @@ namespace Cevir.Core.Tests
             story.EditorSetIdentity("story.ns", "Story", "");
             var beats = new List<StoryBeat>
             {
-                new StoryBeat { type = StoryBeatType.NpcLine, text = new LocalizedString { en = "What is your name sign?", az = "Sənin ad işarən nədir?" } },
+                new StoryBeat { type = StoryBeatType.NpcLine, text = new LocalizedString { en = "What is your nickname?", az = "Sənin ləqəbin nədir?" } },
                 new StoryBeat { type = StoryBeatType.LearnerNameSign },
                 new StoryBeat { type = StoryBeatType.NpcLine, text = new LocalizedString { en = "Nice to meet you, {namesign}!", az = "Tanış olduğuma şadam, {namesign}!" } }
             };
@@ -231,18 +231,22 @@ namespace Cevir.Core.Tests
             Assert.IsTrue(session.NeedsNameSign);
             Assert.IsFalse(session.BeginResponse(), "the camera waits for the name sign");
 
-            session.SetNameSign("Eynəkli Ana");
+            session.SetNameSign("eynəkli");
+            Assert.IsTrue(session.NeedsNameSign, "only words from the list count");
+            session.SetNameSign("eynək");
             Assert.IsFalse(session.NeedsNameSign);
+            Assert.AreEqual("Eynək", session.NameSign, "the list's own spelling");
             Assert.AreSame(glasses, session.NameSignTarget);
             Assert.IsTrue(session.BeginResponse());
             Assert.IsNull(session.Spelling, "no letter-by-letter spelling");
 
             SpellOutcome outcome = session.SubmitAttempt(Ok());
             Assert.IsTrue(outcome.TaskComplete);
-            Assert.AreEqual("Nice to meet you, Eynəkli Ana!", session.FormatText(session.CurrentBeat));
+            Assert.AreEqual("Nice to meet you, Eynək!", session.FormatText(session.CurrentBeat));
 
-            session.SetNameSign("Gülüş");
-            Assert.IsNull(session.NameSignTarget, "an own name sign is not a dictionary sign");
+            session.SetNameSign("Pişik");
+            Assert.AreEqual("Pişik", session.NameSignTarget.Gloss, "a word the lessons don't teach gets a gloss-only sign");
+            Assert.AreNotSame(glasses, session.NameSignTarget);
         }
 
         [Test]

@@ -67,8 +67,6 @@ namespace Cevir.Core.UI
         [SerializeField] private GameObject nameCard;
         [SerializeField] private TMP_InputField firstNameField;
         [SerializeField] private TMP_InputField lastNameField;
-        [Tooltip("Name sign (ləqəb or most recognisable feature), shown when a name-sign beat needs it.")]
-        [SerializeField] private TMP_InputField nameSignField;
         [SerializeField] private TextMeshProUGUI nameCardTitle;
         [SerializeField] private TextMeshProUGUI nameCardBody;
         [SerializeField] private Button nameContinueButton;
@@ -83,7 +81,6 @@ namespace Cevir.Core.UI
         private bool _hudOpen;
         private bool _attempting;
         private bool _finished;
-        private bool _askingNameSign;
         private float _waitingSince;
         private Coroutine _lineRoutine;
 
@@ -322,14 +319,12 @@ namespace Cevir.Core.UI
         private void ShowNameCard()
         {
             if (nameCard == null) return;
-            _askingNameSign = false;
             if (firstNameField != null)
             {
                 firstNameField.text = _session.FirstName;
                 firstNameField.gameObject.SetActive(true);
             }
 
-            if (nameSignField != null) nameSignField.gameObject.SetActive(false);
             SetLabel(nameCardTitle, "What's your name?", "Adın nədir?");
             SetLabel(nameCardBody, "So Aysel knows what to call you.", "Aysel səni necə çağıracağını bilsin.");
             if (lastNameField != null)
@@ -341,19 +336,17 @@ namespace Cevir.Core.UI
             nameCard.SetActive(true);
         }
 
-        /// <summary>Asks for the name sign: the nickname or most recognisable feature the learner will sign.</summary>
+        /// <summary>Asks for the nickname / best-known feature from the list, then opens the camera.</summary>
         private void ShowNameSignCard()
         {
-            if (nameCard == null || nameSignField == null) return;
-            _askingNameSign = true;
-            if (firstNameField != null) firstNameField.gameObject.SetActive(false);
-            if (lastNameField != null) lastNameField.gameObject.SetActive(false);
-            nameSignField.text = _session.NameSign;
-            nameSignField.gameObject.SetActive(true);
-            nameCard.SetActive(true);
-            SetLabel(nameCardTitle, "What's your name sign?", "Ad işarən nədir?");
-            SetLabel(nameCardBody, "Deaf people call each other by a name sign: a nickname or your most recognisable feature (glasses, curly hair, a smile...). Write it, then show its sign.",
-                "Karlar bir-birini ad işarəsi ilə çağırır: ləqəbin və ya ən tanınan xüsusiyyətin (eynək, buruq saç, gülüş...). Onu yaz, sonra işarəsini göstər.");
+            if (NameSignPickerUI.Instance == null) return;
+            NameSignPickerUI.Instance.Open(_session.NameSign, word =>
+            {
+                if (_session == null || string.IsNullOrEmpty(word)) return;
+                _session.SetNameSign(word);
+                _game.SetNameSign(word);
+                _session.BeginResponse();
+            });
         }
 
         private static void SetLabel(TextMeshProUGUI label, string en, string az)
@@ -366,18 +359,6 @@ namespace Cevir.Core.UI
 
         private void OnNameEntered()
         {
-            if (_askingNameSign)
-            {
-                string sign = nameSignField != null ? nameSignField.text.Trim() : string.Empty;
-                if (sign.Length == 0) return;
-                _session.SetNameSign(sign);
-                if (nameCard != null) nameCard.SetActive(false);
-                _askingNameSign = false;
-                _game.SetNameSign(sign);
-                _session.BeginResponse();
-                return;
-            }
-
             string first = firstNameField != null ? firstNameField.text.Trim() : string.Empty;
             string last = lastNameField != null && _session.AsksSurname ? lastNameField.text.Trim() : _session.LastName;
             if (first.Length == 0) return;
@@ -434,8 +415,8 @@ namespace Cevir.Core.UI
             }
             else if (beat.type == StoryBeatType.LearnerNameSign)
             {
-                // A name sign is personal. When it matches a known sign (e.g. «Eynək») the recogniser checks the first
-                // tries; after two misses, or for the learner's own sign, it is enough that the hands are clearly shown.
+                // The nickname / feature is a dictionary sign: the word model checks the first two tries when it knows
+                // the word; after that, or for words it doesn't know, it is enough that the hands are clearly shown.
                 target = _session.SignBeatFailures < 2 ? _session.NameSignTarget : null;
                 if (letterLabel != null) letterLabel.text = Loc.ToUpperAz(_session.NameSign);
                 if (letterThumbnail != null) letterThumbnail.gameObject.SetActive(false);

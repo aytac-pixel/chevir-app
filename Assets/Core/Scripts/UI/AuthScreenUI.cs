@@ -7,9 +7,9 @@ namespace Cevir.Core.UI
 {
     /// <summary>
     /// Sign in / create account, shown over the whole app while the learner is signed out (only when a server is
-    /// configured). Creating an account asks for a name, a name sign (nickname or most recognisable feature: Deaf
-    /// people call each other by name signs), e-mail and password; the name is used in the app and on the league table,
-    /// the name sign in the stories.
+    /// configured). Creating an account asks for a name, a nickname / best-known feature picked from a list of
+    /// dictionary signs (Deaf people call each other by such a sign), e-mail and password; the name is used in the app
+    /// and on the league table, the nickname sign in the stories.
     /// </summary>
     public sealed class AuthScreenUI : MonoBehaviour
     {
@@ -17,7 +17,9 @@ namespace Cevir.Core.UI
         [SerializeField] private TextMeshProUGUI titleLabel;
         [SerializeField] private GameObject nameRow;
         [SerializeField] private TMP_InputField nameField;
-        [SerializeField] private TMP_InputField nameSignField;
+        [Tooltip("Opens the list of nicknames / best-known features (NameSignPickerUI).")]
+        [SerializeField] private Button nameSignButton;
+        [SerializeField] private TextMeshProUGUI nameSignLabel;
         [SerializeField] private TextMeshProUGUI nameSignHint;
         [SerializeField] private TMP_InputField emailField;
         [SerializeField] private TMP_InputField passwordField;
@@ -33,6 +35,7 @@ namespace Cevir.Core.UI
         private bool _signUp = true;
         private bool _reset; // entering the e-mailed code and a new password
         private bool _busy;
+        private string _nameSign = string.Empty;
 
         private void Awake()
         {
@@ -50,6 +53,7 @@ namespace Cevir.Core.UI
                 codeField.characterLimit = 10;
             }
             if (forgotButton != null) forgotButton.onClick.AddListener(ForgotPassword);
+            if (nameSignButton != null) nameSignButton.onClick.AddListener(PickNameSign);
             if (passwordField != null)
             {
                 passwordField.contentType = TMP_InputField.ContentType.Password;
@@ -105,7 +109,12 @@ namespace Cevir.Core.UI
         {
             if (titleLabel != null) titleLabel.text = _reset ? "Yeni şifrə" : _signUp ? UIStrings.SignUpTitle : UIStrings.SignInTitle;
             if (nameRow != null) nameRow.SetActive(_signUp && !_reset);
-            if (nameSignField != null) nameSignField.gameObject.SetActive(_signUp && !_reset);
+            if (nameSignButton != null) nameSignButton.gameObject.SetActive(_signUp && !_reset);
+            if (nameSignLabel != null)
+            {
+                nameSignLabel.text = _nameSign.Length > 0 ? "Ləqəbin: " + _nameSign : "Ləqəbin / ən tanınan xüsusiyyətin: seç";
+                nameSignLabel.color = _nameSign.Length > 0 ? UIPalette.TextPrimary : UIPalette.TextSecondary;
+            }
             if (nameSignHint != null) nameSignHint.gameObject.SetActive(_signUp && !_reset);
             if (codeField != null) codeField.gameObject.SetActive(_reset);
             var passwordHint = passwordField != null ? passwordField.placeholder as TextMeshProUGUI : null;
@@ -125,12 +134,12 @@ namespace Cevir.Core.UI
         {
             if (_busy || _cloud == null) return;
             string name = nameField != null ? nameField.text.Trim() : string.Empty;
-            string nameSign = nameSignField != null ? nameSignField.text.Trim() : string.Empty;
+            string nameSign = _nameSign;
             string email = emailField != null ? emailField.text.Trim() : string.Empty;
             string password = passwordField != null ? passwordField.text : string.Empty;
 
             if (_signUp && name.Length == 0) { Message(UIStrings.NeedName, true); return; }
-            if (_signUp && !_reset && nameSignField != null && nameSign.Length == 0) { Message(UIStrings.NeedNameSign, true); return; }
+            if (_signUp && !_reset && nameSignButton != null && nameSign.Length == 0) { Message(UIStrings.NeedNameSign, true); return; }
             if (email.Length < 3 || !email.Contains("@")) { Message(UIStrings.NeedEmail, true); return; }
             if (password.Length < 6) { Message(UIStrings.NeedPassword, true); return; }
 
@@ -181,6 +190,17 @@ namespace Cevir.Core.UI
                     if (error != null) Message(error, true);
                 });
             }
+        }
+
+        private void PickNameSign()
+        {
+            if (_busy || NameSignPickerUI.Instance == null) return;
+            NameSignPickerUI.Instance.Open(_nameSign, word =>
+            {
+                _nameSign = word ?? string.Empty;
+                Message(null, false);
+                Render();
+            });
         }
 
         private void ForgotPassword()

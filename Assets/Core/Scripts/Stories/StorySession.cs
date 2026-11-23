@@ -30,6 +30,7 @@ namespace Cevir.Core.Stories
     public sealed class StorySession
     {
         private readonly ILanguagePack _pack;
+        private SignDefinition _nameSignTarget;
         private int _index = -1;
 
         public event Action<StoryBeat> BeatChanged;
@@ -49,7 +50,7 @@ namespace Cevir.Core.Stories
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
 
-        /// <summary>The learner's name sign: a nickname or their most recognisable feature (e.g. "eynək").</summary>
+        /// <summary>The learner's nickname / best-known feature, a word from <see cref="NameSignOptions"/> (e.g. "Eynək").</summary>
         public string NameSign { get; private set; }
         public StoryPhase Phase { get; private set; }
         public int BeatIndex => _index;
@@ -85,12 +86,12 @@ namespace Cevir.Core.Stories
             }
         }
 
-        /// <summary>True when a name-sign beat is coming and the learner has not told us their name sign yet.</summary>
+        /// <summary>True when a name-sign beat is coming and the learner has not picked a word from the list yet.</summary>
         public bool NeedsNameSign
         {
             get
             {
-                if (!string.IsNullOrEmpty(NameSign)) return false;
+                if (NameSignOptions.Find(NameSign) != null) return false;
                 foreach (StoryBeat beat in Story.Beats)
                 {
                     if (beat.type == StoryBeatType.LearnerNameSign) return true;
@@ -102,34 +103,36 @@ namespace Cevir.Core.Stories
 
         public void SetNameSign(string nameSign)
         {
-            NameSign = (nameSign ?? string.Empty).Trim();
+            NameSign = NameSignOptions.Find(nameSign) ?? (nameSign ?? string.Empty).Trim();
         }
 
         /// <summary>
-        /// A dictionary sign that matches the name sign's feature (e.g. "Eynəkli" → «Eynək»), used to check the
-        /// attempt with the recogniser. Null when the name sign is the learner's own: then only the hands are checked.
+        /// The sign to check for the learner's nickname / best-known feature: the pack's own sign with that gloss when
+        /// there is one, otherwise a gloss-only sign the word model can judge. Null when no name sign is set.
         /// </summary>
         public SignDefinition NameSignTarget
         {
             get
             {
-                if (_pack == null || _pack.Dictionary == null || string.IsNullOrEmpty(NameSign)) return null;
-                string[] words = Loc.ToLowerAz(NameSign).Split(new[] { ' ', ',', '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
-                SignDefinition best = null;
-                foreach (SignDefinition sign in _pack.Dictionary.Signs)
+                if (string.IsNullOrEmpty(NameSign)) return null;
+                if (_nameSignTarget != null && _nameSignTarget.Gloss == NameSign) return _nameSignTarget;
+                _nameSignTarget = null;
+                if (_pack != null && _pack.Dictionary != null)
                 {
-                    if (sign == null || sign.Kind == SignKind.Fingerspelling || sign.Kind == SignKind.Number) continue;
-                    string gloss = Loc.ToLowerAz(sign.Gloss ?? string.Empty);
-                    if (gloss.Length < 3 || gloss.Contains(" ")) continue;
-                    foreach (string word in words)
+                    string key = Loc.ToLowerAz(NameSign);
+                    foreach (SignDefinition sign in _pack.Dictionary.Signs)
                     {
-                        // "eynəkli", "eynəyi" ... still point to «eynək»; the longest match wins.
-                        bool hit = word == gloss || (word.StartsWith(gloss, StringComparison.Ordinal) && word.Length - gloss.Length <= 3);
-                        if (hit && (best == null || gloss.Length > best.Gloss.Length)) best = sign;
+                        if (sign == null || sign.Kind == SignKind.Fingerspelling || sign.Kind == SignKind.Number) continue;
+                        if (Loc.ToLowerAz(sign.Gloss ?? string.Empty) == key)
+                        {
+                            _nameSignTarget = sign;
+                            break;
+                        }
                     }
                 }
 
-                return best;
+                if (_nameSignTarget == null) _nameSignTarget = SignDefinition.CreateForGloss("namesign." + Loc.ToLowerAz(NameSign), NameSign, SignKind.Word);
+                return _nameSignTarget;
             }
         }
 

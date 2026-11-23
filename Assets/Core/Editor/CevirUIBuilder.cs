@@ -86,6 +86,7 @@ namespace Cevir.Core.Editor
             BuildRuntimePanel<AccountSettingsUI>(canvasGo.transform, "AccountSettingsLayer", theme);
             BuildRuntimePanel<ReminderSettingsUI>(canvasGo.transform, "ReminderSettingsLayer", theme);
             BuildAuthScreen(canvasGo.transform);
+            BuildRuntimePanel<NameSignPickerUI>(canvasGo.transform, "NameSignPickerLayer", theme); // above sign-in: used at sign-up
             toast.transform.SetParent(canvasGo.transform, false); // above the full-screen panels, so their messages show
             toast.transform.SetAsLastSibling();
             HardenShadows(canvasGo);

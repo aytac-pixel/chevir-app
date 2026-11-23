@@ -205,7 +205,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         };
 
         // Beat script: "npc|AZ text|EN text|sign;sign", "you|AZ instruction|EN instruction|expected sign", "namesign|AZ|EN"
-        // (the learner shows their own name sign).
+        // (the learner signs the nickname / best-known feature picked at sign-up).
         private static readonly string[][] StoryScripts =
         {
             null, // Story 1 is built by FillStory1
@@ -275,8 +275,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             {
                 "npc|Salam! Necəsən?|Hi! How are you?|Salam;Necəsən",
                 "you|«Yaxşı» işarəsini göstər|Sign \"fine\"|Yaxşı",
-                "npc|Sənin ad işarən nədir?|What is your name sign?|Sənin adın nədir?",
-                "namesign|Ad işarəni göstər|Show your name sign",
+                "npc|Sənin ləqəbin / ən tanınan xüsusiyyətin nədir?|What is your nickname / best-known feature?|Sənin adın nədir?",
+                "namesign|«{namesign}» işarəsini göstər|Sign \"{namesign}\"",
                 "npc|Tanış olduğuma şadam, {name}! Sən bilirsən!|Nice to meet you, {name}! You know it!|Tanış olduğuma şadam;Sən bilirsən?",
                 "you|«Sağ ol» işarəsini göstər|Sign \"thank you\"|Sağ ol"
             }
@@ -642,8 +642,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
         /// <summary>
         /// Story 1 "Hello, my name is..." (end of Unit 1): on a street, Aysel walks up, greets the learner, explains that
-        /// Deaf people call each other by name signs and asks for the learner's; the learner shows their name sign
-        /// (nickname or most recognisable feature, from the profile); Aysel answers "Nice to meet you!".
+        /// Deaf people call each other by a nickname or best-known feature and asks for the learner's; the learner signs
+        /// the word picked at sign-up (a dictionary sign); Aysel answers "Nice to meet you!".
         /// The NPC's sign sequence is a gloss proposal and must be checked by AzSLD signers.
         /// </summary>
         private static void FillStory1(StoryData story, UnitData unlock, Dictionary<string, SignDefinition> words)
@@ -664,24 +664,24 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                     type = StoryBeatType.NpcLine,
                     approach = true,
                     pose = NpcPose.Wave,
-                    text = new LocalizedString("Hello! Deaf people don't spell each other's names: we use a name sign, from a nickname or your best-known feature.",
-                        "Salam! Karlar bir-birinin adını hərf-hərf demir: ad işarəsi ilə, ləqəb və ya ən tanınan xüsusiyyətlə çağırırıq."),
+                    text = new LocalizedString("Hello! Deaf people don't spell each other's names: we call each other by a nickname or best-known feature.",
+                        "Salam! Karlar bir-birinin adını hərf-hərf demir: bir-birimizi ləqəb və ya ən tanınan xüsusiyyətlə çağırırıq."),
                     npcSigns = Signs(words, "Salam")
                 },
                 new StoryBeat
                 {
                     type = StoryBeatType.NpcLine,
                     pose = NpcPose.Idle,
-                    text = new LocalizedString("What is your name sign?", "Sənin ad işarən nədir?"),
+                    text = new LocalizedString("What is your nickname / best-known feature?", "Sənin ləqəbin / ən tanınan xüsusiyyətin nədir?"),
                     // Record "story1_name_az/en.wav" with this question to give the line a voice.
                     voice = new LocalizedAudio { en = LoadAudio("story1_name_en"), az = LoadAudio("story1_name_az") },
-                    // Until an «ad işarəsi» clip exists, the NPC signs the closest lesson sentence.
+                    // Until a «Sənin ləqəbin nədir?» clip exists, the NPC signs the closest lesson sentence.
                     npcSigns = Signs(words, "Sənin adın nədir?")
                 },
                 new StoryBeat
                 {
                     type = StoryBeatType.LearnerNameSign,
-                    text = new LocalizedString("Show your name sign", "Ad işarəni göstər")
+                    text = new LocalizedString("Sign \"{namesign}\"", "«{namesign}» işarəsini göstər")
                 },
                 new StoryBeat
                 {

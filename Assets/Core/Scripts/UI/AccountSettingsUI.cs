@@ -25,7 +25,8 @@ namespace Cevir.Core.UI
         private GameObject _removePhoto;
         private TMP_InputField _firstName;
         private TMP_InputField _lastName;
-        private TMP_InputField _nameSign;
+        private TextMeshProUGUI _nameSignLabel;
+        private string _nameSign = string.Empty;
         private Button _rightHand;
         private Button _leftHand;
         private bool _leftHanded;
@@ -67,7 +68,8 @@ namespace Cevir.Core.UI
             if (game == null) return;
             _firstName.text = game.Progress.firstName;
             _lastName.text = game.Progress.lastName;
-            _nameSign.text = game.Progress.nameSign;
+            _nameSign = game.Progress.nameSign ?? string.Empty;
+            ShowNameSign();
             _leftHanded = game.Progress.leftHanded;
             _newEmail.text = string.Empty;
             _newPassword.text = string.Empty;
@@ -213,9 +215,24 @@ namespace Cevir.Core.UI
             }
 
             game.SetLearnerName(_firstName.text, _lastName.text);
-            if ((_nameSign.text ?? string.Empty).Trim() != game.Progress.nameSign) game.SetNameSign(_nameSign.text);
+            if (_nameSign != game.Progress.nameSign) game.SetNameSign(_nameSign);
             if (_leftHanded != game.Progress.leftHanded) game.SetLeftHanded(_leftHanded);
             Message("Məlumatlar yadda saxlandı.", false);
+        }
+
+        private void PickNameSign()
+        {
+            if (NameSignPickerUI.Instance == null) return;
+            NameSignPickerUI.Instance.Open(_nameSign, word =>
+            {
+                _nameSign = word ?? string.Empty;
+                ShowNameSign();
+            });
+        }
+
+        private void ShowNameSign()
+        {
+            if (_nameSignLabel != null) _nameSignLabel.text = _nameSign.Length > 0 ? _nameSign : "Seç";
         }
 
         private void ChangeEmail()
@@ -392,7 +409,9 @@ namespace Cevir.Core.UI
             kit.Text(details, "Title", "Şəxsi məlumatlar", 36f, UIPalette.TextPrimary);
             _firstName = kit.Input(details, "FirstName", "Ad", TMP_InputField.ContentType.Name, 30);
             _lastName = kit.Input(details, "LastName", "Soyad", TMP_InputField.ContentType.Name, 30);
-            _nameSign = kit.Input(details, "NameSign", "Ad işarəsi: ləqəb və ya ən tanınan xüsusiyyət", TMP_InputField.ContentType.Standard, 40);
+            kit.Text(details, "NameSignTitle", "Ləqəbin / ən tanınan xüsusiyyətin", 30f, UIPalette.TextSecondary);
+            Button nameSign = kit.Button(details, "NameSign", "", UIPalette.Surface, UIPalette.TextPrimary, 92f, false, out _nameSignLabel, PickNameSign);
+            UIKit.Layout(nameSign.gameObject, flexibleWidth: 1f);
             kit.Text(details, "HandTitle", "İşarə əli", 30f, UIPalette.TextSecondary);
             RectTransform hands = UIKit.Rect("Hands", details);
             UIKit.Row(hands.gameObject, 16f).childForceExpandWidth = true;

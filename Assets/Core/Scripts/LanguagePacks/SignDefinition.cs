@@ -76,6 +76,21 @@ namespace Cevir.Core.LanguagePacks
             }
         }
 
+        /// <summary>
+        /// A sign known only by its gloss, made at runtime (no media, no references), e.g. a learner's nickname sign
+        /// from the dictionary that the lessons don't teach. The word model can still judge it by its gloss.
+        /// </summary>
+        public static SignDefinition CreateForGloss(string id, string displayGloss, SignKind signKind)
+        {
+            var sign = CreateInstance<SignDefinition>();
+            sign.signId = id;
+            sign.gloss = displayGloss;
+            sign.kind = signKind;
+            sign.category = "ləqəb";
+            sign.name = id;
+            return sign;
+        }
+
 #if UNITY_EDITOR
         public void EditorInitialize(string id, string displayGloss, SignKind signKind, bool isDynamic, bool isTwoHanded, string signCategory)
         {
