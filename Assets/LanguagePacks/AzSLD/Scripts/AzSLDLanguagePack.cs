@@ -24,6 +24,17 @@ namespace Cevir.LanguagePacks.AzSLD
             "Q", "L", "M", "N", "O", "Ö", "P", "R", "S", "Ş", "T", "U", "Ü", "V", "Y", "Z"
         };
 
+        /// <summary>
+        /// Letters whose AzSL form moves (Ç, G, Ğ, Ö, Ü, Y, Z). The dactyl dataset does not capture them well,
+        /// so they are left out of the lessons, exercises and checks (decided 2026-11-23).
+        /// </summary>
+        public static readonly string[] MovingLetters = { "Ç", "G", "Ğ", "Ö", "Ü", "Y", "Z" };
+
+        public static bool IsMovingLetter(string letter)
+        {
+            return System.Array.IndexOf(MovingLetters, letter) >= 0;
+        }
+
         public static readonly string[] Numerals = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
         private static readonly Dictionary<char, string> AsciiMap = new Dictionary<char, string>

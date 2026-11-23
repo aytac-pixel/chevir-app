@@ -207,6 +207,45 @@ namespace Cevir.Core.Tests
         }
 
         [Test]
+        public void NameSignBeatAsksForTheNameSignAndMatchesAKnownFeature()
+        {
+            StoryTestPack pack = StoryTestPack.WithAlphabet();
+            var glasses = ScriptableObject.CreateInstance<SignDefinition>();
+            glasses.EditorInitialize("word.eynek", "Eynək", SignKind.Word, false, false, "test");
+            pack.PackDictionary.EditorAdd(glasses);
+
+            var story = ScriptableObject.CreateInstance<StoryData>();
+            story.EditorSetIdentity("story.ns", "Story", "");
+            var beats = new List<StoryBeat>
+            {
+                new StoryBeat { type = StoryBeatType.NpcLine, text = new LocalizedString { en = "What is your name sign?", az = "Sənin ad işarən nədir?" } },
+                new StoryBeat { type = StoryBeatType.LearnerNameSign },
+                new StoryBeat { type = StoryBeatType.NpcLine, text = new LocalizedString { en = "Nice to meet you, {namesign}!", az = "Tanış olduğuma şadam, {namesign}!" } }
+            };
+            story.EditorSetContent(1, null, 20, null, null, new StoryCharacter(), beats);
+
+            var session = new StorySession(story, pack, "Ana", "", "");
+            session.Begin();
+            session.NpcLineFinished();
+            Assert.IsFalse(session.NeedsName);
+            Assert.IsTrue(session.NeedsNameSign);
+            Assert.IsFalse(session.BeginResponse(), "the camera waits for the name sign");
+
+            session.SetNameSign("Eynəkli Ana");
+            Assert.IsFalse(session.NeedsNameSign);
+            Assert.AreSame(glasses, session.NameSignTarget);
+            Assert.IsTrue(session.BeginResponse());
+            Assert.IsNull(session.Spelling, "no letter-by-letter spelling");
+
+            SpellOutcome outcome = session.SubmitAttempt(Ok());
+            Assert.IsTrue(outcome.TaskComplete);
+            Assert.AreEqual("Nice to meet you, Eynəkli Ana!", session.FormatText(session.CurrentBeat));
+
+            session.SetNameSign("Gülüş");
+            Assert.IsNull(session.NameSignTarget, "an own name sign is not a dictionary sign");
+        }
+
+        [Test]
         public void ClosingTheCameraWaitsAndCantUseCameraSkips()
         {
             StoryTestPack pack = StoryTestPack.WithAlphabet();

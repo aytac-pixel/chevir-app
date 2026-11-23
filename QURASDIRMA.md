@@ -25,7 +25,7 @@ El və üz modelləri (`hand_landmarker`, `face_landmarker`) layihəyə artıq d
 2. Menyuda **Chevir > Setup > 1. Configure Mobile Project (one click)**.
    - TextMeshPro resursları idxal olunarsa, eyni menyunu bir dəfə də bas.
    - Bu addım AzSLD dil paketini (A1 səviyyəsi, 10 bölmə, 10 hekayə), VT323 piksel şriftini (Ə daxil), əsas səhnəni (`Assets/Scenes/Main.unity`), dörd əsas ekranı (Dərs, Hekayə, Liqa, Profil), giriş/qeydiyyat ekranını, dərs və hekayə ekranlarını, Android/iOS ayarlarını (portret, kamera və internet icazəsi, loqodan tətbiq ikonu, `com.chevirapp.cevir`) hazırlayır.
-3. **Play** düyməsinə bas. Verilənlər bazası qoşulubsa (aşağıda, 3a), əvvəlcə qeydiyyat/giriş ekranı açılır; sonra Dərs ekranı, 1-ci bölmə (Əlifba: 32 hərf, 5 dərs + təkrar) aktivdir. Kompüterin kamerası ilə də yoxlaya bilərsən.
+3. **Play** düyməsinə bas. Verilənlər bazası qoşulubsa (aşağıda, 3a), əvvəlcə qeydiyyat/giriş ekranı açılır; sonra Dərs ekranı, 1-ci bölmə (Əlifba: 25 hərf, 5 dərs + təkrar; hərəkətli hərflər Ç, G, Ğ, Ö, Ü, Y, Z çıxarılıb) aktivdir. Kompüterin kamerası ilə də yoxlaya bilərsən.
 
 ## 3a. Verilənlər bazası (Supabase): hesablar, irəliləyiş və liqa
 
@@ -74,7 +74,7 @@ Bunun üçün bir dəfə repozitoriyada *Settings > Secrets and variables > Acti
 - **Canlar:** ən çox 10. Səhv işarə və ya səhv cavab 1 can aparır; hər 2 saatdan bir 1 can bərpa olunur (tətbiq bağlı olanda da). Təkrar dərsləri can aparmır və can qaytarır.
 - **Bölmə 1 dərsi:** hərf göstərilir → **ANLADIM** → kamera açılır → düzgün göstərsən növbəti hərf, səhv olsa −1 can və eyni hərf yenidən.
 - **Hesablar və liqa:** qeydiyyat (ad, e-poçt, şifrə), giriş, şifrəni unutdum, çıxış. İrəliləyiş hesabda saxlanır, başqa telefonda daxil olanda geri gəlir. Liqada eyni liqadakı real istifadəçilər həftəlik XP-yə görə sıralanır; həftə bitəndə yüksəlmə/enmə serverdə hesablanır. Saxta istifadəçi, izləyici və ya dost məlumatı yoxdur.
-- **Hekayə 1 ("Hello, my name is..."):** 1-ci bölmə bitəndə açılır və dərhal təklif olunur. Aysel yaxınlaşır, salam verir və adını soruşur; "Respond in Sign Language" ön kameranı açır, adını hərf-hərf göstərirsən (soyad soruşulmur). Düzgün cavabda uğur animasiyası və "Nice to meet you!" gəlir, XP və seriya yazılır, hekayə "Completed" olur.
+- **Hekayə 1 ("Hello, my name is..."):** 1-ci bölmə bitəndə açılır və dərhal təklif olunur. Aysel yaxınlaşır, salam verir, karların bir-birini ad işarəsi ilə çağırdığını deyir və ad işarəni soruşur; "İşarə dili ilə cavab ver" ön kameranı açır, ad işarəni (qeydiyyatda yazdığın ləqəb və ya ən tanınan xüsusiyyət) göstərirsən. Düzgün cavabda uğur animasiyası və "Nice to meet you!" gəlir, XP və seriya yazılır, hekayə "Completed" olur.
 - **Hekayə 2–10:** adları və açılma qaydası hazırdır, səhnələri hələ yazılmayıb ("Tezliklə").
 - **İstinad məlumatı olmayan hərflər:** hər hərf üçün istinad (əl nöqtələri) idxal olunmayıbsa, tətbiq yalnız əlin kamerada aydın görünməsini yoxlayır və bunu ekranda açıq yazır; əl formasını hələ yoxlamır. İstinad idxal olunanda (README, "Reference data pipeline") həmin hərf üçün əsl yoxlama özü işə düşür.
 - **Hekayə şəkilləri və səsləri** sadə fayllardır, eyni adla əvəz oluna bilər.

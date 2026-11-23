@@ -162,6 +162,6 @@ Not yet run in the Unity editor or on a phone:
 - The MediaPipe bridge: API names, the `Mediapipe.Runtime` assembly name, camera rotation and handedness on each phone.
 - Matcher thresholds against real AzSLD data and pilot users.
 
-Next pieces: reference landmarks for the 32 letters (real handshape checking), scenes for stories 2–10, mini-game screens, more interface languages.
+Next pieces: reference landmarks for the 25 still letters (the moving letters Ç, G, Ğ, Ö, Ü, Y, Z are not taught), scenes for stories 2–10, mini-game screens, more interface languages.
 
 Before a commercial release: get written permission from ADA University for AzSLD (CC BY 4.0 vs CC BY-NC), and have Deaf community representatives review every clip, rule and story.

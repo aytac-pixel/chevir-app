@@ -36,17 +36,21 @@ namespace Cevir.Core.Stories
         public event Action<StoryPhase> PhaseChanged;
         public event Action<StorySession> Finished;
 
-        public StorySession(StoryData story, ILanguagePack pack, string firstName, string lastName)
+        public StorySession(StoryData story, ILanguagePack pack, string firstName, string lastName, string nameSign = null)
         {
             Story = story;
             _pack = pack;
             FirstName = firstName ?? string.Empty;
             LastName = lastName ?? string.Empty;
+            NameSign = (nameSign ?? string.Empty).Trim();
         }
 
         public StoryData Story { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
+
+        /// <summary>The learner's name sign: a nickname or their most recognisable feature (e.g. "eynək").</summary>
+        public string NameSign { get; private set; }
         public StoryPhase Phase { get; private set; }
         public int BeatIndex => _index;
         public StoryBeat CurrentBeat => _index >= 0 && _index < Story.Beats.Count ? Story.Beats[_index] : null;
@@ -81,6 +85,54 @@ namespace Cevir.Core.Stories
             }
         }
 
+        /// <summary>True when a name-sign beat is coming and the learner has not told us their name sign yet.</summary>
+        public bool NeedsNameSign
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(NameSign)) return false;
+                foreach (StoryBeat beat in Story.Beats)
+                {
+                    if (beat.type == StoryBeatType.LearnerNameSign) return true;
+                }
+
+                return false;
+            }
+        }
+
+        public void SetNameSign(string nameSign)
+        {
+            NameSign = (nameSign ?? string.Empty).Trim();
+        }
+
+        /// <summary>
+        /// A dictionary sign that matches the name sign's feature (e.g. "Eynəkli" → «Eynək»), used to check the
+        /// attempt with the recogniser. Null when the name sign is the learner's own: then only the hands are checked.
+        /// </summary>
+        public SignDefinition NameSignTarget
+        {
+            get
+            {
+                if (_pack == null || _pack.Dictionary == null || string.IsNullOrEmpty(NameSign)) return null;
+                string[] words = Loc.ToLowerAz(NameSign).Split(new[] { ' ', ',', '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
+                SignDefinition best = null;
+                foreach (SignDefinition sign in _pack.Dictionary.Signs)
+                {
+                    if (sign == null || sign.Kind == SignKind.Fingerspelling || sign.Kind == SignKind.Number) continue;
+                    string gloss = Loc.ToLowerAz(sign.Gloss ?? string.Empty);
+                    if (gloss.Length < 3 || gloss.Contains(" ")) continue;
+                    foreach (string word in words)
+                    {
+                        // "eynəkli", "eynəyi" ... still point to «eynək»; the longest match wins.
+                        bool hit = word == gloss || (word.StartsWith(gloss, StringComparison.Ordinal) && word.Length - gloss.Length <= 3);
+                        if (hit && (best == null || gloss.Length > best.Gloss.Length)) best = sign;
+                    }
+                }
+
+                return best;
+            }
+        }
+
         /// <summary>True when a beat in this story asks for the surname too (the name card hides the field otherwise).</summary>
         public bool AsksSurname
         {
@@ -111,6 +163,7 @@ namespace Cevir.Core.Stories
         public string FormatText(StoryBeat beat)
         {
             string text = beat != null ? beat.text.Get() : string.Empty;
+            text = text.Replace("{namesign}", NameSign);
             return text.Replace("{name}", string.IsNullOrEmpty(FirstName) ? Loc.Pick("friend", "dost") : FirstName);
         }
 
@@ -125,6 +178,8 @@ namespace Cevir.Core.Stories
         {
             StoryBeat beat = CurrentBeat;
             if (Phase != StoryPhase.AwaitingResponse || beat == null) return false;
+
+            if (beat.type == StoryBeatType.LearnerNameSign && NeedsNameSign) return false;
 
             if (beat.type == StoryBeatType.LearnerFingerspellName)
             {

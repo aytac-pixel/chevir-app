@@ -146,9 +146,10 @@ namespace Cevir.Core.Editor
             hudRoot.gameObject.SetActive(false);
 
             // ---------------------------------------------------------------- name card, celebration, results
-            TMP_InputField firstName, lastName;
+            TMP_InputField firstName, lastName, nameSign;
+            TextMeshProUGUI nameTitle, nameBody;
             Button nameContinue;
-            GameObject nameCard = BuildNameCard(screen, out firstName, out lastName, out nameContinue);
+            GameObject nameCard = BuildNameCard(screen, out firstName, out lastName, out nameSign, out nameTitle, out nameBody, out nameContinue);
             CelebrationUI celebration = BuildCelebration(screen);
             FeedbackOverlayUI overlay = BuildFeedbackOverlay(screen, null);
 
@@ -184,6 +185,9 @@ namespace Cevir.Core.Editor
             Set(ui, "nameCard", nameCard);
             Set(ui, "firstNameField", firstName);
             Set(ui, "lastNameField", lastName);
+            Set(ui, "nameSignField", nameSign);
+            Set(ui, "nameCardTitle", nameTitle);
+            Set(ui, "nameCardBody", nameBody);
             Set(ui, "nameContinueButton", nameContinue);
             Set(ui, "celebration", celebration);
 
@@ -367,7 +371,8 @@ namespace Cevir.Core.Editor
             return tiles;
         }
 
-        private static GameObject BuildNameCard(Transform parent, out TMP_InputField firstName, out TMP_InputField lastName, out Button next)
+        private static GameObject BuildNameCard(Transform parent, out TMP_InputField firstName, out TMP_InputField lastName,
+            out TMP_InputField nameSign, out TextMeshProUGUI title, out TextMeshProUGUI body, out Button next)
         {
             RectTransform root = Rect("NameCard", parent);
             Stretch(root);
@@ -378,11 +383,14 @@ namespace Cevir.Core.Editor
             Column(card.gameObject, 52, 24f);
             card.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            Label(card.transform, "Title", "What's your name?", "Adın nədir?", 52f, UIPalette.TextPrimary);
-            Label(card.transform, "Body", "You'll spell it in sign language, letter by letter.", "Onu işarə dilində, hərf-hərf göstərəcəksən.",
+            title = Label(card.transform, "Title", "What's your name?", "Adın nədir?", 52f, UIPalette.TextPrimary);
+            body = Label(card.transform, "Body", "So Aysel knows what to call you.", "Aysel səni necə çağıracağını bilsin.",
                 32f, UIPalette.TextSecondary, TextAlignmentOptions.TopLeft, false);
             firstName = InputField(card.transform, "FirstName", "Name", "Ad");
             lastName = InputField(card.transform, "LastName", "Surname", "Soyad");
+            nameSign = InputField(card.transform, "NameSign", "Nickname or feature (e.g. glasses)", "Ləqəb və ya xüsusiyyət (məs. eynək)");
+            nameSign.characterLimit = 40;
+            nameSign.gameObject.SetActive(false);
             TextMeshProUGUI nextLabel;
             next = GradientButton(card.transform, "ContinueButton", "CONTINUE", "DAVAM ET", 130f, null, out nextLabel);
 

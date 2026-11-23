@@ -118,6 +118,8 @@ namespace Cevir.Core.UI
         public static string AdjustFingerAngle => Loc.Pick("Adjust your finger angle", "Barmaq bucağını düzəlt");
         public static string LetterSelfCheck => Loc.Pick("Automatic checking for this letter isn't ready yet: we only check that your hand is clearly visible.",
             "Bu hərfin avtomatik yoxlaması hələ hazır deyil: yalnız əlinin aydın göründüyünü yoxlayırıq.");
+        public static string NameSignSelfCheck => Loc.Pick("Your name sign is your own: show it clearly with your hands in view.",
+            "Ad işarən sənə məxsusdur: onu əllərin kamerada görünəcək şəkildə aydın göstər.");
         public static string NameCardTitle => Loc.Pick("What's your name?", "Adın nədir?");
         public static string NameCardBody => Loc.Pick("You'll spell it in sign language, letter by letter.", "Onu işarə dilində, hərf-hərf göstərəcəksən.");
         public static string FirstName => Loc.Pick("Name", "Ad");
@@ -176,6 +178,7 @@ namespace Cevir.Core.UI
         public static string ConfirmEmailSent => Loc.Pick("Account created. Open the link we sent to your e-mail, then sign in.",
             "Hesab yaradıldı. E-poçtuna göndərilən linki aç, sonra daxil ol.");
         public static string NeedName => Loc.Pick("Enter your name.", "Adını yaz.");
+        public static string NeedNameSign => Loc.Pick("Enter your nickname or most recognisable feature.", "Ləqəbini və ya ən tanınan xüsusiyyətini yaz.");
         public static string NeedEmail => Loc.Pick("Enter your e-mail.", "E-poçtunu yaz.");
         public static string NeedPassword => Loc.Pick("The password must be at least 6 characters.", "Şifrə ən azı 6 simvol olmalıdır.");
         public static string PleaseWait => Loc.Pick("Please wait...", "Gözlə...");

@@ -295,6 +295,14 @@ namespace Cevir.Core.Game
             RaiseProfileChanged();
         }
 
+        /// <summary>The learner's name sign (ad işarəsi): nickname or most recognisable feature.</summary>
+        public void SetNameSign(string nameSign)
+        {
+            Progress.nameSign = (nameSign ?? string.Empty).Trim();
+            Save();
+            RaiseProfileChanged();
+        }
+
         public void SetAvatarUrl(string url)
         {
             Progress.avatarUrl = url ?? string.Empty;
@@ -586,7 +594,7 @@ namespace Cevir.Core.Game
             }
 
             ActivePackProgress.MarkStoryAnnounced(story.Id);
-            CurrentStory = new StorySession(story, ActivePack, Progress.firstName, Progress.lastName);
+            CurrentStory = new StorySession(story, ActivePack, Progress.firstName, Progress.lastName, Progress.nameSign);
             SetState(GameState.Story);
             if (StoryStarted != null) StoryStarted(CurrentStory);
             CurrentStory.Begin();
@@ -624,6 +632,12 @@ namespace Cevir.Core.Game
             {
                 Progress.firstName = story.FirstName;
                 Progress.lastName = story.LastName;
+                RaiseProfileChanged();
+            }
+
+            if (!string.IsNullOrEmpty(story.NameSign) && story.NameSign != Progress.nameSign)
+            {
+                Progress.nameSign = story.NameSign;
                 RaiseProfileChanged();
             }
 

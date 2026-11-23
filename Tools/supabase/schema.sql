@@ -19,6 +19,8 @@ alter table public.profiles add column if not exists avatar_url    text    not n
 alter table public.profiles add column if not exists reminders_on  boolean not null default true;
 alter table public.profiles add column if not exists practice_from text;
 alter table public.profiles add column if not exists practice_to   text;
+-- Name sign (ad işarəsi): the nickname or most recognisable feature the learner is called by, e.g. 'eynək'.
+alter table public.profiles add column if not exists name_sign     text    not null default '';
 
 -- The app's full saved progress (lessons, hearts, streak, mastery ...) as JSON text. Private to its owner.
 create table if not exists public.progress (
@@ -112,12 +114,14 @@ drop trigger if exists weekly_xp_set_tier on public.weekly_xp;
 create trigger weekly_xp_set_tier before insert or update on public.weekly_xp
     for each row execute function public.weekly_xp_tier();
 
--- A profile row for every new account (name from the sign-up form).
+-- A profile row for every new account (name and name sign from the sign-up form).
 create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-    insert into public.profiles (id, display_name)
-    values (new.id, coalesce(new.raw_user_meta_data ->> 'display_name', ''))
+    insert into public.profiles (id, display_name, name_sign)
+    values (new.id,
+            coalesce(new.raw_user_meta_data ->> 'display_name', ''),
+            left(coalesce(new.raw_user_meta_data ->> 'name_sign', ''), 40))
     on conflict (id) do nothing;
     return new;
 end $$;

@@ -16,7 +16,7 @@ namespace Cevir.Core.UI
     /// First-person story player. The learner "walks" into the scene (bag straps and hands in the foreground), the
     /// NPC approaches, speaks (voice + typewriter bubble) and signs (clip panel). "Respond in Sign Language" opens
     /// the front camera inside the HUD, where the learner sees their own hands with the tracked skeleton and
-    /// fingerspells their name letter by letter. Every attempt is scored by <see cref="SignPracticeController"/>
+    /// shows their name sign (or fingerspells, for older stories). Every attempt is scored by <see cref="SignPracticeController"/>
     /// against the current letter; tips appear live, correct letters pop green, and the story continues with the
     /// NPC's reply. Story logic lives in <see cref="StorySession"/>; rewards in <see cref="GameManager.CompleteStory"/>.
     /// </summary>
@@ -67,6 +67,10 @@ namespace Cevir.Core.UI
         [SerializeField] private GameObject nameCard;
         [SerializeField] private TMP_InputField firstNameField;
         [SerializeField] private TMP_InputField lastNameField;
+        [Tooltip("Name sign (ləqəb or most recognisable feature), shown when a name-sign beat needs it.")]
+        [SerializeField] private TMP_InputField nameSignField;
+        [SerializeField] private TextMeshProUGUI nameCardTitle;
+        [SerializeField] private TextMeshProUGUI nameCardBody;
         [SerializeField] private Button nameContinueButton;
 
         [Header("Celebration")]
@@ -79,6 +83,7 @@ namespace Cevir.Core.UI
         private bool _hudOpen;
         private bool _attempting;
         private bool _finished;
+        private bool _askingNameSign;
         private float _waitingSince;
         private Coroutine _lineRoutine;
 
@@ -305,13 +310,28 @@ namespace Cevir.Core.UI
                 return;
             }
 
+            if (_session.CurrentBeat.type == StoryBeatType.LearnerNameSign && _session.NeedsNameSign)
+            {
+                ShowNameSignCard();
+                return;
+            }
+
             _session.BeginResponse();
         }
 
         private void ShowNameCard()
         {
             if (nameCard == null) return;
-            if (firstNameField != null) firstNameField.text = _session.FirstName;
+            _askingNameSign = false;
+            if (firstNameField != null)
+            {
+                firstNameField.text = _session.FirstName;
+                firstNameField.gameObject.SetActive(true);
+            }
+
+            if (nameSignField != null) nameSignField.gameObject.SetActive(false);
+            SetLabel(nameCardTitle, "What's your name?", "Adın nədir?");
+            SetLabel(nameCardBody, "So Aysel knows what to call you.", "Aysel səni necə çağıracağını bilsin.");
             if (lastNameField != null)
             {
                 lastNameField.text = _session.LastName;
@@ -321,8 +341,43 @@ namespace Cevir.Core.UI
             nameCard.SetActive(true);
         }
 
+        /// <summary>Asks for the name sign: the nickname or most recognisable feature the learner will sign.</summary>
+        private void ShowNameSignCard()
+        {
+            if (nameCard == null || nameSignField == null) return;
+            _askingNameSign = true;
+            if (firstNameField != null) firstNameField.gameObject.SetActive(false);
+            if (lastNameField != null) lastNameField.gameObject.SetActive(false);
+            nameSignField.text = _session.NameSign;
+            nameSignField.gameObject.SetActive(true);
+            nameCard.SetActive(true);
+            SetLabel(nameCardTitle, "What's your name sign?", "Ad işarən nədir?");
+            SetLabel(nameCardBody, "Deaf people call each other by a name sign: a nickname or your most recognisable feature (glasses, curly hair, a smile...). Write it, then show its sign.",
+                "Karlar bir-birini ad işarəsi ilə çağırır: ləqəbin və ya ən tanınan xüsusiyyətin (eynək, buruq saç, gülüş...). Onu yaz, sonra işarəsini göstər.");
+        }
+
+        private static void SetLabel(TextMeshProUGUI label, string en, string az)
+        {
+            if (label == null) return;
+            var localized = label.GetComponent<LocalizedLabel>();
+            if (localized != null) localized.Set(en, az);
+            else label.text = Loc.Pick(en, az);
+        }
+
         private void OnNameEntered()
         {
+            if (_askingNameSign)
+            {
+                string sign = nameSignField != null ? nameSignField.text.Trim() : string.Empty;
+                if (sign.Length == 0) return;
+                _session.SetNameSign(sign);
+                if (nameCard != null) nameCard.SetActive(false);
+                _askingNameSign = false;
+                _game.SetNameSign(sign);
+                _session.BeginResponse();
+                return;
+            }
+
             string first = firstNameField != null ? firstNameField.text.Trim() : string.Empty;
             string last = lastNameField != null && _session.AsksSurname ? lastNameField.text.Trim() : _session.LastName;
             if (first.Length == 0) return;
@@ -377,6 +432,14 @@ namespace Cevir.Core.UI
 
                 if (tiles != null) tiles.Refresh();
             }
+            else if (beat.type == StoryBeatType.LearnerNameSign)
+            {
+                // A name sign is personal. When it matches a known sign (e.g. «Eynək») the recogniser checks the first
+                // tries; after two misses, or for the learner's own sign, it is enough that the hands are clearly shown.
+                target = _session.SignBeatFailures < 2 ? _session.NameSignTarget : null;
+                if (letterLabel != null) letterLabel.text = Loc.ToUpperAz(_session.NameSign);
+                if (letterThumbnail != null) letterThumbnail.gameObject.SetActive(false);
+            }
             else
             {
                 target = beat.expectedSign;
@@ -387,7 +450,7 @@ namespace Cevir.Core.UI
             if (selfCheckNote != null)
             {
                 selfCheckNote.gameObject.SetActive(!checkable);
-                selfCheckNote.text = UIStrings.LetterSelfCheck;
+                selfCheckNote.text = beat.type == StoryBeatType.LearnerNameSign ? UIStrings.NameSignSelfCheck : UIStrings.LetterSelfCheck;
             }
 
             _attempting = true;

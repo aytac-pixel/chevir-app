@@ -788,6 +788,12 @@ namespace Cevir.Core.Editor
             Layout(title.gameObject, preferredHeight: 80f);
             TMP_InputField name = InputField(card.transform, "Name", "Name and surname", "Ad və soyad");
             name.characterLimit = 40;
+            TMP_InputField nameSign = InputField(card.transform, "NameSign", "Nickname or best-known feature", "Ləqəb və ya ən tanınan xüsusiyyət");
+            nameSign.characterLimit = 40;
+            TextMeshProUGUI nameSignHint = Label(card.transform, "NameSignHint",
+                "Deaf people call each other by a name sign, e.g. glasses, curly hair, a smile.",
+                "Karlar bir-birini ad işarəsi ilə çağırır: məs. eynək, buruq saç, gülüş.", 28f, UIPalette.TextSecondary,
+                TextAlignmentOptions.TopLeft, false);
             TMP_InputField email = InputField(card.transform, "Email", "E-mail", "E-poçt");
             TMP_InputField code = InputField(card.transform, "Code", "6-digit code from the e-mail", "E-poçta gələn 6 rəqəmli kod");
             code.gameObject.SetActive(false);
@@ -808,6 +814,8 @@ namespace Cevir.Core.Editor
             Set(ui, "titleLabel", title);
             Set(ui, "nameRow", name.gameObject);
             Set(ui, "nameField", name);
+            Set(ui, "nameSignField", nameSign);
+            Set(ui, "nameSignHint", nameSignHint);
             Set(ui, "emailField", email);
             Set(ui, "passwordField", password);
             Set(ui, "codeField", code);

@@ -13,7 +13,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 {
     /// <summary>
     /// Creates the AzSLD pack: the A1 level as 10 units (the home path of the design), its vocabulary as sign
-    /// entries (32 letters, numerals and A1 words), the 10 A1 stories (Story 1 complete,
+    /// entries (25 still letters, numerals and A1 words), the 10 A1 stories (Story 1 complete,
     /// the rest listed as coming soon) plus the shared registry and gamification config. Safe to re-run:
     /// existing assets and content edits are kept. Word lists are proposals for the content team; every sign's
     /// AzSLD form must be confirmed with Deaf signers before recording references.
@@ -160,7 +160,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
         private static readonly UnitSpec[] Units =
         {
-            // Unit 1 teaches the 32 letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
+            // Unit 1 teaches letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
+            // The moving letters (Ç, G, Ğ, Ö, Ü, Y, Z) are left out, decided 2026-11-23: 25 letters remain.
             new UnitSpec { En = "Alphabet", Az = "Əlifba", Category = "daktil",
                 GuideEn = "Show each letter with your dominant hand at shoulder height, palm towards the viewer.",
                 GuideAz = "Hər hərfi əsas əlinlə, çiyin hündürlüyündə, ovucu qarşı tərəfə göstər." },
@@ -185,8 +186,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 GuideAz = "Bütün səviyyəni təkrarla, sonra A2-yə keçmək üçün imtahanı (20 təsadüfi işarə, 80% düzgün) keç." }
         };
 
-        /// <summary>Unit 1 lessons as in kurikulum/Tapilmali_media_A1_A2.txt: A–Ə, F–I, İ–M, N–S, Ş–Z (indices into the alphabet).</summary>
-        private static readonly int[] Unit1LessonBounds = { 0, 7, 13, 19, 25, 32 };
+        /// <summary>Unit 1 lessons over the 25 still letters: A–E, Ə–I, İ–L, M–R, S–V (indices into that list).</summary>
+        private static readonly int[] Unit1LessonBounds = { 0, 5, 10, 15, 20, 25 };
 
         // Story N closes unit N and uses only signs taught up to that unit (scripts: kurikulum/Hekayeler_A1_ssenari.md).
         private static readonly string[][] Stories =
@@ -203,7 +204,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             new[] { "A1 is done!", "A1 bitdi!" }
         };
 
-        // Beat script: "npc|AZ text|EN text|sign;sign", "you|AZ instruction|EN instruction|expected sign", "name|AZ|EN".
+        // Beat script: "npc|AZ text|EN text|sign;sign", "you|AZ instruction|EN instruction|expected sign", "namesign|AZ|EN"
+        // (the learner shows their own name sign).
         private static readonly string[][] StoryScripts =
         {
             null, // Story 1 is built by FillStory1
@@ -273,8 +275,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             {
                 "npc|Salam! Necəsən?|Hi! How are you?|Salam;Necəsən",
                 "you|«Yaxşı» işarəsini göstər|Sign \"fine\"|Yaxşı",
-                "npc|Sənin adın nədir?|What is your name?|Sənin adın nədir?",
-                "name|Adını hərf-hərf göstər|Show your name letter by letter",
+                "npc|Sənin ad işarən nədir?|What is your name sign?|Sənin adın nədir?",
+                "namesign|Ad işarəni göstər|Show your name sign",
                 "npc|Tanış olduğuma şadam, {name}! Sən bilirsən!|Nice to meet you, {name}! You know it!|Tanış olduğuma şadam;Sən bilirsən?",
                 "you|«Sağ ol» işarəsini göstər|Sign \"thank you\"|Sağ ol"
             }
@@ -454,7 +456,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
         private static List<LessonData> CreateUnit1Lessons(string unitId, List<SignDefinition> letters)
         {
-            // Letters only, in alphabet order, then a practice lesson over all 32. Always rewritten so older
+            // Letters only, in alphabet order, then a practice lesson over all of them. Always rewritten so older
             // projects (7 letter lessons + facial expressions) are brought in line.
             int[] bounds = Unit1LessonBounds;
             var lessons = new List<LessonData>();
@@ -626,21 +628,22 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             return stories;
         }
 
-        /// <summary>Story 1 is (re)built when empty or still in the older form that also asked for the surname.</summary>
+        /// <summary>Story 1 is (re)built when empty or still in an older form that spelled the name letter by letter.</summary>
         private static bool NeedsStory1(StoryData story)
         {
             if (story.Beats.Count == 0) return true;
             foreach (StoryBeat beat in story.Beats)
             {
-                if (beat.type == StoryBeatType.LearnerFingerspellName && beat.nameScope == NameScope.FullName) return true;
+                if (beat.type == StoryBeatType.LearnerFingerspellName) return true;
             }
 
             return false;
         }
 
         /// <summary>
-        /// Story 1 "Hello, my name is..." (end of Unit 1): on a street, Aysel walks up, greets the learner and asks
-        /// their name; the learner shows it letter by letter with the Unit 1 alphabet; Aysel answers "Nice to meet you!".
+        /// Story 1 "Hello, my name is..." (end of Unit 1): on a street, Aysel walks up, greets the learner, explains that
+        /// Deaf people call each other by name signs and asks for the learner's; the learner shows their name sign
+        /// (nickname or most recognisable feature, from the profile); Aysel answers "Nice to meet you!".
         /// The NPC's sign sequence is a gloss proposal and must be checked by AzSLD signers.
         /// </summary>
         private static void FillStory1(StoryData story, UnitData unlock, Dictionary<string, SignDefinition> words)
@@ -661,16 +664,24 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                     type = StoryBeatType.NpcLine,
                     approach = true,
                     pose = NpcPose.Wave,
-                    text = new LocalizedString("Hello! What is your name?", "Salam! Adın nədir?"),
-                    // The old voice clips also asked for the surname; record "story1_name_az/en.wav" to give this line a voice.
-                    voice = new LocalizedAudio { en = LoadAudio("story1_name_en"), az = LoadAudio("story1_name_az") },
-                    npcSigns = Signs(words, "Salam", "Sənin adın nədir?")
+                    text = new LocalizedString("Hello! Deaf people don't spell each other's names: we use a name sign, from a nickname or your best-known feature.",
+                        "Salam! Karlar bir-birinin adını hərf-hərf demir: ad işarəsi ilə, ləqəb və ya ən tanınan xüsusiyyətlə çağırırıq."),
+                    npcSigns = Signs(words, "Salam")
                 },
                 new StoryBeat
                 {
-                    type = StoryBeatType.LearnerFingerspellName,
-                    nameScope = NameScope.FirstName,
-                    text = new LocalizedString("Show your name letter by letter", "Adını hərf-hərf göstər")
+                    type = StoryBeatType.NpcLine,
+                    pose = NpcPose.Idle,
+                    text = new LocalizedString("What is your name sign?", "Sənin ad işarən nədir?"),
+                    // Record "story1_name_az/en.wav" with this question to give the line a voice.
+                    voice = new LocalizedAudio { en = LoadAudio("story1_name_en"), az = LoadAudio("story1_name_az") },
+                    // Until an «ad işarəsi» clip exists, the NPC signs the closest lesson sentence.
+                    npcSigns = Signs(words, "Sənin adın nədir?")
+                },
+                new StoryBeat
+                {
+                    type = StoryBeatType.LearnerNameSign,
+                    text = new LocalizedString("Show your name sign", "Ad işarəni göstər")
                 },
                 new StoryBeat
                 {
@@ -710,8 +721,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                         beat.expectedSign = expected;
                         break;
                     default:
-                        beat.type = StoryBeatType.LearnerFingerspellName;
-                        beat.nameScope = NameScope.FirstName;
+                        beat.type = StoryBeatType.LearnerNameSign;
                         break;
                 }
 
@@ -761,6 +771,15 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             foreach (string letter in AzSLDLanguagePack.Alphabet)
             {
                 string id = AzSLDLanguagePack.LetterId(letter);
+                if (AzSLDLanguagePack.IsMovingLetter(letter))
+                {
+                    // Moving letters are not taught: out of the dictionary, so no lesson, review or quiz picks them.
+                    string movingId = id;
+                    dictionary.EditorRemoveWhere(s => s != null && s.SignId == movingId);
+                    string stale = Root + "/Signs/Dictionary/Letters/" + CevirAssetUtility.SafeFileName(id) + ".asset";
+                    if (AssetDatabase.LoadAssetAtPath<SignDefinition>(stale) != null) AssetDatabase.DeleteAsset(stale);
+                    continue;
+                }
 
                 // Static by default; set Dynamic on letters whose AzSLD form includes movement once verified with signers.
                 SignDefinition sign = CevirAssetUtility.LoadOrCreate<SignDefinition>(

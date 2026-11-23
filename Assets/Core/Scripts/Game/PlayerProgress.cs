@@ -14,9 +14,12 @@ namespace Cevir.Core.Game
         public string activeLanguageCode = "";
         public string nickname = "";
 
-        /// <summary>Learner's name, fingerspelled in Story 1 and shown on the profile.</summary>
+        /// <summary>Learner's name, shown on the profile and the league table.</summary>
         public string firstName = "";
         public string lastName = "";
+
+        /// <summary>Name sign (ad işarəsi): a nickname or the most recognisable feature, e.g. "eynək".</summary>
+        public string nameSign = "";
 
         /// <summary>Interface language: "az" (default) or "en".</summary>
         public string uiLanguage = "az";

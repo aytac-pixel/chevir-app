@@ -60,9 +60,14 @@ namespace Cevir.Core.Cloud
         /// Creates an account. <paramref name="done"/> gets (response, signedIn): signedIn is false when the project
         /// requires e-mail confirmation first (the learner then confirms and signs in).
         /// </summary>
-        public void SignUp(string email, string password, string displayName, Action<CloudResponse, bool> done)
+        public void SignUp(string email, string password, string displayName, string nameSign, Action<CloudResponse, bool> done)
         {
-            var body = new SignUpRequest { email = email, password = password, data = new SignUpData { display_name = displayName } };
+            var body = new SignUpRequest
+            {
+                email = email,
+                password = password,
+                data = new SignUpData { display_name = displayName, name_sign = nameSign ?? string.Empty }
+            };
             Send("POST", "/auth/v1/signup", JsonUtility.ToJson(body), null, false, response =>
             {
                 bool signedIn = response.Ok && ApplyAuth(response.Body);

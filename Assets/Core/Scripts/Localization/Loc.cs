@@ -47,6 +47,20 @@ namespace Cevir.Core.Localization
             return new string(chars);
         }
 
+        /// <summary>Lower-cases with Azerbaijani rules (İ → i, I → ı).</summary>
+        public static string ToLowerAz(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return value ?? string.Empty;
+            var chars = value.ToCharArray();
+            for (int i = 0; i < chars.Length; i++)
+            {
+                char c = chars[i];
+                chars[i] = c == 'İ' ? 'i' : c == 'I' ? 'ı' : char.ToLowerInvariant(c);
+            }
+
+            return new string(chars);
+        }
+
         /// <summary>Upper-cases for the current interface language (Azerbaijani rules when in Azerbaijani).</summary>
         public static string Upper(string value)
         {

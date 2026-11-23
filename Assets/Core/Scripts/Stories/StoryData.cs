@@ -16,7 +16,13 @@ namespace Cevir.Core.Stories
         LearnerFingerspellName,
 
         /// <summary>The learner answers with one sign from the dictionary.</summary>
-        LearnerSign
+        LearnerSign,
+
+        /// <summary>
+        /// The learner shows their own name sign (ad işarəsi): Deaf people call each other by a sign for a nickname or
+        /// their most recognisable feature instead of spelling the name. The feature comes from the profile.
+        /// </summary>
+        LearnerNameSign
     }
 
     public enum NpcPose
@@ -49,7 +55,7 @@ namespace Cevir.Core.Stories
     {
         public StoryBeatType type = StoryBeatType.NpcLine;
 
-        [Tooltip("NPC line, or the instruction shown for a learner beat. {name} is replaced by the learner's first name.")]
+        [Tooltip("NPC line, or the instruction shown for a learner beat. {name} is replaced by the learner's first name, {namesign} by their name sign.")]
         public LocalizedString text;
 
         [Tooltip("Voice for the NPC line. Optional: the bubble and the signs carry the line without it.")]

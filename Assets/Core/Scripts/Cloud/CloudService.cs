@@ -35,6 +35,8 @@ namespace Cevir.Core.Cloud
         private float _nextRetry;
         private string _pendingName;
         private const string PendingNameKey = "cevir.auth.pendingName";
+        private string _pendingNameSign;
+        private const string PendingNameSignKey = "cevir.auth.pendingNameSign";
 
         public static CloudService Instance { get; private set; }
 
@@ -118,6 +120,12 @@ namespace Cevir.Core.Cloud
 
         public void SignUp(string name, string email, string password, Action<string, bool> done)
         {
+            SignUp(name, null, email, password, done);
+        }
+
+        /// <summary>Creates an account with the learner's name and name sign (nickname or best-known feature).</summary>
+        public void SignUp(string name, string nameSign, string email, string password, Action<string, bool> done)
+        {
             if (_client == null)
             {
                 done(CloudErrors.Unknown, false);
@@ -125,7 +133,8 @@ namespace Cevir.Core.Cloud
             }
 
             name = (name ?? string.Empty).Trim();
-            _client.SignUp(email.Trim(), password, name, (response, signedIn) =>
+            nameSign = (nameSign ?? string.Empty).Trim();
+            _client.SignUp(email.Trim(), password, name, nameSign, (response, signedIn) =>
             {
                 if (!response.Ok)
                 {
@@ -136,6 +145,8 @@ namespace Cevir.Core.Cloud
                 // The name typed at sign-up is the learner's name in the app and on the league table.
                 _pendingName = name;
                 PlayerPrefs.SetString(PendingNameKey, name); // kept until the first sign-in (after e-mail confirmation)
+                _pendingNameSign = nameSign;
+                PlayerPrefs.SetString(PendingNameSignKey, nameSign);
                 PlayerPrefs.Save();
                 if (signedIn) OnSignedIn();
                 done(null, !signedIn);
@@ -321,6 +332,7 @@ namespace Cevir.Core.Cloud
         private void OnSignedIn()
         {
             if (string.IsNullOrEmpty(_pendingName)) _pendingName = PlayerPrefs.GetString(PendingNameKey, string.Empty);
+            if (string.IsNullOrEmpty(_pendingNameSign)) _pendingNameSign = PlayerPrefs.GetString(PendingNameSignKey, string.Empty);
             _synced = false;
             _game.SetServices(_league, null);
             SetState(CloudState.SignedIn);
@@ -370,11 +382,15 @@ namespace Cevir.Core.Cloud
                         _game.SetLearnerName(first, last); // saves, which schedules the upload
                     }
 
+                    if (!string.IsNullOrEmpty(_pendingNameSign)) _game.SetNameSign(_pendingNameSign);
+
                     ScheduleUpload(0f);
                 }
 
                 _pendingName = null;
                 PlayerPrefs.DeleteKey(PendingNameKey);
+                _pendingNameSign = null;
+                PlayerPrefs.DeleteKey(PendingNameSignKey);
 
                 _synced = true;
                 SettleLeague();
@@ -450,6 +466,12 @@ namespace Cevir.Core.Cloud
                             else ScheduleUpload(30f); // offline: try again later
                         }
                     };
+
+                    // The name sign goes in its own request: a database without the name_sign column yet
+                    // (schema.sql not run again) then only loses this field, not the whole profile.
+                    // It is also kept in the progress JSON above.
+                    var nameSign = new ProfileNameSignRow { id = userId, name_sign = progress.nameSign ?? string.Empty };
+                    _client.Upsert("profiles", "id", JsonUtility.ToJson(nameSign), r4 => { });
 
                     if (progress.xp == null || string.IsNullOrEmpty(progress.xp.week))
                     {

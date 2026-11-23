@@ -44,6 +44,7 @@ namespace Cevir.Core.Cloud
     public sealed class SignUpData
     {
         public string display_name;
+        public string name_sign;
     }
 
     [Serializable]
@@ -105,6 +106,14 @@ namespace Cevir.Core.Cloud
         public bool reminders_on;
         public string practice_from;
         public string practice_to;
+    }
+
+    /// <summary>Only the name sign column of a profile (sent on its own, see CloudService.UploadNow).</summary>
+    [Serializable]
+    public sealed class ProfileNameSignRow
+    {
+        public string id;
+        public string name_sign;
     }
 
     [Serializable]
