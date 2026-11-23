@@ -87,6 +87,7 @@ namespace Cevir.Core.Editor
             BuildRuntimePanel<ReminderSettingsUI>(canvasGo.transform, "ReminderSettingsLayer", theme);
             BuildAuthScreen(canvasGo.transform);
             BuildRuntimePanel<NameSignPickerUI>(canvasGo.transform, "NameSignPickerLayer", theme); // above sign-in: used at sign-up
+            BuildRuntimePanel<DataConsentUI>(canvasGo.transform, "DataConsentLayer", theme); // permission dialog, asked at sign-up
             toast.transform.SetParent(canvasGo.transform, false); // above the full-screen panels, so their messages show
             toast.transform.SetAsLastSibling();
             HardenShadows(canvasGo);
@@ -256,6 +257,7 @@ namespace Cevir.Core.Editor
             Set(ui, "iconBack", IconSprite("chevron_left"));
             Set(ui, "iconBell", IconSprite("bell"));
             if (typeof(T) == typeof(AccountSettingsUI)) Set(ui, "iconUser", IconSprite("user"));
+            if (typeof(T) == typeof(DataConsentUI)) Set(ui, "iconCamera", IconSprite("camera"));
 
             return ui;
         }

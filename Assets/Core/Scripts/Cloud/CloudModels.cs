@@ -45,6 +45,7 @@ namespace Cevir.Core.Cloud
     {
         public string display_name;
         public string name_sign;
+        public bool data_consent;
     }
 
     [Serializable]
@@ -114,6 +115,26 @@ namespace Cevir.Core.Cloud
     {
         public string id;
         public string name_sign;
+    }
+
+    /// <summary>The learner's answer to «Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et» (sign samples).</summary>
+    [Serializable]
+    public sealed class ProfileConsentRow
+    {
+        public string id;
+        public bool data_consent;
+    }
+
+    [Serializable]
+    public sealed class SignSampleVideoRow
+    {
+        public string video_path;
+    }
+
+    [Serializable]
+    public sealed class SignSampleVideoRows
+    {
+        public List<SignSampleVideoRow> items = new List<SignSampleVideoRow>();
     }
 
     [Serializable]

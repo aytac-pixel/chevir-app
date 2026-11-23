@@ -117,6 +117,15 @@ namespace Cevir.Core.Lesson
         /// <summary>Raised after every scored attempt (for analytics and debug overlays).</summary>
         public event Action<MatchResult> AttemptScored;
 
+        /// <summary>Raised when an attempt starts waiting for the learner's sign (used to save sign samples).</summary>
+        public event Action AttemptStarted;
+
+        /// <summary>The sign the current or last attempt asked for (null for a choice among candidates).</summary>
+        public SignDefinition CurrentTarget => _target;
+
+        /// <summary>What judged the last attempt: "letter", "word", "presence", "matcher" or "among".</summary>
+        public string LastJudge { get; private set; }
+
         /// <summary>Raised for every processed frame, for the live landmark overlay.</summary>
         public event Action<LandmarkFrame, SignFeatureFrame> FrameProcessed;
 
@@ -247,6 +256,7 @@ namespace Cevir.Core.Lesson
             _letterBest = 0f;
             _letterPassed = false;
             SetPhase(Phase.WaitingForHand);
+            if (AttemptStarted != null) AttemptStarted();
         }
 
         private void Update()
@@ -488,6 +498,7 @@ namespace Cevir.Core.Lesson
                 _attempt.RemoveAt(_attempt.Count - 1);
             }
 
+            LastJudge = LetterMode ? "letter" : WordMode ? "word" : _presenceOnly ? "presence" : _candidates != null ? "among" : "matcher";
             MatchResult result;
             if (LetterMode)
             {

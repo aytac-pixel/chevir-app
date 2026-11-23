@@ -32,7 +32,7 @@ El və üz modelləri (`hand_landmarker`, `face_landmarker`) layihəyə artıq d
 Tətbiq istifadəçiləri, onların irəliləyişini və liqa reytinqini Supabase-də saxlayır (pulsuz plan kifayətdir).
 
 1. supabase.com-da hesab aç, **New project** yarat (region: Frankfurt / eu-central yaxındır). Verilənlər bazası şifrəsini bir yerdə saxla.
-2. Layihədə **SQL Editor > New query**, `Tools/supabase/schema.sql` faylının bütün mətnini yapışdır və **Run** bas. Cədvəllər, giriş qaydaları, liqa funksiyaları, profil şəkilləri üçün `avatars` qovluğu və hesabı silmə funksiyası yaranır (təkrar işə salmaq təhlükəsizdir).
+2. Layihədə **SQL Editor > New query**, `Tools/supabase/schema.sql` faylının bütün mətnini yapışdır və **Run** bas. Cədvəllər, giriş qaydaları, liqa funksiyaları, profil şəkilləri üçün `avatars` qovluğu, işarə cəhdləri üçün `sign_samples` cədvəli və gizli `sign-samples` video qovluğu, hesabı silmə funksiyası yaranır (təkrar işə salmaq təhlükəsizdir).
 3. **Project Settings > API** (və ya *Data API*) bölməsindən **Project URL** və **anon public** açarını götür.
 4. Bu iki dəyəri `Assets/Core/Resources/cevir_cloud.json` faylına yaz (`supabaseUrl`, `anonKey`). Bu açar açıq (public) açardır, tətbiqə yazmaq olar; **service_role** açarını heç vaxt tətbiqə qoyma.
 5. **Authentication > Sign In / Providers > Email**: *Confirm email* açıqdır, istifadəçi e-poçtuna gələn linki açıb sonra daxil olur. *Authentication > URL Configuration* bölməsində Site URL olaraq `https://chevirapp.com` yaz.

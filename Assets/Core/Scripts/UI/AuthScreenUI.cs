@@ -36,6 +36,7 @@ namespace Cevir.Core.UI
         private bool _reset; // entering the e-mailed code and a new password
         private bool _busy;
         private string _nameSign = string.Empty;
+        private bool? _dataConsent; // answer to the data permission, asked when "create account" is pressed
 
         private void Awake()
         {
@@ -143,6 +144,17 @@ namespace Cevir.Core.UI
             if (email.Length < 3 || !email.Contains("@")) { Message(UIStrings.NeedEmail, true); return; }
             if (password.Length < 6) { Message(UIStrings.NeedPassword, true); return; }
 
+            // Like the camera permission: ask before the account is created (once; the answer is sent with the sign-up).
+            if (_signUp && !_reset && !_dataConsent.HasValue && DataConsentUI.Instance != null)
+            {
+                DataConsentUI.Instance.Ask(allowed =>
+                {
+                    _dataConsent = allowed;
+                    Submit();
+                });
+                return;
+            }
+
             SetBusy(true);
             if (_reset)
             {
@@ -165,7 +177,7 @@ namespace Cevir.Core.UI
 
             if (_signUp)
             {
-                _cloud.SignUp(name, nameSign, email, password, (error, needsConfirmation) =>
+                _cloud.SignUp(name, nameSign, _dataConsent, email, password, (error, needsConfirmation) =>
                 {
                     SetBusy(false);
                     if (error != null)

@@ -60,13 +60,14 @@ namespace Cevir.Core.Cloud
         /// Creates an account. <paramref name="done"/> gets (response, signedIn): signedIn is false when the project
         /// requires e-mail confirmation first (the learner then confirms and signs in).
         /// </summary>
-        public void SignUp(string email, string password, string displayName, string nameSign, Action<CloudResponse, bool> done)
+        public void SignUp(string email, string password, string displayName, string nameSign, bool dataConsent,
+            Action<CloudResponse, bool> done)
         {
             var body = new SignUpRequest
             {
                 email = email,
                 password = password,
-                data = new SignUpData { display_name = displayName, name_sign = nameSign ?? string.Empty }
+                data = new SignUpData { display_name = displayName, name_sign = nameSign ?? string.Empty, data_consent = dataConsent }
             };
             Send("POST", "/auth/v1/signup", JsonUtility.ToJson(body), null, false, response =>
             {
@@ -213,6 +214,19 @@ namespace Cevir.Core.Cloud
             Authorized(() => Send("POST", "/rest/v1/" + table + "?on_conflict=" + onConflict, json, headers, true, done), done);
         }
 
+        /// <summary>Inserts one row (POST, no upsert) as the signed-in user.</summary>
+        public void Insert(string table, string json, Action<CloudResponse> done)
+        {
+            var headers = new Dictionary<string, string> { { "Prefer", "return=minimal" } };
+            Authorized(() => Send("POST", "/rest/v1/" + table, json, headers, true, done), done);
+        }
+
+        /// <summary>Deletes the rows matching a PostgREST filter, e.g. "user_id=eq.&lt;id&gt;".</summary>
+        public void DeleteRows(string table, string filter, Action<CloudResponse> done)
+        {
+            Authorized(() => Send("DELETE", "/rest/v1/" + table + "?" + filter, null, null, true, done), done);
+        }
+
         /// <summary>Calls a database function (POST /rest/v1/rpc/&lt;name&gt;).</summary>
         public void Rpc(string function, string json, Action<CloudResponse> done)
         {
@@ -222,13 +236,33 @@ namespace Cevir.Core.Cloud
         /// <summary>Uploads (or replaces) a file in a storage bucket as the signed-in user.</summary>
         public void UploadFile(string bucket, string path, byte[] data, string contentType, Action<CloudResponse> done)
         {
-            var headers = new Dictionary<string, string> { { "x-upsert", "true" }, { "Cache-Control", "max-age=60" } };
+            UploadFile(bucket, path, data, contentType, true, done);
+        }
+
+        /// <summary>Uploads a file; with <paramref name="replace"/> false an existing file of that name is an error.</summary>
+        public void UploadFile(string bucket, string path, byte[] data, string contentType, bool replace, Action<CloudResponse> done)
+        {
+            var headers = new Dictionary<string, string> { { "x-upsert", replace ? "true" : "false" }, { "Cache-Control", "max-age=60" } };
             Authorized(() => SendRaw("POST", "/storage/v1/object/" + bucket + "/" + path, data, contentType, headers, true, done), done);
         }
 
         public void DeleteFile(string bucket, string path, Action<CloudResponse> done)
         {
             Authorized(() => Send("DELETE", "/storage/v1/object/" + bucket + "/" + path, null, null, true, done), done);
+        }
+
+        /// <summary>Deletes several files of a bucket in one call (paths inside the bucket).</summary>
+        public void DeleteFiles(string bucket, IList<string> paths, Action<CloudResponse> done)
+        {
+            var body = new StringBuilder("{\"prefixes\":[");
+            for (int i = 0; i < paths.Count; i++)
+            {
+                if (i > 0) body.Append(',');
+                body.Append('"').Append(paths[i].Replace("\\", "\\\\").Replace("\"", "\\\"")).Append('"');
+            }
+
+            body.Append("]}");
+            Authorized(() => Send("DELETE", "/storage/v1/object/" + bucket, body.ToString(), null, true, done), done);
         }
 
         /// <summary>Address of a file in a public bucket (no token needed to read it).</summary>

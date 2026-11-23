@@ -37,6 +37,9 @@ namespace Cevir.Core.UI
         private TMP_InputField _newPassword;
         private TMP_InputField _repeatPassword;
         private TextMeshProUGUI _remindersStatus;
+        private GameObject _dataCard;
+        private Button _dataOn;
+        private Button _dataOff;
         private GameObject _dangerCard;
         private TextMeshProUGUI _deleteLabel;
         private TextMeshProUGUI _message;
@@ -104,6 +107,10 @@ namespace Cevir.Core.UI
             _emailCard.SetActive(signedIn);
             _passwordCard.SetActive(signedIn);
             _dangerCard.SetActive(signedIn);
+            _dataCard.SetActive(signedIn);
+            bool consent = GameManager.Instance != null && GameManager.Instance.Progress.dataConsent;
+            UIKit.Select(_dataOn, consent);
+            UIKit.Select(_dataOff, !consent);
             _emailCurrent.text = signedIn ? "Hazırkı: <b>" + cloud.Email + "</b>" : string.Empty;
             _deleteLabel.text = _deleteArmed ? "TƏSDİQLƏ: HESABI SİL" : "HESABI SİL";
             UIKit.Select(_rightHand, !_leftHanded);
@@ -294,6 +301,24 @@ namespace Cevir.Core.UI
             });
         }
 
+        private void SetDataConsent(bool allowed)
+        {
+            CloudService cloud = CloudService.Instance;
+            GameManager game = GameManager.Instance;
+            if (_busy || cloud == null || game == null) return;
+            if (game.Progress.dataConsent == allowed && game.Progress.dataConsentAsked) return;
+
+            SetBusy(true);
+            cloud.SetDataConsent(allowed, error =>
+            {
+                SetBusy(false);
+                Render();
+                if (error != null) Message(error, true);
+                else Message(allowed ? "Təşəkkürlər! Cəhdlərin Chevir-i inkişaf etdirməyə kömək edəcək."
+                    : "Söndürüldü. Əvvəl saxlanan cəhdlərin silindi.", false);
+            });
+        }
+
         private void OpenReminders()
         {
             if (ReminderSettingsUI.Instance != null) ReminderSettingsUI.Instance.Open(false);
@@ -437,6 +462,20 @@ namespace Cevir.Core.UI
             _remindersStatus = kit.Text(reminderTexts, "Status", "", 28f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
             Button reminderButton = kit.Button(reminderRow, "Open", "AYARLA", UIPalette.CyanLight, UIPalette.Primary, 84f, false, OpenReminders);
             UIKit.Layout(reminderButton.gameObject, preferredWidth: 210f, minWidth: 180f);
+
+            // Data permission (sign samples for the dataset).
+            RectTransform data = kit.Card(content, "DataConsent", 40, 16f);
+            _dataCard = data.gameObject;
+            kit.Text(data, "Title", DataConsentUI.Title, 34f, UIPalette.TextPrimary);
+            kit.Text(data, "Body", "Kamerada göstərdiyin işarələrin nöqtələri və 3 saniyəlik kiçik video saxlanılır ki, Chevir " +
+                "işarə dilini daha yaxşı tanısın. Söndürəndə əvvəl saxlananlar da silinir.", 28f, UIPalette.TextSecondary,
+                TextAlignmentOptions.TopLeft, false);
+            RectTransform dataRow = UIKit.Rect("Choice", data);
+            UIKit.Row(dataRow.gameObject, 16f).childForceExpandWidth = true;
+            _dataOn = kit.Button(dataRow, "On", "İcazə verirəm", UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => SetDataConsent(true));
+            UIKit.Layout(_dataOn.gameObject, flexibleWidth: 1f);
+            _dataOff = kit.Button(dataRow, "Off", "İcazə vermirəm", UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => SetDataConsent(false));
+            UIKit.Layout(_dataOff.gameObject, flexibleWidth: 1f);
 
             // E-mail.
             RectTransform emailCard = kit.Card(content, "Email", 40, 18f);

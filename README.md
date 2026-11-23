@@ -138,11 +138,12 @@ Subclass `LanguagePackDefinition` (as `AzSLDLanguagePack` does), give it a manif
 
 ## Server (Supabase)
 
-`Tools/supabase/schema.sql` creates four tables, all with row level security:
+`Tools/supabase/schema.sql` creates five tables, all with row level security:
 - `profiles`: name shown on the league table, tier, total XP, streak (readable by signed-in users, writable by the owner; the tier can only change through `settle_league`).
 - `progress`: the app's whole save (JSON) per user, private to its owner.
 - `weekly_xp`: XP per ISO week and tier, the source of the ranking.
 - `league_settlements`: which weeks were settled, with rank and group size.
+- `sign_samples`: camera attempts for the dataset, only from learners who allowed it (`profiles.data_consent`, asked at sign-up, changeable in account settings; turning it off deletes their samples). Each row has the target sign, lesson / story, judge, score, verdict, device and the MediaPipe landmarks of every frame (`landmarks` jsonb, format described in the schema). A 3 s, 144 px wide, 8 fps Motion-JPEG `.avi` of the attempt goes to the private bucket `sign-samples` (`video_path`). Code: `Cloud/SignSampleCollector.cs`, `Cloud/MjpegAvi.cs`, `UI/DataConsentUI.cs`.
 
 Functions: `league_standings(week, tier)` and `settle_league(current_week)`. The app talks to Supabase over HTTPS (`SupabaseClient`, no SDK). Progress is saved on the phone first and uploaded 3 s after each change; on sign-in the newer copy wins. XP is reported by the app, so a modified app could inflate its own league XP; move XP awarding to the server before leagues matter for prizes.
 

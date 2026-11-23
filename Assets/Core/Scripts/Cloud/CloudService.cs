@@ -37,11 +37,17 @@ namespace Cevir.Core.Cloud
         private const string PendingNameKey = "cevir.auth.pendingName";
         private string _pendingNameSign;
         private const string PendingNameSignKey = "cevir.auth.pendingNameSign";
+        private int _pendingConsent = -1; // -1 not asked, 0 refused, 1 allowed (answer given at sign-up)
+        private const string PendingConsentKey = "cevir.auth.pendingConsent";
 
         public static CloudService Instance { get; private set; }
 
         public CloudState State { get; private set; }
         public string Email => _client != null ? _client.Email : null;
+        public string UserId => _client != null ? _client.UserId : null;
+
+        /// <summary>The server client, for the sign-sample uploads (null when no server is configured).</summary>
+        internal SupabaseClient Client => _client;
 
         /// <summary>True once the first download after sign-in finished (or failed and the local copy is used).</summary>
         public bool Synced => _synced;
@@ -77,6 +83,7 @@ namespace Cevir.Core.Cloud
             _league.Updated += () => _game.NotifyProfileChanged();
             _game.Saved += OnSaved;
             _game.LeagueRefreshRequested += RefreshLeague;
+            SignSampleCollector.Attach(this, game);
 
             if (_client.HasSession)
             {
@@ -126,6 +133,15 @@ namespace Cevir.Core.Cloud
         /// <summary>Creates an account with the learner's name and name sign (nickname or best-known feature).</summary>
         public void SignUp(string name, string nameSign, string email, string password, Action<string, bool> done)
         {
+            SignUp(name, nameSign, null, email, password, done);
+        }
+
+        /// <summary>
+        /// Creates an account. <paramref name="dataConsent"/> is the answer to the data permission asked at sign-up
+        /// (null: not asked; the app asks after the first sign-in).
+        /// </summary>
+        public void SignUp(string name, string nameSign, bool? dataConsent, string email, string password, Action<string, bool> done)
+        {
             if (_client == null)
             {
                 done(CloudErrors.Unknown, false);
@@ -134,7 +150,7 @@ namespace Cevir.Core.Cloud
 
             name = (name ?? string.Empty).Trim();
             nameSign = (nameSign ?? string.Empty).Trim();
-            _client.SignUp(email.Trim(), password, name, nameSign, (response, signedIn) =>
+            _client.SignUp(email.Trim(), password, name, nameSign, dataConsent == true, (response, signedIn) =>
             {
                 if (!response.Ok)
                 {
@@ -147,6 +163,8 @@ namespace Cevir.Core.Cloud
                 PlayerPrefs.SetString(PendingNameKey, name); // kept until the first sign-in (after e-mail confirmation)
                 _pendingNameSign = nameSign;
                 PlayerPrefs.SetString(PendingNameSignKey, nameSign);
+                _pendingConsent = dataConsent.HasValue ? (dataConsent.Value ? 1 : 0) : -1;
+                PlayerPrefs.SetInt(PendingConsentKey, _pendingConsent);
                 PlayerPrefs.Save();
                 if (signedIn) OnSignedIn();
                 done(null, !signedIn);
@@ -292,7 +310,7 @@ namespace Cevir.Core.Cloud
                 return;
             }
 
-            _client.DeleteFile("avatars", _client.UserId + "/avatar.jpg", ignored =>
+            DeleteSignSampleFiles(false, ignoredSamples => _client.DeleteFile("avatars", _client.UserId + "/avatar.jpg", ignored =>
             {
                 _client.Rpc("delete_account", "{}", r =>
                 {
@@ -312,6 +330,81 @@ namespace Cevir.Core.Cloud
                     SetState(CloudState.SignedOut);
                     done(null);
                 });
+            }));
+        }
+
+        // ------------------------------------------------------------------ sign samples (dataset)
+
+        /// <summary>
+        /// Saves the learner's answer to «Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et». The profile on the server
+        /// is updated at once (the database only accepts samples while it is on). Turning it off also deletes the
+        /// samples already saved for this account.
+        /// </summary>
+        public void SetDataConsent(bool allowed, Action<string> done)
+        {
+            _game.SetDataConsent(allowed);
+            if (_client == null || !_client.HasSession)
+            {
+                if (done != null) done(null);
+                return;
+            }
+
+            UploadConsent(allowed, error =>
+            {
+                if (allowed || error != null)
+                {
+                    if (done != null) done(error);
+                    return;
+                }
+
+                DeleteSignSampleFiles(true, done);
+            });
+        }
+
+        private void UploadConsent(bool allowed, Action<string> done)
+        {
+            var row = new ProfileConsentRow { id = _client.UserId, data_consent = allowed };
+            _client.Upsert("profiles", "id", JsonUtility.ToJson(row), r =>
+            {
+                if (done != null) done(r.Ok ? null : r.Error);
+            });
+        }
+
+        /// <summary>Deletes this account's sample videos from storage and, with <paramref name="rows"/>, the table rows too.</summary>
+        private void DeleteSignSampleFiles(bool rows, Action<string> done)
+        {
+            string userId = _client.UserId;
+            _client.Select("sign_samples?select=video_path&video_path=not.is.null&user_id=eq." + userId + "&limit=1000", list =>
+            {
+                if (!list.Ok)
+                {
+                    // No table yet (schema.sql not run again) or offline: nothing to delete here.
+                    if (done != null) done(list.Status == 404 || list.Status == 400 ? null : list.Error);
+                    return;
+                }
+
+                var paths = new System.Collections.Generic.List<string>();
+                foreach (SignSampleVideoRow row in SupabaseClient.ParseArray<SignSampleVideoRows>(list.Body).items)
+                {
+                    if (!string.IsNullOrEmpty(row.video_path)) paths.Add(row.video_path);
+                }
+
+                Action deleteRows = () =>
+                {
+                    if (!rows)
+                    {
+                        if (done != null) done(null);
+                        return;
+                    }
+
+                    _client.DeleteRows("sign_samples", "user_id=eq." + userId, r =>
+                    {
+                        if (done != null) done(r.Ok ? null : r.Error);
+                    });
+                };
+
+                if (paths.Count == 0) deleteRows();
+                else _client.DeleteFiles(SignSampleCollector.Bucket, paths, ignored => deleteRows());
             });
         }
 
@@ -333,6 +426,7 @@ namespace Cevir.Core.Cloud
         {
             if (string.IsNullOrEmpty(_pendingName)) _pendingName = PlayerPrefs.GetString(PendingNameKey, string.Empty);
             if (string.IsNullOrEmpty(_pendingNameSign)) _pendingNameSign = PlayerPrefs.GetString(PendingNameSignKey, string.Empty);
+            if (_pendingConsent < 0) _pendingConsent = PlayerPrefs.GetInt(PendingConsentKey, -1);
             _synced = false;
             _game.SetServices(_league, null);
             SetState(CloudState.SignedIn);
@@ -383,6 +477,7 @@ namespace Cevir.Core.Cloud
                     }
 
                     if (!string.IsNullOrEmpty(_pendingNameSign)) _game.SetNameSign(_pendingNameSign);
+                    if (_pendingConsent >= 0) _game.SetDataConsent(_pendingConsent == 1);
 
                     ScheduleUpload(0f);
                 }
@@ -391,6 +486,8 @@ namespace Cevir.Core.Cloud
                 PlayerPrefs.DeleteKey(PendingNameKey);
                 _pendingNameSign = null;
                 PlayerPrefs.DeleteKey(PendingNameSignKey);
+                _pendingConsent = -1;
+                PlayerPrefs.DeleteKey(PendingConsentKey);
 
                 _synced = true;
                 SettleLeague();
@@ -472,6 +569,7 @@ namespace Cevir.Core.Cloud
                     // It is also kept in the progress JSON above.
                     var nameSign = new ProfileNameSignRow { id = userId, name_sign = progress.nameSign ?? string.Empty };
                     _client.Upsert("profiles", "id", JsonUtility.ToJson(nameSign), r4 => { });
+                    if (progress.dataConsentAsked) UploadConsent(progress.dataConsent, null);
 
                     if (progress.xp == null || string.IsNullOrEmpty(progress.xp.week))
                     {

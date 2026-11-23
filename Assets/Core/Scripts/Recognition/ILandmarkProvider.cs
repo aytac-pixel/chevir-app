@@ -28,13 +28,23 @@ namespace Cevir.Core.Recognition
         void ApplyPack(ILanguagePack pack);
     }
 
-    /// <summary>Providers that own a camera expose it for the lesson screen's preview.</summary>
+    /// <summary>
+    /// Providers that already read the camera picture on the CPU can share it: <c>UprightFrame(pixels, width, height)</c>
+    /// with rows top-down, upright as the learner holds the phone and not mirrored. Raised on the main thread; the
+    /// buffer is reused, so copy what you keep. Used to save short sample videos (only with the learner's permission).
+    /// </summary>
+    public interface ICameraFrameSource
+    {
+        event Action<Color32[], int, int> UprightFrame;
+    }
+
     /// <summary>Optional: a one-line live status of the recognizer (frames, results, hands, last error) for testing.</summary>
     public interface IRecognitionDiagnostics
     {
         string DiagnosticText { get; }
     }
 
+    /// <summary>Providers that own a camera expose it for the lesson screen's preview.</summary>
     public interface ICameraPreviewSource
     {
         /// <summary>Live camera texture, or null before the camera has started.</summary>

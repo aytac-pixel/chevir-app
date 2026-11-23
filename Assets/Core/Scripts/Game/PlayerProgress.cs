@@ -53,8 +53,14 @@ namespace Cevir.Core.Game
         /// <summary>Public URL of the profile photo on the server (empty: none, or only stored on this phone).</summary>
         public string avatarUrl = "";
 
-        /// <summary>Opt-in to share anonymised landmark data (never video). Off by default.</summary>
-        public bool shareAnonymousLandmarks;
+        /// <summary>
+        /// «Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et»: the learner allows the app to save their camera attempts
+        /// (landmarks and a short low-resolution video) on the server to improve the dataset. Off until they allow it.
+        /// </summary>
+        public bool dataConsent;
+
+        /// <summary>True once the learner has answered the data permission question (asked at sign-up).</summary>
+        public bool dataConsentAsked;
 
         public List<PackProgress> packs = new List<PackProgress>();
 

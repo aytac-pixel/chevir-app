@@ -303,6 +303,15 @@ namespace Cevir.Core.Game
             RaiseProfileChanged();
         }
 
+        /// <summary>The learner's answer to the sign-sample permission (landmarks + short video for the dataset).</summary>
+        public void SetDataConsent(bool allowed)
+        {
+            Progress.dataConsent = allowed;
+            Progress.dataConsentAsked = true;
+            Save();
+            RaiseProfileChanged();
+        }
+
         public void SetAvatarUrl(string url)
         {
             Progress.avatarUrl = url ?? string.Empty;

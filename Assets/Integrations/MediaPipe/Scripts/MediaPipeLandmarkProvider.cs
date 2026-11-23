@@ -30,7 +30,7 @@ namespace Cevir.Integrations.MediaPipe
     /// hand result arrives; the face data in it is the latest face result (at most one inference step older).
     /// </summary>
     public sealed class MediaPipeLandmarkProvider : MonoBehaviour, ILandmarkProvider, IPackAwareLandmarkProvider, ICameraPreviewSource,
-        IRecognitionDiagnostics
+        IRecognitionDiagnostics, ICameraFrameSource
     {
         [Header("Models (.task files renamed to .bytes)")]
         [SerializeField] private TextAsset handLandmarkerModel;
@@ -96,6 +96,9 @@ namespace Cevir.Integrations.MediaPipe
         public bool CameraDenied { get; private set; }
 
         public event Action<LandmarkFrame> FrameReady;
+
+        /// <summary>The upright picture sent to MediaPipe (top-down rows, not mirrored); see ICameraFrameSource.</summary>
+        public event Action<Color32[], int, int> UprightFrame;
 
         // ---------------------------------------------------------------- diagnostics (test builds)
 
@@ -384,6 +387,7 @@ namespace Cevir.Integrations.MediaPipe
             }
 
             _cpuTexture.SetPixels32(_upright);
+            if (UprightFrame != null) UprightFrame(_upright, width, height);
 
             var processing = new ImageProcessingOptions(rotationDegrees: 0);
             try

@@ -21,6 +21,9 @@ alter table public.profiles add column if not exists practice_from text;
 alter table public.profiles add column if not exists practice_to   text;
 -- Name sign (ad işarəsi): the nickname or most recognisable feature the learner is called by, e.g. 'eynək'.
 alter table public.profiles add column if not exists name_sign     text    not null default '';
+-- «Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et»: the learner allows saving their sign attempts (asked at sign-up).
+alter table public.profiles add column if not exists data_consent    boolean not null default false;
+alter table public.profiles add column if not exists data_consent_at timestamptz;
 
 -- The app's full saved progress (lessons, hearts, streak, mastery ...) as JSON text. Private to its owner.
 create table if not exists public.progress (
@@ -53,12 +56,44 @@ create table if not exists public.league_settlements (
     primary key (user_id, week)
 );
 
+-- Sign attempts for the dataset (only from learners with profiles.data_consent): the MediaPipe landmarks of every
+-- frame, what was asked, what the model said, and the path of a short low-resolution video in bucket "sign-samples".
+-- landmarks JSON (v1): {"v":1,"aspect":w/h,"face_idx":[mesh point ids],"blendshapes":[names],
+--   "frames":[{"t":seconds,"l":[21*xyz],"r":[21*xyz],"p":[33*xyz],"f":[face_idx*xyz],"b":[blendshapes],"h":[pitch,yaw,roll]}]}
+-- x, y are normalised to the upright, NOT mirrored camera picture (y down); missing parts are left out of a frame.
+create table if not exists public.sign_samples (
+    id           uuid primary key default gen_random_uuid(),
+    user_id      uuid not null default auth.uid() references auth.users (id) on delete cascade,
+    created_at   timestamptz not null default now(),
+    sign_id      text,
+    gloss        text,
+    sign_kind    text,
+    pack         text,
+    context      text,
+    context_kind text,
+    judge        text,
+    score        real,
+    correct      boolean not null default false,
+    feedback     text,
+    duration_s   real,
+    frame_count  int,
+    left_handed  boolean not null default false,
+    app_version  text,
+    device_model text,
+    os           text,
+    video_path   text,
+    landmarks    jsonb not null
+);
+create index if not exists sign_samples_gloss on public.sign_samples (gloss, correct);
+create index if not exists sign_samples_user on public.sign_samples (user_id, created_at desc);
+
 -- ---------------------------------------------------------------- row level security
 
 alter table public.profiles           enable row level security;
 alter table public.progress           enable row level security;
 alter table public.weekly_xp          enable row level security;
 alter table public.league_settlements enable row level security;
+alter table public.sign_samples       enable row level security;
 
 drop policy if exists "profiles readable by signed-in users" on public.profiles;
 create policy "profiles readable by signed-in users" on public.profiles
@@ -82,6 +117,26 @@ drop policy if exists "own settlements" on public.league_settlements;
 create policy "own settlements" on public.league_settlements
     for select to authenticated using (user_id = auth.uid());
 
+-- True when the signed-in learner allowed saving sign samples.
+create or replace function public.has_data_consent() returns boolean
+language sql stable security definer set search_path = public as $$
+    select coalesce((select data_consent from public.profiles where id = auth.uid()), false);
+$$;
+revoke all on function public.has_data_consent() from public, anon;
+grant execute on function public.has_data_consent() to authenticated;
+
+-- Learners add only their own samples and only with permission; they can list and delete theirs (to withdraw).
+-- The team reads everything in the dashboard (Table Editor / SQL / Storage), which bypasses these rules.
+drop policy if exists "own sign samples insert" on public.sign_samples;
+create policy "own sign samples insert" on public.sign_samples
+    for insert to authenticated with check (user_id = auth.uid() and public.has_data_consent());
+drop policy if exists "own sign samples select" on public.sign_samples;
+create policy "own sign samples select" on public.sign_samples
+    for select to authenticated using (user_id = auth.uid());
+drop policy if exists "own sign samples delete" on public.sign_samples;
+create policy "own sign samples delete" on public.sign_samples
+    for delete to authenticated using (user_id = auth.uid());
+
 -- The league tier is changed only by settle_league (below), never directly by the app.
 create or replace function public.keep_league_tier() returns trigger
 language plpgsql as $$
@@ -94,6 +149,14 @@ begin
         end if;
     end if;
     new.updated_at := now();
+    -- When the data permission was given (or taken back).
+    if tg_op = 'INSERT' then
+        if new.data_consent then new.data_consent_at := now(); end if;
+    elsif new.data_consent is distinct from old.data_consent then
+        new.data_consent_at := now();
+    else
+        new.data_consent_at := old.data_consent_at;
+    end if;
     return new;
 end $$;
 
@@ -114,14 +177,15 @@ drop trigger if exists weekly_xp_set_tier on public.weekly_xp;
 create trigger weekly_xp_set_tier before insert or update on public.weekly_xp
     for each row execute function public.weekly_xp_tier();
 
--- A profile row for every new account (name and name sign from the sign-up form).
+-- A profile row for every new account (name, name sign and the data permission from the sign-up form).
 create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-    insert into public.profiles (id, display_name, name_sign)
+    insert into public.profiles (id, display_name, name_sign, data_consent)
     values (new.id,
             coalesce(new.raw_user_meta_data ->> 'display_name', ''),
-            left(coalesce(new.raw_user_meta_data ->> 'name_sign', ''), 40))
+            left(coalesce(new.raw_user_meta_data ->> 'name_sign', ''), 40),
+            coalesce(new.raw_user_meta_data ->> 'data_consent', '') = 'true')
     on conflict (id) do nothing;
     return new;
 end $$;
@@ -223,10 +287,29 @@ drop policy if exists "avatars own delete" on storage.objects;
 create policy "avatars own delete" on storage.objects
     for delete to authenticated using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
 
+-- ---------------------------------------------------------------- sign sample videos
+
+-- Private bucket "sign-samples": short Motion-JPEG .avi clips (max 1 MB), in a folder named after the learner's id.
+-- Only the team sees them (dashboard > Storage); a learner may upload only with permission and delete their own.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('sign-samples', 'sign-samples', false, 1048576, array['video/x-msvideo', 'video/avi'])
+on conflict (id) do update set public = false, file_size_limit = 1048576, allowed_mime_types = array['video/x-msvideo', 'video/avi'];
+
+drop policy if exists "sign samples own insert" on storage.objects;
+create policy "sign samples own insert" on storage.objects
+    for insert to authenticated with check (bucket_id = 'sign-samples' and (storage.foldername(name))[1] = auth.uid()::text
+                                            and public.has_data_consent());
+drop policy if exists "sign samples own select" on storage.objects;
+create policy "sign samples own select" on storage.objects
+    for select to authenticated using (bucket_id = 'sign-samples' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "sign samples own delete" on storage.objects;
+create policy "sign samples own delete" on storage.objects
+    for delete to authenticated using (bucket_id = 'sign-samples' and (storage.foldername(name))[1] = auth.uid()::text);
+
 -- ---------------------------------------------------------------- account deletion
 
--- Deletes the caller's account; profiles, progress, weekly XP and settlements go with it (on delete cascade).
--- The app removes the photo through the storage API first.
+-- Deletes the caller's account; profiles, progress, weekly XP, settlements and sign samples go with it (on delete
+-- cascade). The app removes the photo and the sample videos through the storage API first.
 create or replace function public.delete_account()
 returns void
 language plpgsql security definer set search_path = public as $$
