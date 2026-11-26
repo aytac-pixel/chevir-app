@@ -39,6 +39,15 @@ namespace Cevir.Core.Stories
             new Group("Heyvanlar", "Pişik", "İt", "Dovşan", "Ayı", "Aslan", "Meymun", "Fil", "Quş", "At", "Canavar")
         };
 
+        /// <summary>
+        /// The word as the learner reads it: Azerbaijani as stored, translated in the English and Russian interface
+        /// (the sign itself, and the stored value, stay Azerbaijani).
+        /// </summary>
+        public static string Display(string word)
+        {
+            return string.IsNullOrEmpty(word) ? word ?? string.Empty : Loc.T(word);
+        }
+
         /// <summary>The list's own spelling of <paramref name="word"/> (any case), or null when it is not in the list.</summary>
         public static string Find(string word)
         {

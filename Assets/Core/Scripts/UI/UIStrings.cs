@@ -23,7 +23,7 @@ namespace Cevir.Core.UI
         {
             return value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "x";
         }
-        public static string Normal => Loc.Pick("Normal", "Normal");
+        public static string Normal => Loc.Pick("Normal", "Normal", "Обычно");
 
         public static string WatchPrompt => Loc.Pick("Watch and remember", "Bax və yadda saxla");
         public static string GotIt => Loc.Pick("GOT IT", "ANLADIM");
@@ -59,8 +59,14 @@ namespace Cevir.Core.UI
             int hours = (int)span.TotalHours;
             int minutes = System.Math.Max(hours > 0 ? 0 : 1, (int)System.Math.Ceiling(span.TotalMinutes - hours * 60));
             if (minutes == 60) { hours++; minutes = 0; }
-            if (hours > 0) return minutes > 0 ? Loc.Pick(hours + " h " + minutes + " min", hours + " saat " + minutes + " dəq") : Loc.Pick(hours + " h", hours + " saat");
-            return Loc.Pick(minutes + " min", minutes + " dəq");
+            if (hours > 0)
+            {
+                return minutes > 0
+                    ? Loc.Pick(hours + " h " + minutes + " min", hours + " saat " + minutes + " dəq", hours + " ч " + minutes + " мин")
+                    : Loc.Pick(hours + " h", hours + " saat", hours + " ч");
+            }
+
+            return Loc.Pick(minutes + " min", minutes + " dəq", minutes + " мин");
         }
         public static string Locked => Loc.Pick("This unit is locked. Finish the earlier units first.", "Bu bölmə hələ bağlıdır. Əvvəlki bölmələri tamamla.");
         public static string Perfect => Loc.Pick("Perfect camera score! +5 XP", "Mükəmməl kamera nəticəsi! +5 XP");
@@ -210,6 +216,11 @@ namespace Cevir.Core.UI
         /// <summary>Dark ink of the pixel style: borders, hard shadows, main text.</summary>
         public static readonly Color Ink = new Color32(0x0A, 0x19, 0x31, 0xFF);
         public static readonly Vector2 ShadowOffset = new Vector2(8f, -8f);
+
+        // Night theme anchors (RGB), used by ThemeSweeper and by art that draws itself (home decor).
+        public const int NightBackground = 0x0E1526;
+        public const int NightText = 0xE8EEFA;
+        public const int NightPrimaryText = 0x6B9BFF;
 
         public static readonly Color LockedFill = new Color32(0xE8, 0xF0, 0xFF, 0xFF);
         public static readonly Color LockedEdge = new Color32(0x0A, 0x19, 0x31, 0xFF);

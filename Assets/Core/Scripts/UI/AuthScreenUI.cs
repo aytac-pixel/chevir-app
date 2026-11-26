@@ -1,4 +1,6 @@
 using Cevir.Core.Cloud;
+using Cevir.Core.Localization;
+using Cevir.Core.Stories;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,6 +32,8 @@ namespace Cevir.Core.UI
         [SerializeField] private TextMeshProUGUI switchLabel;
         [SerializeField] private Button forgotButton;
         [SerializeField] private TextMeshProUGUI messageLabel;
+        [Tooltip("Interface language buttons in the order of Loc.Supported (AZ, EN, RU).")]
+        [SerializeField] private Button[] languageButtons;
 
         private CloudService _cloud;
         private bool _signUp = true;
@@ -55,6 +59,14 @@ namespace Cevir.Core.UI
             }
             if (forgotButton != null) forgotButton.onClick.AddListener(ForgotPassword);
             if (nameSignButton != null) nameSignButton.onClick.AddListener(PickNameSign);
+            if (languageButtons != null)
+            {
+                for (int i = 0; i < languageButtons.Length && i < Loc.Supported.Length; i++)
+                {
+                    string code = Loc.Supported[i];
+                    if (languageButtons[i] != null) languageButtons[i].onClick.AddListener(() => SetLanguage(code));
+                }
+            }
             if (passwordField != null)
             {
                 passwordField.contentType = TMP_InputField.ContentType.Password;
@@ -66,6 +78,22 @@ namespace Cevir.Core.UI
                 emailField.contentType = TMP_InputField.ContentType.EmailAddress;
                 emailField.characterLimit = 254;
             }
+        }
+
+        private void OnEnable()
+        {
+            Loc.LanguageChanged += OnLanguageChanged;
+        }
+
+        private void OnDisable()
+        {
+            Loc.LanguageChanged -= OnLanguageChanged;
+        }
+
+        private void OnLanguageChanged(string language)
+        {
+            if (messageLabel != null) messageLabel.gameObject.SetActive(false);
+            Render();
         }
 
         private void Start()
@@ -106,27 +134,38 @@ namespace Cevir.Core.UI
             if (target.activeSelf != visible) target.SetActive(visible);
         }
 
+        private static void SetLanguage(string code)
+        {
+            if (Game.GameManager.Instance != null) Game.GameManager.Instance.SetUiLanguage(code);
+            else Loc.SetLanguage(code);
+        }
+
         private void Render()
         {
-            if (titleLabel != null) titleLabel.text = _reset ? "Yeni şifrə" : _signUp ? UIStrings.SignUpTitle : UIStrings.SignInTitle;
+            if (languageButtons != null)
+            {
+                for (int i = 0; i < languageButtons.Length && i < Loc.Supported.Length; i++) UIKit.Select(languageButtons[i], Loc.Supported[i] == Loc.Language);
+            }
+
+            if (titleLabel != null) titleLabel.text = _reset ? Loc.T("Yeni şifrə") : _signUp ? UIStrings.SignUpTitle : UIStrings.SignInTitle;
             if (nameRow != null) nameRow.SetActive(_signUp && !_reset);
             if (nameSignButton != null) nameSignButton.gameObject.SetActive(_signUp && !_reset);
             if (nameSignLabel != null)
             {
-                nameSignLabel.text = _nameSign.Length > 0 ? "Ləqəbin: " + _nameSign : "Ləqəbin / ən tanınan xüsusiyyətin: seç";
+                nameSignLabel.text = _nameSign.Length > 0 ? Loc.T("Ləqəbin: ") + NameSignOptions.Display(_nameSign) : Loc.T("Ləqəbin / ən tanınan xüsusiyyətin: seç");
                 nameSignLabel.color = _nameSign.Length > 0 ? UIPalette.TextPrimary : UIPalette.TextSecondary;
             }
             if (nameSignHint != null) nameSignHint.gameObject.SetActive(_signUp && !_reset);
             if (codeField != null) codeField.gameObject.SetActive(_reset);
             var passwordHint = passwordField != null ? passwordField.placeholder as TextMeshProUGUI : null;
-            if (passwordHint != null) passwordHint.text = _reset ? "Yeni şifrə" : "Şifrə";
+            if (passwordHint != null) passwordHint.text = _reset ? Loc.T("Yeni şifrə") : Loc.T("Şifrə");
             if (primaryLabel != null)
             {
                 primaryLabel.text = _busy ? UIStrings.PleaseWait
-                    : _reset ? "ŞİFRƏNİ YENİLƏ" : (_signUp ? UIStrings.SignUpButton : UIStrings.SignInButton);
+                    : _reset ? Loc.T("ŞİFRƏNİ YENİLƏ") : (_signUp ? UIStrings.SignUpButton : UIStrings.SignInButton);
             }
 
-            if (switchLabel != null) switchLabel.text = _reset ? "Daxil olmağa qayıt" : _signUp ? UIStrings.SwitchToSignIn : UIStrings.SwitchToSignUp;
+            if (switchLabel != null) switchLabel.text = _reset ? Loc.T("Daxil olmağa qayıt") : _signUp ? UIStrings.SwitchToSignIn : UIStrings.SwitchToSignUp;
             if (forgotButton != null) forgotButton.gameObject.SetActive(!_signUp && !_reset);
             if (primaryButton != null) primaryButton.interactable = !_busy;
         }
@@ -162,7 +201,7 @@ namespace Cevir.Core.UI
                 if (code.Length < 6)
                 {
                     SetBusy(false);
-                    Message("E-poçtuna gələn kodu yaz.", true);
+                    Message(Loc.T("E-poçtuna gələn kodu yaz."), true);
                     return;
                 }
 

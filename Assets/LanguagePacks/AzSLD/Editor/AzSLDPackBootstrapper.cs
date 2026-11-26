@@ -39,6 +39,9 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
             public string GuideEn;
             public string GuideAz;
 
+            /// <summary>Pixel icon on the home path: Assets/Core/Sprites/Units/unit_&lt;Icon&gt;.png.</summary>
+            public string Icon;
+
             /// <summary>Fixed lesson plan (title EN, title AZ, glosses...) when the unit follows the curriculum table exactly.</summary>
             public LessonSpec[] Lessons;
         }
@@ -162,26 +165,26 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
         {
             // Unit 1 teaches letters only (no facial expressions, no fingerspelled words), decided 2026-11-13.
             // The moving letters (Ç, G, Ğ, Ö, Ü, Y, Z) are left out, decided 2026-11-23: 25 letters remain.
-            new UnitSpec { En = "Alphabet", Az = "Əlifba", Category = "daktil",
+            new UnitSpec { En = "Alphabet", Az = "Əlifba", Category = "daktil", Icon = "alphabet",
                 GuideEn = "Show each letter with your dominant hand at shoulder height, palm towards the viewer.",
                 GuideAz = "Hər hərfi əsas əlinlə, çiyin hündürlüyündə, ovucu qarşı tərəfə göstər." },
-            new UnitSpec { En = "Greetings & Introductions", Az = "Salamlaşma və tanışlıq", Category = "salamlaşma",
+            new UnitSpec { En = "Greetings & Introductions", Az = "Salamlaşma və tanışlıq", Category = "salamlaşma", Icon = "greetings",
                 Lessons = Unit2Lessons },
-            new UnitSpec { En = "Pronouns & Basic Sentences", Az = "Əvəzliklər və sadə cümlələr", Category = "əvəzliklər",
+            new UnitSpec { En = "Pronouns & Basic Sentences", Az = "Əvəzliklər və sadə cümlələr", Category = "əvəzliklər", Icon = "pronouns",
                 Lessons = Unit3Lessons },
-            new UnitSpec { En = "Question Words", Az = "Sual sözləri", Category = "suallar",
+            new UnitSpec { En = "Question Words", Az = "Sual sözləri", Category = "suallar", Icon = "questions",
                 Lessons = Unit4Lessons },
-            new UnitSpec { En = "Family & People", Az = "Ailə və insanlar", Category = "ailə",
+            new UnitSpec { En = "Family & People", Az = "Ailə və insanlar", Category = "ailə", Icon = "family",
                 Lessons = Unit5Lessons },
-            new UnitSpec { En = "Numbers & Counting", Az = "Rəqəmlər və sayma", Category = "rəqəmlər",
+            new UnitSpec { En = "Numbers & Counting", Az = "Rəqəmlər və sayma", Category = "rəqəmlər", Icon = "numbers",
                 Lessons = Unit6Lessons },
-            new UnitSpec { En = "Time & Schedules", Az = "Zaman və cədvəl", Category = "zaman",
+            new UnitSpec { En = "Time & Schedules", Az = "Zaman və cədvəl", Category = "zaman", Icon = "time",
                 Lessons = Unit7Lessons },
-            new UnitSpec { En = "Daily Objects & Colors", Az = "Gündəlik əşyalar və rənglər", Category = "əşyalar",
+            new UnitSpec { En = "Daily Objects & Colors", Az = "Gündəlik əşyalar və rənglər", Category = "əşyalar", Icon = "objects",
                 Lessons = Unit8Lessons },
-            new UnitSpec { En = "Essential Places", Az = "Vacib yerlər", Category = "yerlər",
+            new UnitSpec { En = "Essential Places", Az = "Vacib yerlər", Category = "yerlər", Icon = "places",
                 Lessons = Unit9Lessons },
-            new UnitSpec { En = "A1 Review & Final Checkpoint", Az = "A1 təkrar və yekun imtahan", Category = "təkrar",
+            new UnitSpec { En = "A1 Review & Final Checkpoint", Az = "A1 təkrar və yekun imtahan", Category = "təkrar", Icon = "review",
                 GuideEn = "Review the whole level, then pass the checkpoint (20 random signs, 80% correct) to enter A2.",
                 GuideAz = "Bütün səviyyəni təkrarla, sonra A2-yə keçmək üçün imtahanı (20 təsadüfi işarə, 80% düzgün) keç." }
         };
@@ -420,6 +423,9 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                     unit.EditorSetTranslation(Loc.Azerbaijani, spec.Az, string.Empty);
                 }
 
+                unit.EditorSetIcon(string.IsNullOrEmpty(spec.Icon) ? null
+                    : AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Core/Sprites/Units/unit_" + spec.Icon + ".png"));
+
                 List<LessonData> lessons;
                 if (u == 0) lessons = CreateUnit1Lessons(unitId, letters);
                 else if (spec.Lessons != null) lessons = CreateFixedLessons(unitId, u, spec, unitSigns[u]);
@@ -581,6 +587,11 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 lesson.EditorSetTranslation(Loc.Azerbaijani, az, string.Empty);
             }
 
+            // Russian titles: generated ones ("Hərflər A–E", "2-ci bölmə təkrarı") are written here, the rest come from
+            // the translation table at runtime.
+            string ru = RussianTitle(az);
+            if (!string.IsNullOrEmpty(ru)) lesson.EditorSetTranslation(Loc.Russian, ru, string.Empty);
+
             if (overwrite || lesson.TargetSigns.Count == 0)
             {
                 // Unit 1 letters: show the letter, "Anladım", then sign it on camera (no quiz steps).
@@ -620,6 +631,10 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 }
                 else if (i < StoryScripts.Length && StoryScripts[i] != null) FillScriptedStory(story, number, unlock, StoryScripts[i], words);
                 else if (story.UnlockUnit == null) story.EditorSetUnlock(number, unlock);
+
+                // Every story has its own pixel-art scene (Assets/Core/Sprites/Story/story_bg_NN.png).
+                Sprite scene = LoadSprite("story_bg_" + number.ToString("00"));
+                story.EditorSetArt(scene != null ? scene : LoadSprite("story_bg_01"), LoadSprite("pov_hands_bag"));
 
                 EditorUtility.SetDirty(story);
                 stories.Add(story);
@@ -693,7 +708,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 }
             };
 
-            story.EditorSetContent(1, unlock, 20, LoadSprite("story_street_bg"), LoadSprite("pov_hands_bag"), npc, beats);
+            story.EditorSetContent(1, unlock, 20, LoadSprite("story_bg_01"), LoadSprite("pov_hands_bag"), npc, beats);
         }
 
         /// <summary>Builds a story from a beat script (see <see cref="StoryScripts"/>): Aysel on the street, as in Story 1.</summary>
@@ -736,7 +751,21 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                 wave = LoadSprite("npc_wave_idle"),
                 waveTalking = LoadSprite("npc_wave")
             };
-            story.EditorSetContent(number, unlock, 20, LoadSprite("story_street_bg"), LoadSprite("pov_hands_bag"), npc, beats);
+            story.EditorSetContent(number, unlock, 20, LoadSprite("story_bg_01"), LoadSprite("pov_hands_bag"), npc, beats);
+        }
+
+        private static string RussianTitle(string az)
+        {
+            if (string.IsNullOrEmpty(az)) return null;
+            if (az.StartsWith("Hərflər ")) return "Буквы " + az.Substring("Hərflər ".Length);
+            System.Text.RegularExpressions.Match review = System.Text.RegularExpressions.Regex.Match(az, @"^(\d+)-c[iıuü] bölmə təkrarı$");
+            if (review.Success) return "Повторение раздела " + review.Groups[1].Value;
+            string direct = Translations.Russian(az);
+            if (direct != null) return direct;
+            System.Text.RegularExpressions.Match numbered = System.Text.RegularExpressions.Regex.Match(az, @"^(.*) (\d+)$");
+            if (numbered.Success && Translations.Russian(numbered.Groups[1].Value) != null)
+                return Translations.Russian(numbered.Groups[1].Value) + " " + numbered.Groups[2].Value;
+            return null;
         }
 
         private static List<SignDefinition> Signs(Dictionary<string, SignDefinition> words, params string[] glosses)

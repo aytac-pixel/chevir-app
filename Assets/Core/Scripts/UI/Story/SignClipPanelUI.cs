@@ -105,7 +105,7 @@ namespace Cevir.Core.UI
             foreach (SignDefinition sign in _phrase)
             {
                 if (text.Length > 0) text.Append("<color=#9AA6B8> · </color>");
-                string gloss = Loc.ToUpperAz(sign.Gloss);
+                string gloss = Loc.Upper(sign.DisplayGloss);
                 if (current == null || sign == current) text.Append("<b>").Append(gloss).Append("</b>");
                 else text.Append("<color=#9AA6B8>").Append(gloss).Append("</color>");
             }

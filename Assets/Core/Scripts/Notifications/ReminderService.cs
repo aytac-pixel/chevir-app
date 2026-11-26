@@ -1,3 +1,4 @@
+using Cevir.Core.Localization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -140,8 +141,8 @@ namespace Cevir.Core.Notifications
             AndroidNotificationCenter.RegisterNotificationChannel(new AndroidNotificationChannel
             {
                 Id = ChannelId,
-                Name = "Məşq xatırlatmaları",
-                Description = "Seçdiyin saatlarda gündəlik dərs xatırlatmaları",
+                Name = Loc.T("Məşq xatırlatmaları"),
+                Description = Loc.T("Seçdiyin saatlarda gündəlik dərs xatırlatmaları"),
                 Importance = Importance.Default
             });
             _channelReady = true;

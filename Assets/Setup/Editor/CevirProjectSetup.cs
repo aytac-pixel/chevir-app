@@ -26,14 +26,21 @@ namespace Cevir.Setup.Editor
 
         private const string FontSource = "Assets/Core/Fonts/DejaVuSans.ttf";
         private const string FontAssetPath = "Assets/Core/Fonts/DejaVuSans SDF.asset";
-        private const string MainFontSource = "Assets/Core/Fonts/VT323-Regular.ttf";
-        private const string MainFontAssetPath = "Assets/Core/Fonts/VT323 SDF.asset";
+        private const string MainFontSource = "Assets/Core/Fonts/Galmuri11.ttf";
+        private const string MainFontAssetPath = "Assets/Core/Fonts/Galmuri11 SDF.asset";
 
         /// <summary>
-        /// VT323 draws smaller than the old Nunito at the same point size (cap height 0.56 vs 0.705 em), so the font
-        /// asset is scaled up once and every label keeps its designed size.
+        /// Galmuri11 is a calm, evenly spaced pixel typeface (12-pixel grid) with every Azerbaijani letter (Ə/ə
+        /// included) and full Cyrillic for the Russian interface. At 0.95 its letters stand about a fifth taller than
+        /// the old VT323 setting while lines stay about as wide, so every label is easier to read and still fits.
         /// </summary>
-        private const float MainFontScale = 1.25f;
+        private const float MainFontScale = 0.95f;
+
+        /// <summary>Faux bold kept light so the pixel shapes stay crisp (TMP default 0.75).</summary>
+        private const float MainBoldStyle = 0.45f;
+
+        /// <summary>Atlas sampling size: 8 atlas pixels per font pixel (12-pixel em), so edges stay sharp squares.</summary>
+        private const int MainSamplingSize = 96;
 
         /// <summary>Letters the UI needs up front; anything else is added to the dynamic atlas on demand.</summary>
         private const string Prewarm =
@@ -84,15 +91,16 @@ namespace Cevir.Setup.Editor
         }
 
         /// <summary>
-        /// VT323 (the pixel typeface of the design; covers every Azerbaijani letter, Ə/ə included) with DejaVu Sans as
-        /// the fallback for anything VT323 lacks (arrows, symbols). VT323 has one weight, so bold text is TMP's faux
-        /// bold. All atlases are dynamic.
+        /// Galmuri11 (the pixel typeface of the design; covers Azerbaijani, Ə/ə included, English and Russian) with
+        /// DejaVu Sans as the fallback for anything it lacks (arrows, symbols). One weight, so bold text is TMP's faux
+        /// bold, kept light. All atlases are dynamic.
         /// </summary>
         private static void EnsureFontAsset()
         {
             TMP_FontAsset fallback = CreateFontAsset(FontSource, FontAssetPath, "DejaVuSans SDF");
-            TMP_FontAsset main = CreateFontAsset(MainFontSource, MainFontAssetPath, "VT323 SDF");
+            TMP_FontAsset main = CreateFontAsset(MainFontSource, MainFontAssetPath, "Galmuri11 SDF", MainSamplingSize, 8);
             if (main == null) return;
+            main.boldStyle = MainBoldStyle;
 
             var so = new SerializedObject(main);
             SerializedProperty scale = so.FindProperty("m_FaceInfo.m_Scale");
@@ -112,7 +120,7 @@ namespace Cevir.Setup.Editor
             AssetDatabase.SaveAssets();
         }
 
-        private static TMP_FontAsset CreateFontAsset(string sourcePath, string assetPath, string assetName)
+        private static TMP_FontAsset CreateFontAsset(string sourcePath, string assetPath, string assetName, int samplingSize = 90, int padding = 9)
         {
             var existing = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(assetPath);
             if (existing != null) return existing;
@@ -124,7 +132,7 @@ namespace Cevir.Setup.Editor
                 return null;
             }
 
-            TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font, 90, 9, GlyphRenderMode.SDFAA, 1024, 1024,
+            TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font, samplingSize, padding, GlyphRenderMode.SDFAA, 1024, 1024,
                 AtlasPopulationMode.Dynamic, true);
             asset.name = assetName;
             AssetDatabase.CreateAsset(asset, assetPath);

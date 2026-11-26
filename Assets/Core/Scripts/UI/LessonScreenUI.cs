@@ -213,7 +213,7 @@ namespace Cevir.Core.UI
             if (promptLabel != null) promptLabel.text = PromptFor(exercise);
             if (glossLabel != null)
             {
-                glossLabel.text = sign != null ? sign.Gloss : string.Empty;
+                glossLabel.text = sign != null ? sign.DisplayGloss : string.Empty;
                 glossLabel.gameObject.SetActive(!isChoice);
             }
 
@@ -267,7 +267,7 @@ namespace Cevir.Core.UI
                 button.interactable = visible;
                 if (!visible) continue;
                 TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>(true);
-                if (label != null) label.text = choices[i].Gloss;
+                if (label != null) label.text = choices[i].DisplayGloss;
             }
         }
 
@@ -375,7 +375,7 @@ namespace Cevir.Core.UI
             if (outcome.HeartLost) Play(SfxId.HeartLost);
             RefreshHud();
 
-            if (overlay != null) overlay.ShowChoiceResult(outcome.Passed, exercise.Sign.Gloss, outcome.HeartLost, ContinueAfterFeedback);
+            if (overlay != null) overlay.ShowChoiceResult(outcome.Passed, exercise.Sign.DisplayGloss, outcome.HeartLost, ContinueAfterFeedback);
             else ContinueAfterFeedback();
         }
 

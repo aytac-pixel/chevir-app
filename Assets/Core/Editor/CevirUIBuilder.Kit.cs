@@ -65,6 +65,24 @@ namespace Cevir.Core.Editor
             theme.iconArrowUp = IconSprite("arrow_up");
             theme.iconArrowDown = IconSprite("arrow_down");
             theme.iconStar = IconSprite("star");
+
+            // Night theme: each bordered panel has a "_night" twin (light border, grey fill).
+            string[] panels = { "panel_r24", "panel_r36", "panel_r48", "pill" };
+            theme.daySprites = new Sprite[panels.Length];
+            theme.nightSprites = new Sprite[panels.Length];
+            for (int i = 0; i < panels.Length; i++)
+            {
+                theme.daySprites[i] = Sprite("UI", panels[i]);
+                theme.nightSprites[i] = Sprite("UI", panels[i] + "_night");
+            }
+
+            // Home decor: small pixel things that drift beside the learning path (clouds by day, stars by night).
+            string[] day = { "decor_cloud_big", "decor_cloud_small", "decor_sparkle", "decor_bird", "decor_kite" };
+            string[] night = { "decor_star_big", "decor_star_small", "decor_moon", "decor_sparkle_night", "decor_comet" };
+            theme.dayDecor = new Sprite[day.Length];
+            theme.nightDecor = new Sprite[night.Length];
+            for (int i = 0; i < day.Length; i++) theme.dayDecor[i] = Sprite("Decor", day[i]);
+            for (int i = 0; i < night.Length; i++) theme.nightDecor[i] = Sprite("Decor", night[i]);
             EditorUtility.SetDirty(theme);
             return theme;
         }

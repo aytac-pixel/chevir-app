@@ -22,6 +22,8 @@ namespace Cevir.Core.UI
 
         [Header("Shared")]
         [SerializeField] private ToastUI toast;
+        [Tooltip("Sprites for the night theme (ThemeSweeper).")]
+        [SerializeField] private CevirTheme theme;
 
         private GameManager _game;
 
@@ -32,6 +34,11 @@ namespace Cevir.Core.UI
         {
             Instance = this;
             if (tabBar != null) tabBar.TabSelected += ShowTab;
+
+            // Night theme: one sweeper recolours every canvas while it is on.
+            ThemeSweeper sweeper = GetComponent<ThemeSweeper>();
+            if (sweeper == null) sweeper = gameObject.AddComponent<ThemeSweeper>();
+            sweeper.Configure(theme);
         }
 
         private void Start()

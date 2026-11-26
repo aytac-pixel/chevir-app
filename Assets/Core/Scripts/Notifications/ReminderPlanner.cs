@@ -1,3 +1,4 @@
+using Cevir.Core.Localization;
 using System;
 using System.Collections.Generic;
 using Cevir.Core.Game;
@@ -61,24 +62,24 @@ namespace Cevir.Core.Notifications
         {
             if (index == 0)
             {
-                title = "Məşq vaxtıdır!";
+                title = Loc.T("Məşq vaxtıdır!");
                 body = flame > 0
-                    ? "Bu günün dərsini keç, " + flame + " günlük alovun davam etsin."
-                    : "Bu gün bir dərs keç, işarə dilini birlikdə öyrənək.";
+                    ? string.Format(Loc.T("Bu günün dərsini keç, {0} günlük alovun davam etsin."), flame)
+                    : Loc.T("Bu gün bir dərs keç, işarə dilini birlikdə öyrənək.");
                 return;
             }
 
             if (index == 1)
             {
-                title = "Xatırlatma";
-                body = "Cəmi 5 dəqiqə: bir dərs keç və bugünkü məşqini tamamla.";
+                title = Loc.T("Xatırlatma");
+                body = Loc.T("Cəmi 5 dəqiqə: bir dərs keç və bugünkü məşqini tamamla.");
                 return;
             }
 
-            title = lastChance ? "Son şans: alovun sönür!" : "Alovun sönməsin!";
+            title = lastChance ? Loc.T("Son şans: alovun sönür!") : Loc.T("Alovun sönməsin!");
             body = lastChance
-                ? "Dünən dərs keçmədin. Bu gün də keçməsən, " + flame + " günlük alovun sönəcək."
-                : "Bu gün hələ dərs keçməmisən. " + flame + " günlük alovunu qoru.";
+                ? string.Format(Loc.T("Dünən dərs keçmədin. Bu gün də keçməsən, {0} günlük alovun sönəcək."), flame)
+                : string.Format(Loc.T("Bu gün hələ dərs keçməmisən. {0} günlük alovunu qoru."), flame);
         }
     }
 }

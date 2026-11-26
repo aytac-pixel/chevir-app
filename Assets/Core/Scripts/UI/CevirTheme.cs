@@ -29,5 +29,15 @@ namespace Cevir.Core.UI
         public Sprite iconArrowUp;
         public Sprite iconArrowDown;
         public Sprite iconStar;
+
+        [Header("Night theme")]
+        [Tooltip("Pixel panels with the dark border; same order as Night Sprites.")]
+        public Sprite[] daySprites;
+        [Tooltip("Night versions: light border, grey fill (ThemeSweeper tints them).")]
+        public Sprite[] nightSprites;
+
+        [Header("Home decor (pixel art)")]
+        public Sprite[] dayDecor;
+        public Sprite[] nightDecor;
     }
 }

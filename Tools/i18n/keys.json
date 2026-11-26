@@ -1,0 +1,2194 @@
+{
+ "İstifadəçi": {
+  "en": "User",
+  "src": "GameManager.cs"
+ },
+ "Məşq xatırlatmaları": {
+  "en": "Practice reminders",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "Seçdiyin saatlarda gündəlik dərs xatırlatmaları": {
+  "en": null,
+  "src": "ReminderService.cs"
+ },
+ "Məşq vaxtıdır!": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "Bu günün dərsini keç, {0} günlük alovun davam etsin.": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "Bu gün bir dərs keç, işarə dilini birlikdə öyrənək.": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "Xatırlatma": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "Cəmi 5 dəqiqə: bir dərs keç və bugünkü məşqini tamamla.": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "Son şans: alovun sönür!": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "Alovun sönməsin!": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "Dünən dərs keçmədin. Bu gün də keçməsən, {0} günlük alovun sönəcək.": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "Bu gün hələ dərs keçməmisən. {0} günlük alovunu qoru.": {
+  "en": null,
+  "src": "ReminderPlanner.cs"
+ },
+ "BAŞLA": {
+  "en": "START",
+  "src": "UIStrings.cs"
+ },
+ "DAVAM ET": {
+  "en": "CONTINUE",
+  "src": "UIStrings.cs"
+ },
+ "YENİDƏN CƏHD ET": {
+  "en": "TRY AGAIN",
+  "src": "UIStrings.cs"
+ },
+ "YOXLA": {
+  "en": "CHECK",
+  "src": "UIStrings.cs"
+ },
+ "BAĞLA": {
+  "en": "CLOSE",
+  "src": "UIStrings.cs"
+ },
+ "ƏSAS EKRANA QAYIT": {
+  "en": "BACK HOME",
+  "src": "UIStrings.cs"
+ },
+ "TƏKRAR ET": {
+  "en": "PRACTICE",
+  "src": "UIStrings.cs"
+ },
+ "Yavaş": {
+  "en": "Slow",
+  "src": "UIStrings.cs"
+ },
+ "Normal": {
+  "en": "Normal",
+  "src": "UIStrings.cs"
+ },
+ "Bax və yadda saxla": {
+  "en": "Watch and remember",
+  "src": "UIStrings.cs"
+ },
+ "ANLADIM": {
+  "en": "GOT IT",
+  "src": "UIStrings.cs"
+ },
+ "İşarəni göstər": {
+  "en": "Show the sign",
+  "src": "UIStrings.cs"
+ },
+ "Bu hansı işarədir?": {
+  "en": "Which sign is this?",
+  "src": "UIStrings.cs"
+ },
+ "Təkrar": {
+  "en": "Review",
+  "src": "UIStrings.cs"
+ },
+ "İmtahan": {
+  "en": "Checkpoint",
+  "src": "UIStrings.cs"
+ },
+ "Kameraya düz bax, üzünü sakit saxla...": {
+  "en": "Look at the camera and keep your face relaxed...",
+  "src": "UIStrings.cs"
+ },
+ "Əlini kameraya göstər": {
+  "en": "Show your hand to the camera",
+  "src": "UIStrings.cs"
+ },
+ "Göstərirsən...": {
+  "en": "Signing...",
+  "src": "UIStrings.cs"
+ },
+ "Yoxlanılır...": {
+  "en": "Checking...",
+  "src": "UIStrings.cs"
+ },
+ "Hazır olanda BAŞLA düyməsini bas": {
+  "en": "Press START when you're ready",
+  "src": "UIStrings.cs"
+ },
+ "Əla!": {
+  "en": "Great!",
+  "src": "UIStrings.cs"
+ },
+ "Düzgün deyil": {
+  "en": "Not quite",
+  "src": "UIStrings.cs"
+ },
+ "Bir daha cəhd et": {
+  "en": "Try once more",
+  "src": "UIStrings.cs"
+ },
+ "Düzgün cavab: ": {
+  "en": "Correct answer: ",
+  "src": "UIStrings.cs"
+ },
+ "Dərs tamamlandı!": {
+  "en": "Lesson complete!",
+  "src": "UIStrings.cs"
+ },
+ "İmtahan keçildi!": {
+  "en": "Checkpoint passed!",
+  "src": "UIStrings.cs"
+ },
+ "İmtahan keçilmədi": {
+  "en": "Checkpoint not passed",
+  "src": "UIStrings.cs"
+ },
+ "Canın qalmadı": {
+  "en": "Out of hearts",
+  "src": "UIStrings.cs"
+ },
+ "Hər 2 saatdan bir 1 can bərpa olunur. Təkrar dərsi ilə də can qazana bilərsən.": {
+  "en": "A heart comes back every 2 hours. A practice lesson also wins hearts back.",
+  "src": "UIStrings.cs"
+ },
+ "Canın qalmayıb. Növbəti can {0} sonra gələcək, ya da təkrar dərsi et.": {
+  "en": "No hearts left. The next one comes back in {0}, or do a practice lesson.",
+  "src": "UIStrings.cs"
+ },
+ "+1 can: {0}": {
+  "en": "+1 heart in {0}",
+  "src": "UIStrings.cs"
+ },
+ "Bu bölmə hələ bağlıdır. Əvvəlki bölmələri tamamla.": {
+  "en": "This unit is locked. Finish the earlier units first.",
+  "src": "UIStrings.cs"
+ },
+ "Mükəmməl kamera nəticəsi! +5 XP": {
+  "en": "Perfect camera score! +5 XP",
+  "src": "UIStrings.cs"
+ },
+ "Seriya: {0} gün": {
+  "en": "Streak: {0} days",
+  "src": "UIStrings.cs"
+ },
+ "Dəqiqlik: {0}%": {
+  "en": "Accuracy: {0}%",
+  "src": "UIStrings.cs"
+ },
+ "+{0} XP": {
+  "en": "+{0} XP",
+  "src": "UIStrings.cs"
+ },
+ "+{0} can": {
+  "en": "+{0} hearts",
+  "src": "UIStrings.cs"
+ },
+ "Bələdçi": {
+  "en": "Guidebook",
+  "src": "UIStrings.cs"
+ },
+ "Bu dərsin məzmunu hazırlanır. Tezliklə!": {
+  "en": "This content is being prepared. Coming soon!",
+  "src": "UIStrings.cs"
+ },
+ "GÖSTƏRDİM": {
+  "en": "I SIGNED IT",
+  "src": "UIStrings.cs"
+ },
+ "Bu işarənin avtomatik yoxlaması hələ hazır deyil. Kamerada özünə baxaraq göstər və təsdiqlə.": {
+  "en": "Automatic checking for this sign isn't ready yet. Watch yourself in the camera, sign it, then confirm.",
+  "src": "UIStrings.cs"
+ },
+ "Bu işarəyə sonra qayıdacağıq.": {
+  "en": "We'll come back to this sign later.",
+  "src": "UIStrings.cs"
+ },
+ "Kamera açılır...": {
+  "en": "Starting camera...",
+  "src": "UIStrings.cs"
+ },
+ "Kameraya icazə lazımdır.\nTelefonun Ayarlar > Tətbiqlər > Chevir bölməsində kameranı aç.": {
+  "en": "Chevir needs the camera.\nAllow it in Settings > Apps > Chevir.",
+  "src": "UIStrings.cs"
+ },
+ "Kamera modulu quraşdırılmayıb.": {
+  "en": "The camera module isn't installed.",
+  "src": "UIStrings.cs"
+ },
+ "Dərs": {
+  "en": "Lessons",
+  "src": "UIStrings.cs"
+ },
+ "Hekayə": {
+  "en": "Stories",
+  "src": "UIStrings.cs"
+ },
+ "Liqa": {
+  "en": "League",
+  "src": "UIStrings.cs"
+ },
+ "Profil": {
+  "en": "Profile",
+  "src": "UIStrings.cs"
+ },
+ "SƏVİYYƏ": {
+  "en": "LEVEL",
+  "src": "UIStrings.cs"
+ },
+ "{0} Səviyyə": {
+  "en": "{0} Level",
+  "src": "UIStrings.cs"
+ },
+ "{0} / {1} bölmə": {
+  "en": "{0} / {1} units",
+  "src": "UIStrings.cs"
+ },
+ "BÖLMƏ {0}": {
+  "en": "UNIT {0}",
+  "src": "UIStrings.cs"
+ },
+ "GİRİŞ": {
+  "en": "ENTRANCE",
+  "src": "UIStrings.cs"
+ },
+ "Dərs {0} / {1}": {
+  "en": "Lesson {0} of {1}",
+  "src": "UIStrings.cs"
+ },
+ "Bölmə tamamlandı. İstənilən dərsi təkrar keçə bilərsən.": {
+  "en": "Unit complete. Practise any lesson again.",
+  "src": "UIStrings.cs"
+ },
+ "{0} səviyyəsini təkrarla və növbəti səviyyəyə keçmək üçün imtahanı ({1}% düzgün) keç.": {
+  "en": "Review everything from {0} and pass the checkpoint ({1}% correct) to enter the next level.",
+  "src": "UIStrings.cs"
+ },
+ "YENİDƏN KEÇ": {
+  "en": "PRACTISE AGAIN",
+  "src": "UIStrings.cs"
+ },
+ "HEKAYƏLƏR": {
+  "en": "STORIES",
+  "src": "UIStrings.cs"
+ },
+ "İşarə Dili Hekayələri": {
+  "en": "Sign Language Stories",
+  "src": "UIStrings.cs"
+ },
+ "Əsas ekranda dərsləri tamamla\n<b>və yeni hekayələr aç!</b>": {
+  "en": "Complete lessons on the Home screen\n<b>to unlock new stories!</b>",
+  "src": "UIStrings.cs"
+ },
+ "BAĞLI": {
+  "en": "LOCKED",
+  "src": "UIStrings.cs"
+ },
+ "YENİ · BAŞLA": {
+  "en": "NEW · START",
+  "src": "UIStrings.cs"
+ },
+ "TAMAMLANDI": {
+  "en": "COMPLETED",
+  "src": "UIStrings.cs"
+ },
+ "TEZLİKLƏ": {
+  "en": "COMING SOON",
+  "src": "UIStrings.cs"
+ },
+ "Bu hekayəni açmaq üçün Əsas ekranda {0}-ci bölməni bitir.": {
+  "en": "Finish Unit {0} on the Home screen to unlock this story.",
+  "src": "UIStrings.cs"
+ },
+ "Yeni hekayə açıldı!": {
+  "en": "New story unlocked!",
+  "src": "UIStrings.cs"
+ },
+ "Öyrəndiklərini real söhbətdə sına:\n\"{0}\"": {
+  "en": "Practise what you learned in a real conversation:\n\"{0}\"",
+  "src": "UIStrings.cs"
+ },
+ "HEKAYƏNİ BAŞLA": {
+  "en": "START STORY",
+  "src": "UIStrings.cs"
+ },
+ "SONRA": {
+  "en": "LATER",
+  "src": "UIStrings.cs"
+ },
+ "İşarə dili ilə cavab ver": {
+  "en": "Respond in Sign Language",
+  "src": "UIStrings.cs"
+ },
+ "Davam etmək üçün toxun": {
+  "en": "Tap to continue",
+  "src": "UIStrings.cs"
+ },
+ "Adını daktil ilə göstər": {
+  "en": "Fingerspell your name",
+  "src": "UIStrings.cs"
+ },
+ "Hərfi göstər": {
+  "en": "Sign the letter",
+  "src": "UIStrings.cs"
+ },
+ "Hərfi keç": {
+  "en": "Skip letter",
+  "src": "UIStrings.cs"
+ },
+ "Kameranı bağla": {
+  "en": "Close camera",
+  "src": "UIStrings.cs"
+ },
+ "Əllərini kameraya aydın göstər": {
+  "en": "Show your hands clearly to the camera",
+  "src": "UIStrings.cs"
+ },
+ "Barmaq bucağını düzəlt": {
+  "en": "Adjust your finger angle",
+  "src": "UIStrings.cs"
+ },
+ "Bu hərfin avtomatik yoxlaması hələ hazır deyil: yalnız əlinin aydın göründüyünü yoxlayırıq.": {
+  "en": "Automatic checking for this letter isn't ready yet: we only check that your hand is clearly visible.",
+  "src": "UIStrings.cs"
+ },
+ "Bu işarənin avtomatik yoxlaması hələ yoxdur: onu əllərin kamerada görünəcək şəkildə aydın göstər.": {
+  "en": "Automatic checking for this sign isn't ready yet: show it clearly with your hands in view.",
+  "src": "UIStrings.cs"
+ },
+ "Adın nədir?": {
+  "en": "What's your name?",
+  "src": "UIStrings.cs"
+ },
+ "Onu işarə dilində, hərf-hərf göstərəcəksən.": {
+  "en": "You'll spell it in sign language, letter by letter.",
+  "src": "UIStrings.cs"
+ },
+ "Ad": {
+  "en": "Name",
+  "src": "UIStrings.cs"
+ },
+ "Soyad": {
+  "en": "Surname",
+  "src": "UIStrings.cs"
+ },
+ "Hekayə tamamlandı!": {
+  "en": "Story complete!",
+  "src": "UIStrings.cs"
+ },
+ "\"{0}\" tamamlandı kimi qeyd olundu.": {
+  "en": "\"{0}\" is now marked as completed.",
+  "src": "UIStrings.cs"
+ },
+ "Bütün cavablar kamera ilə yoxlandı! +{0} XP": {
+  "en": "Every answer camera-checked! +{0} XP",
+  "src": "UIStrings.cs"
+ },
+ "HEKAYƏLƏRƏ QAYIT": {
+  "en": "BACK TO STORIES",
+  "src": "UIStrings.cs"
+ },
+ "İşarə dilində": {
+  "en": "In sign language",
+  "src": "UIStrings.cs"
+ },
+ "HƏFTƏLİK REYTİNQ": {
+  "en": "WEEKLY RANKING",
+  "src": "UIStrings.cs"
+ },
+ "İLK {0} NÖVBƏTİ LİQAYA KEÇİR": {
+  "en": "TOP {0} ADVANCE TO THE NEXT LEAGUE",
+  "src": "UIStrings.cs"
+ },
+ "SON {0} AŞAĞI DÜŞÜR": {
+  "en": "BOTTOM {0} ARE DEMOTED",
+  "src": "UIStrings.cs"
+ },
+ "Qoşulub: {0}": {
+  "en": "Joined {0}",
+  "src": "UIStrings.cs"
+ },
+ "Profili dəyiş": {
+  "en": "Edit profile",
+  "src": "UIStrings.cs"
+ },
+ "Bu həftə XP": {
+  "en": "XP this week",
+  "src": "UIStrings.cs"
+ },
+ "Liqada yer": {
+  "en": "League place",
+  "src": "UIStrings.cs"
+ },
+ "Reytinqi görmək üçün internetə qoşul.": {
+  "en": "Connect to the internet to see the ranking.",
+  "src": "UIStrings.cs"
+ },
+ "Bu həftə liqada hələ başqa iştirakçı yoxdur.": {
+  "en": "No one else in this league yet this week.",
+  "src": "UIStrings.cs"
+ },
+ "Hesab": {
+  "en": "Account",
+  "src": "UIStrings.cs"
+ },
+ "HESABDAN ÇIX": {
+  "en": "SIGN OUT",
+  "src": "UIStrings.cs"
+ },
+ "Hesabdan çıxırsan?": {
+  "en": "Sign out?",
+  "src": "UIStrings.cs"
+ },
+ "İrəliləyişin hesabında saxlanılıb. Davam etmək üçün yenidən daxil ol.": {
+  "en": "Your progress is saved in your account. Sign in again to continue.",
+  "src": "UIStrings.cs"
+ },
+ "Statistika": {
+  "en": "Statistics",
+  "src": "UIStrings.cs"
+ },
+ "Günlük seriya": {
+  "en": "Day Streak",
+  "src": "UIStrings.cs"
+ },
+ "Ümumi XP": {
+  "en": "Total XP",
+  "src": "UIStrings.cs"
+ },
+ "Səviyyə": {
+  "en": "Level",
+  "src": "UIStrings.cs"
+ },
+ "Öyrənilən işarə": {
+  "en": "Signs Learned",
+  "src": "UIStrings.cs"
+ },
+ "Dostlar": {
+  "en": "Friends",
+  "src": "UIStrings.cs"
+ },
+ "Birlikdə öyrənmək daha maraqlıdır!": {
+  "en": "Learning together is more fun!",
+  "src": "UIStrings.cs"
+ },
+ "Dostlarını dəvət et və seriyanı paylaş.": {
+  "en": "Invite friends and share your streak.",
+  "src": "UIStrings.cs"
+ },
+ "Dostları dəvət et": {
+  "en": "Invite friends",
+  "src": "UIStrings.cs"
+ },
+ "Chevir ilə Azərbaycan İşarə Dilini öyrənirəm. Seriyam: {0} gün! Sən də qoşul: {1}": {
+  "en": "I'm learning Azerbaijani Sign Language with Chevir. My streak: {0} days! Join me: {1}",
+  "src": "UIStrings.cs"
+ },
+ "Dəvət linki kopyalandı": {
+  "en": "Invite link copied",
+  "src": "UIStrings.cs"
+ },
+ "YADDA SAXLA": {
+  "en": "SAVE",
+  "src": "UIStrings.cs"
+ },
+ "Tətbiqin dili": {
+  "en": "App language",
+  "src": "UIStrings.cs"
+ },
+ "İşarə əli": {
+  "en": "Signing hand",
+  "src": "UIStrings.cs"
+ },
+ "Sağ": {
+  "en": "Right",
+  "src": "UIStrings.cs"
+ },
+ "Azərbaycan İşarə Dilini öyrən": {
+  "en": "Learn Azerbaijani Sign Language",
+  "src": "UIStrings.cs"
+ },
+ "Daxil ol": {
+  "en": "Sign in",
+  "src": "UIStrings.cs"
+ },
+ "Hesab yarat": {
+  "en": "Create an account",
+  "src": "UIStrings.cs"
+ },
+ "DAXİL OL": {
+  "en": "SIGN IN",
+  "src": "UIStrings.cs"
+ },
+ "HESAB YARAT": {
+  "en": "CREATE ACCOUNT",
+  "src": "UIStrings.cs"
+ },
+ "Hesabın yoxdur? Yarat": {
+  "en": "No account yet? Create one",
+  "src": "UIStrings.cs"
+ },
+ "Hesabın var? Daxil ol": {
+  "en": "Already have an account? Sign in",
+  "src": "UIStrings.cs"
+ },
+ "Şifrəni unutmusan?": {
+  "en": "Forgot password?",
+  "src": "UIStrings.cs"
+ },
+ "E-poçtuna 6 rəqəmli kod göndərdik. Kodu və yeni şifrəni yaz.": {
+  "en": "We e-mailed you a 6-digit code. Enter it and a new password.",
+  "src": "UIStrings.cs"
+ },
+ "Hesab yaradıldı. E-poçtuna göndərilən linki aç, sonra daxil ol.": {
+  "en": "Account created. Open the link we sent to your e-mail, then sign in.",
+  "src": "UIStrings.cs"
+ },
+ "Adını yaz.": {
+  "en": "Enter your name.",
+  "src": "UIStrings.cs"
+ },
+ "Ləqəbini / ən tanınan xüsusiyyətini seç.": {
+  "en": "Pick your nickname or best-known feature.",
+  "src": "UIStrings.cs"
+ },
+ "E-poçtunu yaz.": {
+  "en": "Enter your e-mail.",
+  "src": "UIStrings.cs"
+ },
+ "Şifrə ən azı 6 simvol olmalıdır.": {
+  "en": "The password must be at least 6 characters.",
+  "src": "UIStrings.cs"
+ },
+ "Gözlə...": {
+  "en": "Please wait...",
+  "src": "UIStrings.cs"
+ },
+ "Sol": {
+  "en": "Left",
+  "src": "UIStrings.cs"
+ },
+ "Bildirişlərə icazə verilmədi. Telefonun Ayarlar > Tətbiqlər > Chevir > Bildirişlər bölməsində aç.": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Bildirişlərə icazə verilmədi": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Xatırlatmalar {0} aralığında gələcək": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Xatırlatmalar söndürüldü": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "AÇIQ": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Xatırlatmalar: <b>{0}</b> və <b>{1}</b>.\nAlovun varsa və həmin gün dərs keçməmisənsə, <b>{2}</b>-da bir dəfə də xatırladacağıq.": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Xatırlatmalar söndürülüb. Seriyanı özün izləməli olacaqsan.": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Bildirişlər": {
+  "en": "Notifications",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "Gün ərzində hansı saatlarda məşq edə bilərsən?": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Seçdiyin saat aralığında sənə 30 dəqiqə arayla 2 xatırlatma göndərəcəyik ki, dərsi unutmayasan.": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Gündəlik xatırlatmalar": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Hazır aralıqlar": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Və ya özün seç": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Başlanğıc": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Son": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "İNDİ YOX": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Səhər": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Günorta": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Axşam": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Gecə": {
+  "en": null,
+  "src": "ReminderSettingsUI.cs"
+ },
+ "Yeni şifrə": {
+  "en": null,
+  "src": "AuthScreenUI.cs"
+ },
+ "Ləqəbin: ": {
+  "en": null,
+  "src": "AuthScreenUI.cs"
+ },
+ "Ləqəbin / ən tanınan xüsusiyyətin: seç": {
+  "en": null,
+  "src": "AuthScreenUI.cs"
+ },
+ "Şifrə": {
+  "en": "Password",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "ŞİFRƏNİ YENİLƏ": {
+  "en": null,
+  "src": "AuthScreenUI.cs"
+ },
+ "Daxil olmağa qayıt": {
+  "en": null,
+  "src": "AuthScreenUI.cs"
+ },
+ "E-poçtuna gələn kodu yaz.": {
+  "en": null,
+  "src": "AuthScreenUI.cs"
+ },
+ "Ləqəbin / ən tanınan xüsusiyyətin nədir?": {
+  "en": null,
+  "src": "NameSignPickerUI.cs"
+ },
+ "Ləqəb": {
+  "en": null,
+  "src": "NameSignPickerUI.cs"
+ },
+ "Karlar bir-birini adla yox, ləqəb və ya ən tanınan xüsusiyyətlə çağırır. Sənə ən uyğun olanı seç: hekayələrdə bu işarəni göstərəcəksən.": {
+  "en": null,
+  "src": "NameSignPickerUI.cs"
+ },
+ "Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et": {
+  "en": null,
+  "src": "DataConsentUI.cs"
+ },
+ "Kamera qarşısında işarə göstərəndə Chevir bu cəhdi saxlaya bilər: əlinin, üzünün və bədəninin nöqtələri və 3 saniyəlik kiçik video. Bunlarla Chevir işarə dilini daha yaxşı tanımağı öyrənir. Məlumatlar yalnız Chevir komandasında qalır, heç kimə göstərilmir. İstədiyin vaxt Hesab ayarlarından söndürə bilərsən.": {
+  "en": null,
+  "src": "DataConsentUI.cs"
+ },
+ "Təşəkkürlər! Chevir-i birlikdə inkişaf etdiririk": {
+  "en": null,
+  "src": "DataConsentUI.cs"
+ },
+ "Yadda saxlandı": {
+  "en": null,
+  "src": "DataConsentUI.cs"
+ },
+ "İCAZƏ VER": {
+  "en": null,
+  "src": "DataConsentUI.cs"
+ },
+ "İCAZƏ VERMƏ": {
+  "en": null,
+  "src": "DataConsentUI.cs"
+ },
+ "Hazırkı: ": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "TƏSDİQLƏ: HESABI SİL": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "HESABI SİL": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Açıq": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Bağlı": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Şəkil açıla bilmədi. Başqa şəkil seç.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Profil şəkli seç": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Şəkil seçmək telefonda işləyir.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Şəkil yadda saxlandı.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Şəkil yüklənir...": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Profil şəkli yeniləndi.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Profil şəkli silindi.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Məlumatlar yadda saxlandı.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Seç": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Yeni e-poçt ünvanını düzgün yaz.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Təsdiq linki {0} ünvanına göndərildi. Linki açandan sonra e-poçt dəyişəcək.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "E-poçt dəyişdirildi.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Şifrələr eyni deyil.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Şifrə dəyişdirildi.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Təşəkkürlər! Cəhdlərin Chevir-i inkişaf etdirməyə kömək edəcək.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Söndürüldü. Əvvəl saxlanan cəhdlərin silindi.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Hesabın və bütün irəliləyişin həmişəlik silinəcək. Əminsənsə, bir daha bas.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Hesab ayarları": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "ŞƏKLİ DƏYİŞ": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "SİL": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Şəxsi məlumatlar": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Ləqəbin / ən tanınan xüsusiyyətin": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Görünüş": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "GÜNDÜZ": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "GECƏ": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "AYARLA": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Kamerada göstərdiyin işarələrin nöqtələri və 3 saniyəlik kiçik video saxlanılır ki, Chevir işarə dilini daha yaxşı tanısın. Söndürəndə əvvəl saxlananlar da silinir.": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "İcazə verirəm": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "İcazə vermirəm": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "E-poçt": {
+  "en": "E-mail",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "Yeni e-poçt": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "E-POÇTU DƏYİŞ": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Şifrəni dəyiş": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Yeni şifrə (ən azı 6 simvol)": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Yeni şifrəni təkrar yaz": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "ŞİFRƏNİ DƏYİŞ": {
+  "en": null,
+  "src": "AccountSettingsUI.cs"
+ },
+ "Aysel səni necə çağıracağını bilsin.": {
+  "en": "So Aysel knows what to call you.",
+  "src": "StoryScreenUI.cs"
+ },
+ "Hər gün {0} aralığında xatırladırıq": {
+  "en": null,
+  "src": "ProfileScreenUI.cs"
+ },
+ "Xatırlatmalar bağlıdır": {
+  "en": null,
+  "src": "ProfileScreenUI.cs"
+ },
+ "dost": {
+  "en": "friend",
+  "src": "StorySession.cs"
+ },
+ "Eynək": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Hündür": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Alçaq": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Uzun": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Qısa": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Balaca": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Kök": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Arıq": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Güclü": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Saç": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Saç hörüyü": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Saqqal": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Keçəl": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Çillər": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Qaş": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Kirpik": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Göz": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Burun": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Qulaq": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Dodaq": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Diş": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Gözəl": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Yaraşıqlı": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Solaxay": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Əkiz": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Tatu": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Geyim və aksesuar": {
+  "en": null,
+  "src": "namesign-group"
+ },
+ "Papaq": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Şlyapa": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Kepka": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Şərf": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Qalstuk": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Sırğa": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Üzük": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Bilərzik": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Saat": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Çanta": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Ətir": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Xasiyyət": {
+  "en": null,
+  "src": "namesign-group"
+ },
+ "Gülümsəmək": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Gülmək": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Şən": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Sakit": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Mehriban": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Utancaq": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Cəsur": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Ciddi": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Zarafat": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Sevimli": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Şirin": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Çalışqan": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Tez": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Maraq və peşə": {
+  "en": null,
+  "src": "namesign-group"
+ },
+ "Futbol": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Basketbol": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Voleybol": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Şahmat": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Boks": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Karate": {
+  "en": null,
+  "src": "namesign"
+ },
+ "İdman": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Gitara": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Mahnı": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Rəssam": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Aşpaz": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Həkim": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Müəllim": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Kitab": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Telefon": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Kompüter": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Velosiped": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Çiçək": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Şokolad": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Çay": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Qəhvə": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Heyvanlar": {
+  "en": null,
+  "src": "namesign-group"
+ },
+ "Pişik": {
+  "en": null,
+  "src": "namesign"
+ },
+ "İt": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Dovşan": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Ayı": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Aslan": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Meymun": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Fil": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Quş": {
+  "en": null,
+  "src": "namesign"
+ },
+ "At": {
+  "en": null,
+  "src": "namesign"
+ },
+ "Canavar": {
+  "en": null,
+  "src": "namesign"
+ },
+ "İnternet bağlantısı yoxdur. Yoxla və yenidən cəhd et.": {
+  "en": "No internet connection. Check it and try again.",
+  "src": "CloudErrors.cs"
+ },
+ "Zəhmət olmasa yenidən daxil ol.": {
+  "en": "Please sign in again.",
+  "src": "CloudErrors.cs"
+ },
+ "Xəta baş verdi. Yenidən cəhd et.": {
+  "en": "Something went wrong. Try again.",
+  "src": "CloudErrors.cs"
+ },
+ "E-poçt və ya şifrə səhvdir.": {
+  "en": "Wrong e-mail or password.",
+  "src": "CloudErrors.cs"
+ },
+ "Əvvəlcə e-poçtunu təsdiqlə (poçt qutuna bax).": {
+  "en": "Confirm your e-mail first (check your inbox).",
+  "src": "CloudErrors.cs"
+ },
+ "Bu e-poçtla hesab artıq var. Daxil ol.": {
+  "en": "An account with this e-mail already exists. Sign in instead.",
+  "src": "CloudErrors.cs"
+ },
+ "E-poçt ünvanını yoxla.": {
+  "en": "Check the e-mail address.",
+  "src": "CloudErrors.cs"
+ },
+ "Çox cəhd oldu. Bir dəqiqə gözlə və yenidən yoxla.": {
+  "en": "Too many attempts. Wait a minute and try again.",
+  "src": "CloudErrors.cs"
+ },
+ "Hazırda yeni hesab açmaq bağlıdır.": {
+  "en": "New accounts are closed right now.",
+  "src": "CloudErrors.cs"
+ },
+ "Yeni şifrə köhnəsindən fərqli olmalıdır.": {
+  "en": "The new password must be different from the old one.",
+  "src": "CloudErrors.cs"
+ },
+ "Kod səhvdir və ya vaxtı keçib. Yenisini istə.": {
+  "en": "The code is wrong or has expired. Request a new one.",
+  "src": "CloudErrors.cs"
+ },
+ "Hesabdan çıx, yenidən daxil ol, sonra şifrəni dəyiş.": {
+  "en": "Sign out and sign in again, then change the password.",
+  "src": "CloudErrors.cs"
+ },
+ "Sən": {
+  "en": "You",
+  "src": "League.cs"
+ },
+ "ÖYRƏNMƏ YOLU": {
+  "en": "LEARNING PATH",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "SIRALAMA": {
+  "en": "RANKING",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "Zirvəyə ilk addım!": {
+  "en": "First step to the top!",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "Dərsləri tamamla, XP topla və liqada yerini qoru.": {
+  "en": "Finish lessons, earn XP and keep your place in the league.",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "Ad və soyad": {
+  "en": "Name and surname",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "Karlar bir-birini ləqəb və ya ən tanınan xüsusiyyətlə çağırır: məs. eynək, saqqal, gülümsəmək.": {
+  "en": "Deaf people call each other by a nickname or best-known feature, e.g. glasses, a beard, a smile.",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "E-poçta gələn 6 rəqəmli kod": {
+  "en": "6-digit code from the e-mail",
+  "src": "CevirUIBuilder.Screens.cs"
+ },
+ "Aysel": {
+  "en": "Aysel",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Salam! Karlar bir-birinin adını hərf-hərf demir: bir-birimizi ləqəb və ya ən tanınan xüsusiyyətlə çağırırıq.": {
+  "en": "Hello! Deaf people don't spell each other's names: we call each other by a nickname or best-known feature.",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Sənin ləqəbin / ən tanınan xüsusiyyətin nədir?": {
+  "en": "What is your nickname / best-known feature?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "«{namesign}» işarəsini göstər": {
+  "en": "Sign \"{namesign}\"",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Tanış olduğuma şadam, {name}!": {
+  "en": "Nice to meet you, {name}!",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Əlifba": {
+  "en": "Alphabet",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Salamlaşma və tanışlıq": {
+  "en": "Greetings & Introductions",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Əvəzliklər və sadə cümlələr": {
+  "en": "Pronouns & Basic Sentences",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Sual sözləri": {
+  "en": "Question Words",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Ailə və insanlar": {
+  "en": "Family & People",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Rəqəmlər və sayma": {
+  "en": "Numbers & Counting",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Zaman və cədvəl": {
+  "en": "Time & Schedules",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Gündəlik əşyalar və rənglər": {
+  "en": "Daily Objects & Colors",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Vacib yerlər": {
+  "en": "Essential Places",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "A1 təkrar və yekun imtahan": {
+  "en": "A1 Review & Final Checkpoint",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Hər hərfi əsas əlinlə, çiyin hündürlüyündə, ovucu qarşı tərəfə göstər.": {
+  "en": "Show each letter with your dominant hand at shoulder height, palm towards the viewer.",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Bütün səviyyəni təkrarla, sonra A2-yə keçmək üçün imtahanı (20 təsadüfi işarə, 80% düzgün) keç.": {
+  "en": "Review the whole level, then pass the checkpoint (20 random signs, 80% correct) to enter A2.",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Salam və sağollaşma": {
+  "en": "Hello and goodbye",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Salam": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Sabahınız xeyir": {
+  "en": "Good morning",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Axşamınız xeyir": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Gecəniz xeyrə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Görüşərik": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Necəsən?": {
+  "en": "How are you?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Necəsən": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Yaxşı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Pis": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Sağ ol": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Adım...": {
+  "en": "My name is...",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Mənim adım ...": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Sənin adın nədir?": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Tanışlıq": {
+  "en": "Getting acquainted",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Tanış olmaq": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Şad olmaq": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Tanış olduğuma şadam": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Nəzakət sözləri": {
+  "en": "Polite words",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Xahiş edirəm": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bağışlayın": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Mən, sən, o": {
+  "en": "I, you, he/she",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Mən/mənim": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Sən/sənin": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Biz, siz, onlar": {
+  "en": "We, you, they",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Biz": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Siz": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Onlar": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bəli və xeyr": {
+  "en": "Yes and no",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Bəli": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Xeyr": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Var və yox": {
+  "en": "There is, there isn't",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Var": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Yox": {
+  "en": null,
+  "src": "gloss"
+ },
+ "İstəmək və bilmək": {
+  "en": "To want and to know",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "İstəmək": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bilmək": {
+  "en": null,
+  "src": "gloss"
+ },
+ "İlk cümlələr": {
+  "en": "First sentences",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Bilmirəm": {
+  "en": null,
+  "src": "gloss"
+ },
+ "İstəmirəm": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Sən bilirsən?": {
+  "en": "Do you know?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Nə? Kim?": {
+  "en": "What? Who?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Nə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Kim": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Harada? Nə vaxt?": {
+  "en": "Where? When?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Harada": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Nə vaxt": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Niyə? Necə?": {
+  "en": "Why? How?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Niyə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Necə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Neçə? Hansı?": {
+  "en": "How many? Which?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Neçə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Hansı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Sual cümlələri": {
+  "en": "Questions",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "O kimdir?": {
+  "en": "Who is that?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Sən haradasan?": {
+  "en": "Where are you?",
+  "src": "story"
+ },
+ "Bu nədir?": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Ana, ata, ailə": {
+  "en": "Mother, father, family",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Ana": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Ata": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Ailə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Qardaş, bacı, uşaq": {
+  "en": "Brother, sister, child",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Qardaş": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bacı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Uşaq": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Nənə, baba, körpə": {
+  "en": "Grandparents, baby",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Nənə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Baba": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Körpə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Kişi, qadın, oğlan, qız": {
+  "en": "Man, woman, boy, girl",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Kişi": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Qadın": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Oğlan": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Qız": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Dost, müəllim, həyat yoldaşı": {
+  "en": "Friend, teacher, spouse",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Dost": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Həyat yoldaşı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Mənim ailəm": {
+  "en": "My family",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Bu mənim anamdır": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Mənim bir qardaşım var": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Sənin bacın varmı?": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Onluqlar": {
+  "en": "Tens",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Böyük rəqəmlər": {
+  "en": "Big numbers",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "İndi, əvvəl, sonra": {
+  "en": "Now, before, after",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "İndi": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Əvvəl": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Sonra": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bu gün": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Günün hissələri": {
+  "en": "Parts of the day",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Gün, həftə, ay, il": {
+  "en": "Day, week, month, year",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Gün": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Həftə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Ay": {
+  "en": null,
+  "src": "gloss"
+ },
+ "İl": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Həftənin günləri 1": {
+  "en": "Days of the week 1",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Bazar ertəsi": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Çərşənbə axşamı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Çərşənbə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Cümə axşamı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Həftənin günləri 2": {
+  "en": "Days of the week 2",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Cümə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Şənbə": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bazar": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Saat neçədir?": {
+  "en": "What time is it?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Saat beşdir": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Rənglər 1": {
+  "en": "Colours 1",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Rəng": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Qırmızı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Mavi": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Yaşıl": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Rənglər 2": {
+  "en": "Colours 2",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Sarı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Qəhvəyi": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bənövşəyi": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Çəhrayı": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Məktəb əşyaları": {
+  "en": "School things",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Dəftər": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Qələm": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Evdə əşyalar": {
+  "en": "Things at home",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Açar": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Masa": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Stul": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Su, çörək, çay": {
+  "en": "Water, bread, tea",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Su": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Çörək": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Rəng + əşya": {
+  "en": "Colour + thing",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Qırmızı çanta": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bu kitabdır": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Telefonum yoxdur": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Ev, məktəb, iş": {
+  "en": "Home, school, work",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Ev": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Məktəb": {
+  "en": null,
+  "src": "gloss"
+ },
+ "İş": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Universitet": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Mağaza, kafe, bank": {
+  "en": "Shop, café, bank",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Mağaza": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Kafe": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Bank": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Xəstəxana, aptek, polis": {
+  "en": "Hospital, pharmacy, police",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Xəstəxana": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Aptek": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Polis": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Avtobus, metro, harada?": {
+  "en": "Bus, metro, where?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Avtobus": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Metro": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Mən evdəyəm": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Aptek haradadır?": {
+  "en": null,
+  "src": "gloss"
+ },
+ "Salam, mənim adım...": {
+  "en": "Hello, my name is...",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Ailəmlə tanış ol": {
+  "en": "Meet my family",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Neçə?": {
+  "en": "How many?",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Məktəb çantası": {
+  "en": "My school bag",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Şəhərdə gəzinti": {
+  "en": "A walk around the city",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "A1 bitdi!": {
+  "en": "A1 is done!",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Əlifba təkrarı": {
+  "en": "Alphabet review",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Salamlaşma və əvəzliklər": {
+  "en": "Greetings and pronouns",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Suallar və ailə": {
+  "en": "Questions and family",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Rəqəmlər və zaman": {
+  "en": "Numbers and time",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "Əşyalar və yerlər": {
+  "en": "Things and places",
+  "src": "AzSLDPackBootstrapper.cs"
+ },
+ "AZ text": {
+  "en": "EN text",
+  "src": "story"
+ },
+ "sign": {
+  "en": null,
+  "src": "gloss"
+ },
+ "AZ instruction": {
+  "en": "EN instruction",
+  "src": "story"
+ },
+ "expected sign": {
+  "en": null,
+  "src": "gloss"
+ },
+ "AZ": {
+  "en": "EN",
+  "src": "story"
+ },
+ "Sabahınız xeyir! Necəsən?": {
+  "en": "Good morning! How are you?",
+  "src": "story"
+ },
+ "«Yaxşı» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Sağ ol! Görüşərik!": {
+  "en": "Thank you! See you!",
+  "src": "story"
+ },
+ "«Görüşərik» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Salam! Sən bilirsən?": {
+  "en": "Hi! Do you know?",
+  "src": "story"
+ },
+ "«Bilmirəm» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "O bilir. Onlar da bilir.": {
+  "en": "He knows. They know too.",
+  "src": "story"
+ },
+ "«Bəli» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "«Kim» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "«Harada» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Nə vaxt görüşərik?": {
+  "en": "When shall we meet?",
+  "src": "story"
+ },
+ "Bu mənim anamdır.": {
+  "en": "This is my mother.",
+  "src": "story"
+ },
+ "«Ana» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Mənim bir qardaşım var. Sənin bacın varmı?": {
+  "en": "I have a brother. Do you have a sister?",
+  "src": "story"
+ },
+ "Ailə yaxşıdır!": {
+  "en": "Family is good!",
+  "src": "story"
+ },
+ "Salam! Neçə? Üç!": {
+  "en": "Hi! How many? Three!",
+  "src": "story"
+ },
+ "«3» rəqəmini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Bəs on neçədir?": {
+  "en": "And ten?",
+  "src": "story"
+ },
+ "«10» rəqəmini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Sağ ol!": {
+  "en": "Thank you!",
+  "src": "story"
+ },
+ "Saat beşdir: «5» rəqəmini göstər": {
+  "en": "It is five o'clock: sign \\",
+  "src": "story"
+ },
+ "Bu gün cümədir. Axşam görüşərik?": {
+  "en": "Today is Friday. See you in the evening?",
+  "src": "story"
+ },
+ "Bu kitabdır.": {
+  "en": "This is a book.",
+  "src": "story"
+ },
+ "«Kitab» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Qırmızı çanta. Telefonum yoxdur!": {
+  "en": "A red bag. I don't have my phone!",
+  "src": "story"
+ },
+ "«Telefon» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Sağ ol! Su?": {
+  "en": "Thank you! Water?",
+  "src": "story"
+ },
+ "«Çay» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Bağışlayın, aptek haradadır?": {
+  "en": "Excuse me, where is the pharmacy?",
+  "src": "story"
+ },
+ "«Aptek» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Avtobus? Metro?": {
+  "en": "Bus? Metro?",
+  "src": "story"
+ },
+ "«Metro» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Sağ ol! Mən evdəyəm, görüşərik.": {
+  "en": "Thanks! I'm at home, see you.",
+  "src": "story"
+ },
+ "Salam! Necəsən?": {
+  "en": "Hi! How are you?",
+  "src": "story"
+ },
+ "Tanış olduğuma şadam, {name}! Sən bilirsən!": {
+  "en": "Nice to meet you, {name}! You know it!",
+  "src": "story"
+ },
+ "«Sağ ol» işarəsini göstər": {
+  "en": "Sign \\",
+  "src": "story"
+ },
+ "Başlanğıc: əlifba, salamlaşma və gündəlik sözlər": {
+  "en": "Beginner: alphabet, greetings and everyday words",
+  "src": "AzSLDPackBootstrapper.cs"
+ }
+}

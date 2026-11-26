@@ -11,6 +11,8 @@ namespace Cevir.Core.UI
     {
         [SerializeField] private Button button;
         [SerializeField] private Image background;
+        [Tooltip("The story's own pixel scene, cropped into the square on the left.")]
+        [SerializeField] private Image sceneArt;
         [SerializeField] private Image numberBox;
         [SerializeField] private TextMeshProUGUI numberLabel;
         [SerializeField] private TextMeshProUGUI titleLabel;
@@ -35,6 +37,13 @@ namespace Cevir.Core.UI
             bool playable = entry.Story.IsPlayable;
 
             if (background != null) background.color = Color.white;
+            if (sceneArt != null)
+            {
+                sceneArt.sprite = entry.Story.Background;
+                sceneArt.enabled = entry.Story.Background != null;
+                // Locked scenes are shown dimmed: you can see where the story happens, not yet go there.
+                sceneArt.color = locked ? new Color(0.55f, 0.6f, 0.7f, 1f) : Color.white;
+            }
             if (numberBox != null)
             {
                 numberBox.sprite = locked ? theme.panel : theme.tileGradient;

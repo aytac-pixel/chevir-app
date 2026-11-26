@@ -52,6 +52,12 @@ namespace Cevir.Core.LanguagePacks
 
         public string SignId => signId;
         public string Gloss => gloss;
+
+        /// <summary>
+        /// The meaning shown to the learner: the gloss itself in Azerbaijani, its translation in the English and
+        /// Russian interface. Letters and numbers stay as they are. <see cref="Gloss"/> stays the recognition key.
+        /// </summary>
+        public string DisplayGloss => Localization.Loc.T(gloss);
         public SignKind Kind => kind;
         public string Category => category;
         public string SimilarityGroup => similarityGroup;

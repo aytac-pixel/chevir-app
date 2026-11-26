@@ -302,7 +302,14 @@ namespace Cevir.Core.Editor
             face.type = Image.Type.Simple;
             Place(face.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(164f, 164f));
             Image icon = Img(rt, "Icon", theme.iconBook, Color.white);
-            Place(icon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(80f, 80f));
+            Place(icon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(96f, 96f));
+
+            // Padlock badge on a locked tile's top-right corner.
+            Image lockBadge = Img(rt, "LockBadge", Panel(24), UIPalette.Surface, true);
+            Place(lockBadge.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(52f, 52f), new Vector2(56f, 56f));
+            Image lockGlyph = Img(lockBadge.transform, "Lock", theme.iconLock, UIPalette.TextSecondary);
+            Place(lockGlyph.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(30f, 30f));
+            lockBadge.gameObject.SetActive(false);
 
             // Caption above: "UNIT 2" and the title (up to two lines), growing upward.
             RectTransform caption = Rect("Caption", rt);
@@ -338,6 +345,7 @@ namespace Cevir.Core.Editor
             Set(node, "startPill", pill.gameObject);
             Set(node, "startLabel", startLabel);
             Set(node, "entranceLabel", entrance);
+            Set(node, "lockBadge", lockBadge.gameObject);
             return SavePrefab(root, "UnitNode").GetComponent<UnitNodeUI>();
         }
 
@@ -398,14 +406,25 @@ namespace Cevir.Core.Editor
             HardShadow(root);
             Button button = root.AddComponent<Button>();
             button.targetGraphic = background;
-            Layout(root, preferredHeight: 176f, minHeight: 176f);
+            Layout(root, preferredHeight: 196f, minHeight: 196f);
 
             HorizontalLayoutGroup row = Row(root, 30f);
-            row.padding = new RectOffset(32, 32, 0, 0);
+            row.padding = new RectOffset(28, 32, 0, 0);
 
-            Image numberBox = Img(rt, "NumberBox", Panel(24), Color.white, true);
-            Layout(numberBox.gameObject, preferredWidth: 90f, preferredHeight: 90f);
-            TextMeshProUGUI number = Text(numberBox.transform, "Number", "1", 40f, UIPalette.Ink, TextAlignmentOptions.Center, true);
+            // The story's pixel scene in a bordered square, the story number on a small tag at its corner.
+            Image frame = Img(rt, "Scene", Panel(24), UIPalette.Ink, true);
+            Layout(frame.gameObject, preferredWidth: 144f, preferredHeight: 144f).minWidth = 144f;
+            RectTransform window = Rect("Window", frame.transform);
+            Stretch(window, 6f, 6f, 6f, 6f);
+            window.gameObject.AddComponent<RectMask2D>();
+            Image sceneArt = Img(window, "Art", Sprite("Story", "story_bg_01"), Color.white);
+            sceneArt.preserveAspect = false;
+            // 216 x 384 scene shown 132 wide: the sky, the place and the horizon, cropped above the ground.
+            Place(sceneArt.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, 40f), new Vector2(132f, 235f));
+
+            Image numberBox = Img(frame.transform, "NumberBox", Panel(24), Color.white, true);
+            Place(numberBox.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(-10f, -10f), new Vector2(60f, 60f));
+            TextMeshProUGUI number = Text(numberBox.transform, "Number", "1", 32f, UIPalette.Ink, TextAlignmentOptions.Center, true);
             Stretch(number.rectTransform);
 
             RectTransform texts = Rect("Texts", rt);
@@ -425,6 +444,7 @@ namespace Cevir.Core.Editor
             StoryCardUI card = root.AddComponent<StoryCardUI>();
             Set(card, "button", button);
             Set(card, "background", background);
+            Set(card, "sceneArt", sceneArt);
             Set(card, "numberBox", numberBox);
             Set(card, "numberLabel", number);
             Set(card, "titleLabel", title);
@@ -782,6 +802,21 @@ namespace Cevir.Core.Editor
                 UIPalette.TextSecondary, TextAlignmentOptions.Center, false);
             Layout(tagline.gameObject, preferredHeight: 60f);
 
+            // Interface language, chosen before signing up (AZ / EN / RU).
+            RectTransform languages = Rect("Languages", content);
+            HorizontalLayoutGroup languageRow = Row(languages.gameObject, 18f, TextAnchor.MiddleCenter);
+            languageRow.childForceExpandWidth = false;
+            Layout(languages.gameObject, preferredHeight: 84f);
+            string[] codes = { "AZ", "EN", "RU" };
+            var languageButtons = new Button[codes.Length];
+            for (int i = 0; i < codes.Length; i++)
+            {
+                TextMeshProUGUI codeLabel;
+                languageButtons[i] = MakeButton(languages, "Language_" + codes[i], codes[i], UIPalette.Surface, UIPalette.TextSecondary, 80f, out codeLabel);
+                codeLabel.fontSize = 32f;
+                Layout(languageButtons[i].gameObject, preferredWidth: 150f, preferredHeight: 80f, minHeight: 80f);
+            }
+
             Image card = Glass(content, "Card", 48, Color.white);
             Column(card.gameObject, 52, 24f);
             TextMeshProUGUI title = Text(card.transform, "Title", "Create an account", 52f, UIPalette.TextPrimary, TextAlignmentOptions.Center, true);
@@ -828,6 +863,11 @@ namespace Cevir.Core.Editor
             Set(ui, "switchLabel", switchLabel);
             Set(ui, "forgotButton", forgot);
             Set(ui, "messageLabel", message);
+            var authSo = new UnityEditor.SerializedObject(ui);
+            UnityEditor.SerializedProperty languageList = authSo.FindProperty("languageButtons");
+            languageList.arraySize = languageButtons.Length;
+            for (int i = 0; i < languageButtons.Length; i++) languageList.GetArrayElementAtIndex(i).objectReferenceValue = languageButtons[i];
+            authSo.ApplyModifiedPropertiesWithoutUndo();
             return ui;
         }
 

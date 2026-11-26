@@ -68,10 +68,12 @@ namespace Cevir.Core.Social
 
         private static readonly string[] En = { "Bronze", "Silver", "Gold", "Sapphire", "Diamond" };
         private static readonly string[] Az = { "Bürünc", "Gümüş", "Qızıl", "Sapfir", "Almaz" };
+        private static readonly string[] Ru = { "Бронза", "Серебро", "Золото", "Сапфир", "Алмаз" };
+        private static readonly string[] RuLeague = { "Бронзовая лига", "Серебряная лига", "Золотая лига", "Сапфировая лига", "Алмазная лига" };
 
         public static int Clamp(int tier, int tierCount) => Mathf.Clamp(tier, 0, Mathf.Max(0, Mathf.Min(tierCount, En.Length) - 1));
-        public static string Name(int tier) => Loc.Pick(En[Clamp(tier, En.Length)], Az[Clamp(tier, Az.Length)]);
-        public static string LeagueName(int tier) => Loc.Pick(Name(tier) + " League", Name(tier) + " Liqası");
+        public static string Name(int tier) => Loc.Pick(En[Clamp(tier, En.Length)], Az[Clamp(tier, Az.Length)], Ru[Clamp(tier, Ru.Length)]);
+        public static string LeagueName(int tier) => Loc.Pick(Name(tier) + " League", Name(tier) + " Liqası", RuLeague[Clamp(tier, RuLeague.Length)]);
         public static Color Color(int tier) => Colors[Clamp(tier, Colors.Length)];
     }
 
@@ -150,11 +152,13 @@ namespace Cevir.Core.Social
             if (left.TotalDays >= 1)
             {
                 int days = (int)Math.Floor(left.TotalDays);
-                return Loc.Pick(days == 1 ? "1 day left" : days + " days left", days + " gün qalıb");
+                return Loc.Pick(days == 1 ? "1 day left" : days + " days left", days + " gün qalıb",
+                    Loc.RussianPlural(days, "Остался {0} день", "Осталось {0} дня", "Осталось {0} дней"));
             }
 
             int hours = Math.Max(1, (int)Math.Ceiling(left.TotalHours));
-            return Loc.Pick(hours == 1 ? "1 hour left" : hours + " hours left", hours + " saat qalıb");
+            return Loc.Pick(hours == 1 ? "1 hour left" : hours + " hours left", hours + " saat qalıb",
+                Loc.RussianPlural(hours, "Остался {0} час", "Осталось {0} часа", "Осталось {0} часов"));
         }
 
         public static string InitialsOf(string name)

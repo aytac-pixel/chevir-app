@@ -1,3 +1,4 @@
+using Cevir.Core.Localization;
 using Cevir.Core.Cloud;
 using Cevir.Core.Game;
 using TMPro;
@@ -46,6 +47,9 @@ namespace Cevir.Core.UI
         private bool _deleteArmed;
         private bool _busy;
         private Texture2D _photoTexture;
+        private Button _dayTheme;
+        private Button _nightTheme;
+        private Button[] _languageButtons = new Button[0];
 
         public static AccountSettingsUI Instance { get; private set; }
 
@@ -55,10 +59,14 @@ namespace Cevir.Core.UI
             Build();
             _panel.SetActive(false);
             AvatarStore.Changed += ShowLocalPhoto;
+            Loc.LanguageChanged += Rebuild;
+            ThemeManager.Changed += Render;
         }
 
         private void OnDestroy()
         {
+            Loc.LanguageChanged -= Rebuild;
+            ThemeManager.Changed -= Render;
             AvatarStore.Changed -= ShowLocalPhoto;
             if (Instance == this) Instance = null;
         }
@@ -89,6 +97,22 @@ namespace Cevir.Core.UI
             _panel.SetActive(false);
         }
 
+        /// <summary>Content is built once in the interface language; a new language builds it again.</summary>
+        private void Rebuild(string language)
+        {
+            bool open = IsOpen;
+            if (_panel != null) Destroy(_panel);
+            Build();
+            _panel.SetActive(false);
+            if (open) Open();
+        }
+
+        private void SetLanguage(string code)
+        {
+            if (GameManager.Instance != null) GameManager.Instance.SetUiLanguage(code);
+            else Loc.SetLanguage(code);
+        }
+
         private void OnEnable()
         {
             ReminderRefresh();
@@ -102,6 +126,7 @@ namespace Cevir.Core.UI
 
         private void Render()
         {
+            if (_panel == null) return;
             CloudService cloud = CloudService.Instance;
             bool signedIn = cloud != null && cloud.State == CloudState.SignedIn;
             _emailCard.SetActive(signedIn);
@@ -111,8 +136,11 @@ namespace Cevir.Core.UI
             bool consent = GameManager.Instance != null && GameManager.Instance.Progress.dataConsent;
             UIKit.Select(_dataOn, consent);
             UIKit.Select(_dataOff, !consent);
-            _emailCurrent.text = signedIn ? "Hazırkı: <b>" + cloud.Email + "</b>" : string.Empty;
-            _deleteLabel.text = _deleteArmed ? "TƏSDİQLƏ: HESABI SİL" : "HESABI SİL";
+            _emailCurrent.text = signedIn ? Loc.T("Hazırkı: ") + "<b>" + cloud.Email + "</b>" : string.Empty;
+            _deleteLabel.text = _deleteArmed ? Loc.T("TƏSDİQLƏ: HESABI SİL") : Loc.T("HESABI SİL");
+            UIKit.Select(_dayTheme, !ThemeManager.IsDark);
+            UIKit.Select(_nightTheme, ThemeManager.IsDark);
+            for (int i = 0; i < _languageButtons.Length; i++) UIKit.Select(_languageButtons[i], Loc.Supported[i] == Loc.Language);
             UIKit.Select(_rightHand, !_leftHanded);
             UIKit.Select(_leftHand, _leftHanded);
             ReminderRefresh();
@@ -123,7 +151,7 @@ namespace Cevir.Core.UI
             GameManager game = GameManager.Instance;
             if (_remindersStatus == null || game == null || game.Progress == null) return;
             ReminderSettings r = game.Progress.reminders;
-            _remindersStatus.text = r != null && r.enabled && r.configured ? "Açıq · " + r.WindowText : "Bağlı";
+            _remindersStatus.text = r != null && r.enabled && r.configured ? Loc.T("Açıq") + " · " + r.WindowText : Loc.T("Bağlı");
         }
 
         // ------------------------------------------------------------------ photo
@@ -149,16 +177,16 @@ namespace Cevir.Core.UI
                 Texture2D picked = NativeGallery.LoadImageAtPath(path, 1024, false, false);
                 if (picked == null)
                 {
-                    Message("Şəkil açıla bilmədi. Başqa şəkil seç.", true);
+                    Message(Loc.T("Şəkil açıla bilmədi. Başqa şəkil seç."), true);
                     return;
                 }
 
                 byte[] jpeg = AvatarStore.PrepareJpeg(picked);
                 Destroy(picked);
                 UploadPhoto(jpeg);
-            }, "Profil şəkli seç", "image/*");
+            }, Loc.T("Profil şəkli seç"), "image/*");
 #else
-            Message("Şəkil seçmək telefonda işləyir.", true);
+            Message(Loc.T("Şəkil seçmək telefonda işləyir."), true);
 #endif
         }
 
@@ -169,19 +197,19 @@ namespace Cevir.Core.UI
             CloudService cloud = CloudService.Instance;
             if (cloud == null || cloud.State != CloudState.SignedIn)
             {
-                Message("Şəkil yadda saxlandı.", false);
+                Message(Loc.T("Şəkil yadda saxlandı."), false);
                 return;
             }
 
             SetBusy(true);
-            Message("Şəkil yüklənir...", false);
+            Message(Loc.T("Şəkil yüklənir..."), false);
             cloud.UploadAvatar(jpeg, error =>
             {
                 SetBusy(false);
                 if (error == null)
                 {
                     AvatarStore.Save(jpeg, GameManager.Instance != null ? GameManager.Instance.Progress.avatarUrl : null);
-                    Message("Profil şəkli yeniləndi.", false);
+                    Message(Loc.T("Profil şəkli yeniləndi."), false);
                 }
                 else
                 {
@@ -205,7 +233,7 @@ namespace Cevir.Core.UI
             cloud.RemoveAvatar(error =>
             {
                 SetBusy(false);
-                Message(error ?? "Profil şəkli silindi.", error != null);
+                Message(error ?? Loc.T("Profil şəkli silindi."), error != null);
             });
         }
 
@@ -217,14 +245,14 @@ namespace Cevir.Core.UI
             if (game == null) return;
             if (_firstName.text.Trim().Length == 0)
             {
-                Message("Adını yaz.", true);
+                Message(Loc.T("Adını yaz."), true);
                 return;
             }
 
             game.SetLearnerName(_firstName.text, _lastName.text);
             if (_nameSign != game.Progress.nameSign) game.SetNameSign(_nameSign);
             if (_leftHanded != game.Progress.leftHanded) game.SetLeftHanded(_leftHanded);
-            Message("Məlumatlar yadda saxlandı.", false);
+            Message(Loc.T("Məlumatlar yadda saxlandı."), false);
         }
 
         private void PickNameSign()
@@ -239,7 +267,7 @@ namespace Cevir.Core.UI
 
         private void ShowNameSign()
         {
-            if (_nameSignLabel != null) _nameSignLabel.text = _nameSign.Length > 0 ? _nameSign : "Seç";
+            if (_nameSignLabel != null) _nameSignLabel.text = _nameSign.Length > 0 ? Stories.NameSignOptions.Display(_nameSign) : Loc.T("Seç");
         }
 
         private void ChangeEmail()
@@ -249,7 +277,7 @@ namespace Cevir.Core.UI
             if (_busy || cloud == null) return;
             if (email.Length < 3 || !email.Contains("@") || !email.Contains("."))
             {
-                Message("Yeni e-poçt ünvanını düzgün yaz.", true);
+                Message(Loc.T("Yeni e-poçt ünvanını düzgün yaz."), true);
                 return;
             }
 
@@ -265,8 +293,8 @@ namespace Cevir.Core.UI
 
                 _newEmail.text = string.Empty;
                 Message(pending
-                    ? "Təsdiq linki " + email + " ünvanına göndərildi. Linki açandan sonra e-poçt dəyişəcək."
-                    : "E-poçt dəyişdirildi.", false);
+                    ? string.Format(Loc.T("Təsdiq linki {0} ünvanına göndərildi. Linki açandan sonra e-poçt dəyişəcək."), email)
+                    : Loc.T("E-poçt dəyişdirildi."), false);
                 Render();
             });
         }
@@ -277,13 +305,13 @@ namespace Cevir.Core.UI
             if (_busy || cloud == null) return;
             if (_newPassword.text.Length < 6)
             {
-                Message("Şifrə ən azı 6 simvol olmalıdır.", true);
+                Message(Loc.T("Şifrə ən azı 6 simvol olmalıdır."), true);
                 return;
             }
 
             if (_newPassword.text != _repeatPassword.text)
             {
-                Message("Şifrələr eyni deyil.", true);
+                Message(Loc.T("Şifrələr eyni deyil."), true);
                 return;
             }
 
@@ -297,7 +325,7 @@ namespace Cevir.Core.UI
                     _repeatPassword.text = string.Empty;
                 }
 
-                Message(error ?? "Şifrə dəyişdirildi.", error != null);
+                Message(error ?? Loc.T("Şifrə dəyişdirildi."), error != null);
             });
         }
 
@@ -314,8 +342,8 @@ namespace Cevir.Core.UI
                 SetBusy(false);
                 Render();
                 if (error != null) Message(error, true);
-                else Message(allowed ? "Təşəkkürlər! Cəhdlərin Chevir-i inkişaf etdirməyə kömək edəcək."
-                    : "Söndürüldü. Əvvəl saxlanan cəhdlərin silindi.", false);
+                else Message(allowed ? Loc.T("Təşəkkürlər! Cəhdlərin Chevir-i inkişaf etdirməyə kömək edəcək.")
+                    : Loc.T("Söndürüldü. Əvvəl saxlanan cəhdlərin silindi."), false);
             });
         }
 
@@ -339,7 +367,7 @@ namespace Cevir.Core.UI
             if (!_deleteArmed)
             {
                 _deleteArmed = true;
-                Message("Hesabın və bütün irəliləyişin həmişəlik silinəcək. Əminsənsə, bir daha bas.", true);
+                Message(Loc.T("Hesabın və bütün irəliləyişin həmişəlik silinəcək. Əminsənsə, bir daha bas."), true);
                 Render();
                 return;
             }
@@ -396,7 +424,7 @@ namespace Cevir.Core.UI
             UIKit.Row(top.gameObject, 20f);
             UIKit.Layout(top.gameObject, preferredHeight: 96f);
             kit.IconButton(top, "Back", iconBack, "‹", 96f, UIPalette.TextPrimary, Color.white, Close);
-            TextMeshProUGUI heading = kit.Text(top, "Heading", "Hesab ayarları", 46f, UIPalette.TextPrimary);
+            TextMeshProUGUI heading = kit.Text(top, "Heading", Loc.T("Hesab ayarları"), 46f, UIPalette.TextPrimary);
             UIKit.Layout(heading.gameObject, flexibleWidth: 1f);
 
             _message = kit.Text(content, "Message", "", 30f, UIPalette.GreenDark, TextAlignmentOptions.Center, false);
@@ -423,28 +451,50 @@ namespace Cevir.Core.UI
             HorizontalLayoutGroup photoRow = UIKit.Row(photoButtons.gameObject, 20f, TextAnchor.MiddleCenter);
             photoRow.childForceExpandWidth = true;
             UIKit.Layout(photoButtons.gameObject, preferredWidth: 900f);
-            Button pick = kit.Button(photoButtons, "Pick", "ŞƏKLİ DƏYİŞ", Color.white, Color.white, 104f, true, PickPhoto);
+            Button pick = kit.Button(photoButtons, "Pick", Loc.T("ŞƏKLİ DƏYİŞ"), Color.white, Color.white, 104f, true, PickPhoto);
             UIKit.Layout(pick.gameObject, flexibleWidth: 1f);
-            Button remove = kit.Button(photoButtons, "Remove", "SİL", UIPalette.RedLight, UIPalette.RedDark, 104f, false, RemovePhoto);
+            Button remove = kit.Button(photoButtons, "Remove", Loc.T("SİL"), UIPalette.RedLight, UIPalette.RedDark, 104f, false, RemovePhoto);
             UIKit.Layout(remove.gameObject, flexibleWidth: 0.5f);
             _removePhoto = remove.gameObject;
 
             // Name and signing hand.
             RectTransform details = kit.Card(content, "Details", 40, 20f);
-            kit.Text(details, "Title", "Şəxsi məlumatlar", 36f, UIPalette.TextPrimary);
-            _firstName = kit.Input(details, "FirstName", "Ad", TMP_InputField.ContentType.Name, 30);
-            _lastName = kit.Input(details, "LastName", "Soyad", TMP_InputField.ContentType.Name, 30);
-            kit.Text(details, "NameSignTitle", "Ləqəbin / ən tanınan xüsusiyyətin", 30f, UIPalette.TextSecondary);
+            kit.Text(details, "Title", Loc.T("Şəxsi məlumatlar"), 36f, UIPalette.TextPrimary);
+            _firstName = kit.Input(details, "FirstName", Loc.T("Ad"), TMP_InputField.ContentType.Name, 30);
+            _lastName = kit.Input(details, "LastName", Loc.T("Soyad"), TMP_InputField.ContentType.Name, 30);
+            kit.Text(details, "NameSignTitle", Loc.T("Ləqəbin / ən tanınan xüsusiyyətin"), 30f, UIPalette.TextSecondary);
             Button nameSign = kit.Button(details, "NameSign", "", UIPalette.Surface, UIPalette.TextPrimary, 92f, false, out _nameSignLabel, PickNameSign);
             UIKit.Layout(nameSign.gameObject, flexibleWidth: 1f);
-            kit.Text(details, "HandTitle", "İşarə əli", 30f, UIPalette.TextSecondary);
+            kit.Text(details, "HandTitle", Loc.T("İşarə əli"), 30f, UIPalette.TextSecondary);
             RectTransform hands = UIKit.Rect("Hands", details);
             UIKit.Row(hands.gameObject, 16f).childForceExpandWidth = true;
-            _rightHand = kit.Button(hands, "Right", "Sağ", UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => { _leftHanded = false; Render(); });
+            _rightHand = kit.Button(hands, "Right", Loc.T("Sağ"), UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => { _leftHanded = false; Render(); });
             UIKit.Layout(_rightHand.gameObject, flexibleWidth: 1f);
-            _leftHand = kit.Button(hands, "Left", "Sol", UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => { _leftHanded = true; Render(); });
+            _leftHand = kit.Button(hands, "Left", Loc.T("Sol"), UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => { _leftHanded = true; Render(); });
             UIKit.Layout(_leftHand.gameObject, flexibleWidth: 1f);
-            kit.Button(details, "SaveDetails", "YADDA SAXLA", Color.white, Color.white, 112f, true, SaveDetails);
+            kit.Button(details, "SaveDetails", Loc.T("YADDA SAXLA"), Color.white, Color.white, 112f, true, SaveDetails);
+
+            // Look: day (light) or night (dark) colours, saved on this phone.
+            RectTransform look = kit.Card(content, "Look", 40, 18f);
+            kit.Text(look, "Title", Loc.T("Görünüş"), 36f, UIPalette.TextPrimary);
+            RectTransform lookRow = UIKit.Rect("Choice", look);
+            UIKit.Row(lookRow.gameObject, 16f).childForceExpandWidth = true;
+            _dayTheme = kit.Button(lookRow, "Day", Loc.T("GÜNDÜZ"), UIPalette.Surface, UIPalette.TextSecondary, 96f, false, () => ThemeManager.SetDark(false));
+            UIKit.Layout(_dayTheme.gameObject, flexibleWidth: 1f);
+            _nightTheme = kit.Button(lookRow, "Night", Loc.T("GECƏ"), UIPalette.Surface, UIPalette.TextSecondary, 96f, false, () => ThemeManager.SetDark(true));
+            UIKit.Layout(_nightTheme.gameObject, flexibleWidth: 1f);
+
+            // Interface language: every label, lesson, story and message follows it.
+            RectTransform language = kit.Card(content, "Language", 40, 18f);
+            kit.Text(language, "Title", Loc.T("Tətbiqin dili"), 36f, UIPalette.TextPrimary);
+            _languageButtons = new Button[Loc.Supported.Length];
+            for (int i = 0; i < Loc.Supported.Length; i++)
+            {
+                string code = Loc.Supported[i];
+                _languageButtons[i] = kit.Button(language, "Language_" + code, Loc.NativeName(code), UIPalette.Surface, UIPalette.TextSecondary, 96f, false,
+                    () => SetLanguage(code));
+                UIKit.Layout(_languageButtons[i].gameObject, flexibleWidth: 1f);
+            }
 
             // Reminders.
             RectTransform reminders = kit.Card(content, "Reminders", 36, 10f);
@@ -458,49 +508,49 @@ namespace Cevir.Core.UI
             RectTransform reminderTexts = UIKit.Rect("Texts", reminderRow);
             UIKit.Column(reminderTexts.gameObject, 0, 4f, TextAnchor.MiddleLeft);
             UIKit.Layout(reminderTexts.gameObject, flexibleWidth: 1f);
-            kit.Text(reminderTexts, "Title", "Bildirişlər", 36f, UIPalette.TextPrimary);
+            kit.Text(reminderTexts, "Title", Loc.T("Bildirişlər"), 36f, UIPalette.TextPrimary);
             _remindersStatus = kit.Text(reminderTexts, "Status", "", 28f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
-            Button reminderButton = kit.Button(reminderRow, "Open", "AYARLA", UIPalette.CyanLight, UIPalette.Primary, 84f, false, OpenReminders);
+            Button reminderButton = kit.Button(reminderRow, "Open", Loc.T("AYARLA"), UIPalette.CyanLight, UIPalette.Primary, 84f, false, OpenReminders);
             UIKit.Layout(reminderButton.gameObject, preferredWidth: 210f, minWidth: 180f);
 
             // Data permission (sign samples for the dataset).
             RectTransform data = kit.Card(content, "DataConsent", 40, 16f);
             _dataCard = data.gameObject;
             kit.Text(data, "Title", DataConsentUI.Title, 34f, UIPalette.TextPrimary);
-            kit.Text(data, "Body", "Kamerada göstərdiyin işarələrin nöqtələri və 3 saniyəlik kiçik video saxlanılır ki, Chevir " +
-                "işarə dilini daha yaxşı tanısın. Söndürəndə əvvəl saxlananlar da silinir.", 28f, UIPalette.TextSecondary,
+            kit.Text(data, "Body", Loc.T("Kamerada göstərdiyin işarələrin nöqtələri və 3 saniyəlik kiçik video saxlanılır ki, Chevir " +
+                "işarə dilini daha yaxşı tanısın. Söndürəndə əvvəl saxlananlar da silinir."), 28f, UIPalette.TextSecondary,
                 TextAlignmentOptions.TopLeft, false);
             RectTransform dataRow = UIKit.Rect("Choice", data);
             UIKit.Row(dataRow.gameObject, 16f).childForceExpandWidth = true;
-            _dataOn = kit.Button(dataRow, "On", "İcazə verirəm", UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => SetDataConsent(true));
+            _dataOn = kit.Button(dataRow, "On", Loc.T("İcazə verirəm"), UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => SetDataConsent(true));
             UIKit.Layout(_dataOn.gameObject, flexibleWidth: 1f);
-            _dataOff = kit.Button(dataRow, "Off", "İcazə vermirəm", UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => SetDataConsent(false));
+            _dataOff = kit.Button(dataRow, "Off", Loc.T("İcazə vermirəm"), UIPalette.Surface, UIPalette.TextSecondary, 92f, false, () => SetDataConsent(false));
             UIKit.Layout(_dataOff.gameObject, flexibleWidth: 1f);
 
             // E-mail.
             RectTransform emailCard = kit.Card(content, "Email", 40, 18f);
             _emailCard = emailCard.gameObject;
-            kit.Text(emailCard, "Title", "E-poçt", 36f, UIPalette.TextPrimary);
+            kit.Text(emailCard, "Title", Loc.T("E-poçt"), 36f, UIPalette.TextPrimary);
             _emailCurrent = kit.Text(emailCard, "Current", "", 30f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
             _emailCurrent.enableWordWrapping = false;
             _emailCurrent.overflowMode = TextOverflowModes.Ellipsis;
-            _newEmail = kit.Input(emailCard, "NewEmail", "Yeni e-poçt", TMP_InputField.ContentType.EmailAddress, 254);
-            kit.Button(emailCard, "ChangeEmail", "E-POÇTU DƏYİŞ", UIPalette.CyanLight, UIPalette.Primary, 104f, false, ChangeEmail);
+            _newEmail = kit.Input(emailCard, "NewEmail", Loc.T("Yeni e-poçt"), TMP_InputField.ContentType.EmailAddress, 254);
+            kit.Button(emailCard, "ChangeEmail", Loc.T("E-POÇTU DƏYİŞ"), UIPalette.CyanLight, UIPalette.Primary, 104f, false, ChangeEmail);
 
             // Password.
             RectTransform passwordCard = kit.Card(content, "Password", 40, 18f);
             _passwordCard = passwordCard.gameObject;
-            kit.Text(passwordCard, "Title", "Şifrəni dəyiş", 36f, UIPalette.TextPrimary);
-            _newPassword = kit.Input(passwordCard, "NewPassword", "Yeni şifrə (ən azı 6 simvol)", TMP_InputField.ContentType.Password, 72);
-            _repeatPassword = kit.Input(passwordCard, "RepeatPassword", "Yeni şifrəni təkrar yaz", TMP_InputField.ContentType.Password, 72);
-            kit.Button(passwordCard, "ChangePassword", "ŞİFRƏNİ DƏYİŞ", UIPalette.CyanLight, UIPalette.Primary, 104f, false, ChangePassword);
+            kit.Text(passwordCard, "Title", Loc.T("Şifrəni dəyiş"), 36f, UIPalette.TextPrimary);
+            _newPassword = kit.Input(passwordCard, "NewPassword", Loc.T("Yeni şifrə (ən azı 6 simvol)"), TMP_InputField.ContentType.Password, 72);
+            _repeatPassword = kit.Input(passwordCard, "RepeatPassword", Loc.T("Yeni şifrəni təkrar yaz"), TMP_InputField.ContentType.Password, 72);
+            kit.Button(passwordCard, "ChangePassword", Loc.T("ŞİFRƏNİ DƏYİŞ"), UIPalette.CyanLight, UIPalette.Primary, 104f, false, ChangePassword);
 
             // Sign out and delete.
             RectTransform danger = kit.Card(content, "Account", 40, 18f);
             _dangerCard = danger.gameObject;
-            kit.Button(danger, "SignOut", "HESABDAN ÇIX", UIPalette.Surface, UIPalette.TextPrimary, 104f, false, SignOut);
+            kit.Button(danger, "SignOut", Loc.T("HESABDAN ÇIX"), UIPalette.Surface, UIPalette.TextPrimary, 104f, false, SignOut);
             TextMeshProUGUI deleteLabel;
-            kit.Button(danger, "Delete", "HESABI SİL", UIPalette.RedLight, UIPalette.RedDark, 104f, false, out deleteLabel, DeleteAccount);
+            kit.Button(danger, "Delete", Loc.T("HESABI SİL"), UIPalette.RedLight, UIPalette.RedDark, 104f, false, out deleteLabel, DeleteAccount);
             _deleteLabel = deleteLabel;
         }
     }

@@ -94,6 +94,7 @@ namespace Cevir.Core.Editor
 
             CevirUIRoot root = canvasGo.AddComponent<CevirUIRoot>();
             Set(root, "tabBar", tabBar);
+            Set(root, "theme", theme);
             Set(root, "homeScreen", home.gameObject);
             Set(root, "storiesScreen", stories.gameObject);
             Set(root, "leagueScreen", league.gameObject);
@@ -133,8 +134,8 @@ namespace Cevir.Core.Editor
             _circle = Sprite("UI", "circle") ?? AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
 
             // A project font in Assets/Core/Fonts wins: the TMP default (LiberationSans) has no Ə/ə glyph.
-            // VT323 (the design's pixel font) first, then any other font asset there.
-            _font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontFolder + "/VT323 SDF.asset");
+            // Galmuri11 (the design's pixel font) first, then any other font asset there.
+            _font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontFolder + "/Galmuri11 SDF.asset");
             string[] fonts = _font == null ? AssetDatabase.FindAssets("t:TMP_FontAsset", new[] { FontFolder }) : new string[0];
             foreach (string guid in fonts)
             {
@@ -374,7 +375,7 @@ namespace Cevir.Core.Editor
             RectTransform previewRt = Rect("Preview", cameraFrame);
             RawImage preview = previewRt.gameObject.AddComponent<RawImage>();
             preview.raycastTarget = false;
-            TextMeshProUGUI placeholder = Text(cameraFrame, "Placeholder", "Kamera açılır...", 34f, new Color(1f, 1f, 1f, 0.7f), TextAlignmentOptions.Center, false);
+            TextMeshProUGUI placeholder = Label(cameraFrame, "Placeholder", "Starting camera...", "Kamera açılır...", 34f, new Color(1f, 1f, 1f, 0.7f), TextAlignmentOptions.Center, false);
             Stretch(placeholder.rectTransform);
             CameraPreviewUI cameraPreview = cameraPanel.gameObject.AddComponent<CameraPreviewUI>();
             Set(cameraPreview, "image", preview);

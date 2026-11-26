@@ -24,6 +24,8 @@ namespace Cevir.Core.UI
         [SerializeField] private GameObject startPill;
         [SerializeField] private TextMeshProUGUI startLabel;
         [SerializeField] private TextMeshProUGUI entranceLabel;
+        [Tooltip("Small padlock on the corner of a locked tile (the tile itself shows the unit's own icon, greyed).")]
+        [SerializeField] private GameObject lockBadge;
 
         private const float TileSize = 164f;
         private const float LockedTileSize = 104f;
@@ -88,12 +90,27 @@ namespace Cevir.Core.UI
 
             if (icon != null)
             {
-                if (entry.IsCheckpoint) icon.sprite = theme.iconTrophy;
+                // Every unit has its own pixel icon (letters, a waving hand, a clock...); locked units show it greyed
+                // with a small padlock, so the path already tells what is coming.
+                Sprite unitIcon = entry.Unit != null ? entry.Unit.Icon : null;
+                if (unitIcon != null) icon.sprite = unitIcon;
+                else if (entry.IsCheckpoint) icon.sprite = theme.iconTrophy;
                 else if (locked) icon.sprite = theme.iconLock;
-                else icon.sprite = theme.iconHand; // an opened unit looks like unit 1: blue tile with the hand
+                else icon.sprite = theme.iconHand;
                 icon.color = locked ? UIPalette.LockedIcon : Color.white;
-                float iconSize = locked ? 52f : 84f;
+                float iconSize = locked ? 64f : 96f;
                 icon.rectTransform.sizeDelta = new Vector2(iconSize, iconSize);
+            }
+
+            if (lockBadge != null)
+            {
+                bool showLock = locked && entry.Unit != null && entry.Unit.Icon != null;
+                lockBadge.SetActive(showLock);
+                if (showLock)
+                {
+                    var badge = (RectTransform)lockBadge.transform;
+                    badge.anchoredPosition = new Vector2(size * 0.5f, size * 0.5f);
+                }
             }
 
             if (glow != null) glow.gameObject.SetActive(false); // no glow in the pixel design

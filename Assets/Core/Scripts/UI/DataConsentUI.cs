@@ -1,4 +1,5 @@
 using System;
+using Cevir.Core.Localization;
 using Cevir.Core.Cloud;
 using Cevir.Core.Game;
 using TMPro;
@@ -21,12 +22,12 @@ namespace Cevir.Core.UI
         [SerializeField] private Sprite iconBack;
         [SerializeField] private Sprite iconCamera;
 
-        public const string Title = "Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et";
+        public static string Title => Loc.T("Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et");
 
-        public const string Body =
+        public static string Body => Loc.T(
             "Kamera qarşısında işarə göstərəndə Chevir bu cəhdi saxlaya bilər: əlinin, üzünün və bədəninin nöqtələri və " +
             "3 saniyəlik kiçik video. Bunlarla Chevir işarə dilini daha yaxşı tanımağı öyrənir. Məlumatlar yalnız Chevir " +
-            "komandasında qalır, heç kimə göstərilmir. İstədiyin vaxt Hesab ayarlarından söndürə bilərsən.";
+            "komandasında qalır, heç kimə göstərilmir. İstədiyin vaxt Hesab ayarlarından söndürə bilərsən.");
 
         private GameObject _panel;
         private Action<bool> _answered;
@@ -42,11 +43,22 @@ namespace Cevir.Core.UI
             Instance = this;
             Build();
             _panel.SetActive(false);
+            Loc.LanguageChanged += Rebuild;
         }
 
         private void OnDestroy()
         {
+            Loc.LanguageChanged -= Rebuild;
             if (Instance == this) Instance = null;
+        }
+
+        /// <summary>Content is built once in the interface language; a new language builds it again.</summary>
+        private void Rebuild(string language)
+        {
+            bool open = IsOpen;
+            if (_panel != null) Destroy(_panel);
+            Build();
+            _panel.SetActive(open);
         }
 
         private void Update()
@@ -66,7 +78,7 @@ namespace Cevir.Core.UI
                 {
                     if (CevirUIRoot.Instance != null && error == null)
                     {
-                        CevirUIRoot.Instance.ShowToast(allowed ? "Təşəkkürlər! Chevir-i birlikdə inkişaf etdiririk" : "Yadda saxlandı");
+                        CevirUIRoot.Instance.ShowToast(allowed ? Loc.T("Təşəkkürlər! Chevir-i birlikdə inkişaf etdiririk") : Loc.T("Yadda saxlandı"));
                     }
                 }));
             }
@@ -123,9 +135,9 @@ namespace Cevir.Core.UI
             kit.Text(card, "Title", Title, 40f, UIPalette.TextPrimary, TextAlignmentOptions.Center);
             kit.Text(card, "Body", Body, 30f, UIPalette.TextSecondary, TextAlignmentOptions.Top, false);
 
-            Button allow = kit.Button(card, "Allow", "İCAZƏ VER", Color.white, Color.white, 112f, true, () => Answer(true));
+            Button allow = kit.Button(card, "Allow", Loc.T("İCAZƏ VER"), Color.white, Color.white, 112f, true, () => Answer(true));
             UIKit.Layout(allow.gameObject, flexibleWidth: 1f);
-            Button deny = kit.Button(card, "Deny", "İCAZƏ VERMƏ", UIPalette.Surface, UIPalette.TextPrimary, 104f, false, () => Answer(false));
+            Button deny = kit.Button(card, "Deny", Loc.T("İCAZƏ VERMƏ"), UIPalette.Surface, UIPalette.TextPrimary, 104f, false, () => Answer(false));
             UIKit.Layout(deny.gameObject, flexibleWidth: 1f);
         }
     }

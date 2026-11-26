@@ -30,10 +30,25 @@ namespace Cevir.Core.Editor
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.maxTextureSize = 2048;
             importer.textureCompression = TextureImporterCompression.CompressedHQ;
+            importer.filterMode = FilterMode.Bilinear;
+
+            // Pixel art is stored at its real pixel size (a story scene is 216 x 384) and scaled up on screen:
+            // point filtering keeps every pixel a sharp square, and the small files stay uncompressed so the
+            // palette colours stay exact.
+            if (IsPixelArt(path))
+            {
+                importer.filterMode = FilterMode.Point;
+                importer.textureCompression = TextureImporterCompression.Uncompressed;
+            }
 
             Match match = Border.Match(path);
             float border = match.Success ? float.Parse(match.Groups[1].Value) : 0f;
             importer.spriteBorder = new Vector4(border, border, border, border);
+        }
+
+        private static bool IsPixelArt(string path)
+        {
+            return path.StartsWith(SpriteRoot + "Story/") || path.StartsWith(SpriteRoot + "Decor/") || path.StartsWith(SpriteRoot + "Units/");
         }
 
         /// <summary>Re-imports any sprite that was imported before these rules existed (first project open).</summary>

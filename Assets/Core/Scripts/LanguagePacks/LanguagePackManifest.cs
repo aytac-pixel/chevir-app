@@ -38,6 +38,6 @@ namespace Cevir.Core.LanguagePacks
             : (string.IsNullOrEmpty(languageCode) ? "?" : languageCode.Substring(0, System.Math.Min(2, languageCode.Length)).ToUpperInvariant());
 
         /// <summary>Language name in the current interface language.</summary>
-        public string LocalizedName => Localization.Loc.IsAz ? displayName : (string.IsNullOrEmpty(englishName) ? displayName : englishName);
+        public string LocalizedName => Localization.Loc.IsAz ? displayName : Localization.Loc.IsRu ? (Localization.Translations.Russian(displayName) ?? displayName) : (string.IsNullOrEmpty(englishName) ? displayName : englishName);
     }
 }

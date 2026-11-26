@@ -103,7 +103,7 @@ namespace Cevir.Core.UI
             if (_game == null) return;
             ILanguagePack pack = _game.ActivePack;
             if (badgeLabel != null) badgeLabel.text = pack != null ? pack.Manifest.Badge : "—";
-            if (languageLabel != null) languageLabel.text = pack != null ? pack.Manifest.LocalizedName.Replace(" Sign ", "\nSign ").Replace(" İşarə ", "\nİşarə ") : string.Empty;
+            if (languageLabel != null) languageLabel.text = pack != null ? pack.Manifest.LocalizedName.Replace(" Sign ", "\nSign ").Replace(" İşarə ", "\nİşarə ").Replace(" жестовый ", "\nжестовый ") : string.Empty;
             if (streakLabel != null) streakLabel.text = _game.Streak.State.current.ToString();
             if (streakIcon != null)
             {
@@ -169,6 +169,7 @@ namespace Cevir.Core.UI
             }
 
             LayoutDots(centers);
+            Decor().Layout(centers, height);
             UnitNodeUI focus = active != null ? active : lastOpen;
             _focus = focus != null ? (RectTransform)focus.transform : null;
             _contentHeight = height;
@@ -181,6 +182,24 @@ namespace Cevir.Core.UI
             if (scrollRect.viewport.rect.height <= 1f) return;
             _scrollPending = false;
             ScrollTo(_focus, _contentHeight);
+        }
+
+        private HomeDecorUI _decor;
+
+        private HomeDecorUI Decor()
+        {
+            if (_decor != null) return _decor;
+            // Its own layer at the very back of the path, under the dots and the tiles.
+            var go = new GameObject("Decor", typeof(RectTransform));
+            var layer = (RectTransform)go.transform;
+            layer.SetParent(content, false);
+            layer.SetAsFirstSibling();
+            layer.anchorMin = Vector2.zero;
+            layer.anchorMax = Vector2.one;
+            layer.offsetMin = layer.offsetMax = Vector2.zero;
+            _decor = go.AddComponent<HomeDecorUI>();
+            _decor.Configure(layer, theme);
+            return _decor;
         }
 
         private void LayoutDots(List<Vector2> centers)

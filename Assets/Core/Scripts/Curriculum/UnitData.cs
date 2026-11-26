@@ -19,12 +19,21 @@ namespace Cevir.Core.Curriculum
                  "and it counts as complete only once the level's gate test is passed.")]
         [SerializeField] private bool checkpoint;
 
+        [Tooltip("Pixel icon on the unit's tile on the home path (white art, tinted grey while locked).")]
+        [SerializeField] private Sprite icon;
+
         public Color ThemeColor => themeColor;
         public string Guidebook => guidebook;
         public IReadOnlyList<LessonData> Lessons => lessons;
         public bool IsCheckpoint => checkpoint;
+        public Sprite Icon => icon;
 
 #if UNITY_EDITOR
+        public void EditorSetIcon(Sprite unitIcon)
+        {
+            icon = unitIcon;
+        }
+
         public void EditorSetContent(Color color, List<LessonData> lessonList)
         {
             themeColor = color;

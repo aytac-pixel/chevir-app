@@ -321,7 +321,7 @@ namespace Cevir.Core.Game
 
         public void SetUiLanguage(string code)
         {
-            Progress.uiLanguage = code == Loc.Azerbaijani ? Loc.Azerbaijani : Loc.English;
+            Progress.uiLanguage = Loc.Normalize(code);
             Loc.SetLanguage(Progress.uiLanguage);
             Save();
             RaiseProfileChanged();

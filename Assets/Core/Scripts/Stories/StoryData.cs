@@ -134,6 +134,13 @@ namespace Cevir.Core.Stories
             beats = storyBeats;
         }
 
+        /// <summary>Scene art only (each story has its own pixel-art place; the NPC and the hands are shared).</summary>
+        public void EditorSetArt(Sprite bg, Sprite fg)
+        {
+            background = bg;
+            foreground = fg;
+        }
+
         public void EditorSetUnlock(int storyNumber, UnitData unit)
         {
             number = storyNumber;

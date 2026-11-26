@@ -1,3 +1,4 @@
+using Cevir.Core.Localization;
 using System.Collections.Generic;
 using Cevir.Core.Cloud;
 using Cevir.Core.Game;
@@ -53,11 +54,24 @@ namespace Cevir.Core.UI
             Instance = this;
             Build();
             _panel.SetActive(false);
+            Loc.LanguageChanged += Rebuild;
         }
 
         private void OnDestroy()
         {
+            Loc.LanguageChanged -= Rebuild;
             if (Instance == this) Instance = null;
+        }
+
+        /// <summary>Content is built once in the interface language; a new language builds it again.</summary>
+        private void Rebuild(string language)
+        {
+            bool open = _panel != null && _panel.activeSelf;
+            if (_panel != null) Destroy(_panel);
+            _presetButtons.Clear();
+            Build();
+            _panel.SetActive(open);
+            if (open) Render();
         }
 
         private void Update()
@@ -112,9 +126,9 @@ namespace Cevir.Core.UI
             {
                 if (!granted && _draft.enabled)
                 {
-                    _hint.text = "Bildirişlərə icazə verilmədi. Telefonun Ayarlar > Tətbiqlər > Chevir > Bildirişlər bölməsində aç.";
+                    _hint.text = Loc.T("Bildirişlərə icazə verilmədi. Telefonun Ayarlar > Tətbiqlər > Chevir > Bildirişlər bölməsində aç.");
                     _hint.gameObject.SetActive(true);
-                    if (CevirUIRoot.Instance != null) CevirUIRoot.Instance.ShowToast("Bildirişlərə icazə verilmədi");
+                    if (CevirUIRoot.Instance != null) CevirUIRoot.Instance.ShowToast(Loc.T("Bildirişlərə icazə verilmədi"));
                     return;
                 }
 
@@ -122,8 +136,8 @@ namespace Cevir.Core.UI
                 if (CevirUIRoot.Instance != null)
                 {
                     CevirUIRoot.Instance.ShowToast(_draft.enabled
-                        ? "Xatırlatmalar " + _draft.WindowText + " aralığında gələcək"
-                        : "Xatırlatmalar söndürüldü");
+                        ? string.Format(Loc.T("Xatırlatmalar {0} aralığında gələcək"), _draft.WindowText)
+                        : Loc.T("Xatırlatmalar söndürüldü"));
                 }
             });
         }
@@ -156,7 +170,7 @@ namespace Cevir.Core.UI
             _backButton.SetActive(!_onboarding);
             _laterButton.SetActive(_onboarding);
             _toggleRow.SetActive(!_onboarding);
-            _toggleLabel.text = _draft.enabled ? "AÇIQ" : "BAĞLI";
+            _toggleLabel.text = _draft.enabled ? Loc.T("AÇIQ") : Loc.T("BAĞLI");
             UIKit.Select(_toggleButton, _draft.enabled);
             _timeSection.SetActive(_draft.enabled);
 
@@ -171,9 +185,9 @@ namespace Cevir.Core.UI
             int second = Mathf.Min(first + ReminderPlanner.Gap, _draft.endMinutes);
             int third = Mathf.Min(first + 2 * ReminderPlanner.Gap, _draft.endMinutes);
             _summary.text = _draft.enabled
-                ? "Xatırlatmalar: <b>" + ReminderSettings.Clock(first) + "</b> və <b>" + ReminderSettings.Clock(second) + "</b>.\n" +
-                  "Alovun varsa və həmin gün dərs keçməmisənsə, <b>" + ReminderSettings.Clock(third) + "</b>-da bir dəfə də xatırladacağıq."
-                : "Xatırlatmalar söndürülüb. Seriyanı özün izləməli olacaqsan.";
+                ? string.Format(Loc.T("Xatırlatmalar: <b>{0}</b> və <b>{1}</b>.\nAlovun varsa və həmin gün dərs keçməmisənsə, <b>{2}</b>-da bir dəfə də xatırladacağıq."),
+                    ReminderSettings.Clock(first), ReminderSettings.Clock(second), ReminderSettings.Clock(third))
+                : Loc.T("Xatırlatmalar söndürülüb. Seriyanı özün izləməli olacaqsan.");
         }
 
         // ------------------------------------------------------------------ layout
@@ -198,7 +212,7 @@ namespace Cevir.Core.UI
             UIKit.Row(top.gameObject, 20f);
             UIKit.Layout(top.gameObject, preferredHeight: 96f);
             _backButton = kit.IconButton(top, "Back", iconBack, "‹", 96f, UIPalette.TextPrimary, Color.white, Close).gameObject;
-            TextMeshProUGUI heading = kit.Text(top, "Heading", "Bildirişlər", 46f, UIPalette.TextPrimary);
+            TextMeshProUGUI heading = kit.Text(top, "Heading", Loc.T("Bildirişlər"), 46f, UIPalette.TextPrimary);
             UIKit.Layout(heading.gameObject, flexibleWidth: 1f);
 
             RectTransform hero = kit.Card(content, "Intro", 44, 18f);
@@ -210,11 +224,11 @@ namespace Cevir.Core.UI
             Image bell = kit.Image(tile.transform, "Bell", iconBell, Color.white, false);
             bell.rectTransform.anchorMin = bell.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
             bell.rectTransform.sizeDelta = new Vector2(76f, 76f);
-            TextMeshProUGUI title = kit.Text(hero, "Title", "Gün ərzində hansı saatlarda məşq edə bilərsən?", 44f, UIPalette.TextPrimary,
+            TextMeshProUGUI title = kit.Text(hero, "Title", Loc.T("Gün ərzində hansı saatlarda məşq edə bilərsən?"), 44f, UIPalette.TextPrimary,
                 TextAlignmentOptions.Center);
             UIKit.Layout(title.gameObject, flexibleWidth: 1f);
             TextMeshProUGUI body = kit.Text(hero, "Body",
-                "Seçdiyin saat aralığında sənə 30 dəqiqə arayla 2 xatırlatma göndərəcəyik ki, dərsi unutmayasan.", 32f,
+                Loc.T("Seçdiyin saat aralığında sənə 30 dəqiqə arayla 2 xatırlatma göndərəcəyik ki, dərsi unutmayasan."), 32f,
                 UIPalette.TextSecondary, TextAlignmentOptions.Center, false);
             UIKit.Layout(body.gameObject, flexibleWidth: 1f);
 
@@ -223,9 +237,9 @@ namespace Cevir.Core.UI
             _toggleRow = toggleCard.gameObject;
             RectTransform toggleRow = UIKit.Rect("Row", toggleCard);
             UIKit.Row(toggleRow.gameObject, 20f);
-            TextMeshProUGUI toggleTitle = kit.Text(toggleRow, "Label", "Gündəlik xatırlatmalar", 36f, UIPalette.TextPrimary);
+            TextMeshProUGUI toggleTitle = kit.Text(toggleRow, "Label", Loc.T("Gündəlik xatırlatmalar"), 36f, UIPalette.TextPrimary);
             UIKit.Layout(toggleTitle.gameObject, flexibleWidth: 1f);
-            _toggleButton = kit.Button(toggleRow, "Switch", "AÇIQ", UIPalette.Primary, Color.white, 88f, false, out _toggleLabel,
+            _toggleButton = kit.Button(toggleRow, "Switch", Loc.T("AÇIQ"), UIPalette.Primary, Color.white, 88f, false, out _toggleLabel,
                 () => { _draft.enabled = !_draft.enabled; Render(); });
             UIKit.Layout(_toggleButton.gameObject, preferredWidth: 220f);
 
@@ -234,7 +248,7 @@ namespace Cevir.Core.UI
             UIKit.Column(times.gameObject, 0, 26f);
             _timeSection = times.gameObject;
 
-            kit.Text(times, "PresetsTitle", "Hazır aralıqlar", 34f, UIPalette.TextSecondary);
+            kit.Text(times, "PresetsTitle", Loc.T("Hazır aralıqlar"), 34f, UIPalette.TextSecondary);
             for (int rowIndex = 0; rowIndex < 2; rowIndex++)
             {
                 RectTransform row = UIKit.Rect("PresetRow" + rowIndex, times);
@@ -243,7 +257,7 @@ namespace Cevir.Core.UI
                 for (int i = rowIndex * 2; i < rowIndex * 2 + 2; i++)
                 {
                     int index = i;
-                    string text = PresetNames[i] + "\n<size=80%>" + ReminderSettings.Clock(Presets[i][0]) + "–" + ReminderSettings.Clock(Presets[i][1]) + "</size>";
+                    string text = Loc.T(PresetNames[i]) + "\n<size=80%>" + ReminderSettings.Clock(Presets[i][0]) + "–" + ReminderSettings.Clock(Presets[i][1]) + "</size>";
                     TextMeshProUGUI label;
                     Button preset = kit.Button(row, "Preset" + i, text, UIPalette.Surface, UIPalette.TextSecondary, 140f, false, out label, () =>
                     {
@@ -260,16 +274,16 @@ namespace Cevir.Core.UI
                 }
             }
 
-            kit.Text(times, "CustomTitle", "Və ya özün seç", 34f, UIPalette.TextSecondary);
+            kit.Text(times, "CustomTitle", Loc.T("Və ya özün seç"), 34f, UIPalette.TextSecondary);
             RectTransform custom = kit.Card(times, "Custom", 36, 24f);
-            _startLabel = TimeRow(kit, custom, "Başlanğıc", true);
-            _endLabel = TimeRow(kit, custom, "Son", false);
+            _startLabel = TimeRow(kit, custom, Loc.T("Başlanğıc"), true);
+            _endLabel = TimeRow(kit, custom, Loc.T("Son"), false);
 
             _summary = kit.Text(content, "Summary", "", 31f, UIPalette.TextSecondary, TextAlignmentOptions.Center, false);
             _hint = kit.Text(content, "Hint", "", 30f, UIPalette.Red, TextAlignmentOptions.Center, false);
 
-            kit.Button(content, "Save", "YADDA SAXLA", Color.white, Color.white, 128f, true, Save);
-            _laterButton = kit.Button(content, "Later", "İNDİ YOX", new Color(1f, 1f, 1f, 0f), UIPalette.TextSecondary, 96f, false, NotNow).gameObject;
+            kit.Button(content, "Save", Loc.T("YADDA SAXLA"), Color.white, Color.white, 128f, true, Save);
+            _laterButton = kit.Button(content, "Later", Loc.T("İNDİ YOX"), new Color(1f, 1f, 1f, 0f), UIPalette.TextSecondary, 96f, false, NotNow).gameObject;
         }
 
         private TextMeshProUGUI TimeRow(UIKit kit, Transform parent, string title, bool start)

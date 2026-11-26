@@ -120,8 +120,8 @@ namespace Cevir.Core.UI
             if (notificationsStatus == null || _game == null || _game.Progress == null) return;
             ReminderSettings r = _game.Progress.reminders;
             notificationsStatus.text = r != null && r.configured && r.enabled
-                ? "Hər gün " + r.WindowText + " aralığında xatırladırıq"
-                : "Xatırlatmalar bağlıdır";
+                ? string.Format(Loc.T("Hər gün {0} aralığında xatırladırıq"), r.WindowText)
+                : Loc.T("Xatırlatmalar bağlıdır");
         }
 
         private void RefreshAvatar()
@@ -167,9 +167,9 @@ namespace Cevir.Core.UI
             if (joinedLabel != null)
             {
                 var joined = new DateTime(progress.joinedUtcTicks, DateTimeKind.Utc).ToLocalTime();
-                CultureInfo culture = Loc.IsAz ? AzerbaijaniCulture() : CultureInfo.InvariantCulture;
+                CultureInfo culture = Loc.IsAz ? AzerbaijaniCulture() : Loc.IsRu ? Loc.Culture : CultureInfo.InvariantCulture;
                 string month = culture.DateTimeFormat.GetMonthName(joined.Month);
-                if (Loc.IsAz && month.Length > 0) month = char.ToUpper(month[0]) + month.Substring(1);
+                if (!Loc.IsEn && month.Length > 0) month = char.ToUpper(month[0]) + month.Substring(1);
                 joinedLabel.text = string.Format(UIStrings.Joined, month + " " + joined.Year);
             }
 

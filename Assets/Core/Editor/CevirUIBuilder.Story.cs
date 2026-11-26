@@ -23,7 +23,7 @@ namespace Cevir.Core.Editor
             // ---------------------------------------------------------------- scene (zooms while walking)
             RectTransform sceneRoot = Rect("Scene", screen);
             Stretch(sceneRoot);
-            Image background = Img(sceneRoot, "Background", Sprite("Story", "story_street_bg"), Color.white);
+            Image background = Img(sceneRoot, "Background", Sprite("Story", "story_bg_01"), Color.white);
             background.preserveAspect = false;
             AspectRatioFitter backgroundFit = background.gameObject.AddComponent<AspectRatioFitter>();
             backgroundFit.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
