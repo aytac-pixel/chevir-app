@@ -39,8 +39,11 @@ namespace Cevir.Setup.Editor
         /// <summary>Faux bold kept light so the pixel shapes stay crisp (TMP default 0.75).</summary>
         private const float MainBoldStyle = 0.45f;
 
-        /// <summary>Atlas sampling size: 8 atlas pixels per font pixel (12-pixel em), so edges stay sharp squares.</summary>
-        private const int MainSamplingSize = 96;
+        /// <summary>
+        /// Atlas sampling size: about 7 atlas pixels per font pixel (12-pixel em), so edges stay sharp squares, while
+        /// every Azerbaijani, Latin and Cyrillic letter still fits in one 2048 atlas (a second atlas page fails in batch mode).
+        /// </summary>
+        private const int MainSamplingSize = 80;
 
         /// <summary>Letters the UI needs up front; anything else is added to the dynamic atlas on demand.</summary>
         private const string Prewarm =
@@ -98,7 +101,7 @@ namespace Cevir.Setup.Editor
         private static void EnsureFontAsset()
         {
             TMP_FontAsset fallback = CreateFontAsset(FontSource, FontAssetPath, "DejaVuSans SDF");
-            TMP_FontAsset main = CreateFontAsset(MainFontSource, MainFontAssetPath, "Galmuri11 SDF", MainSamplingSize, 8);
+            TMP_FontAsset main = CreateFontAsset(MainFontSource, MainFontAssetPath, "Galmuri11 SDF", MainSamplingSize, 8, 2048);
             if (main == null) return;
             main.boldStyle = MainBoldStyle;
 
@@ -120,7 +123,7 @@ namespace Cevir.Setup.Editor
             AssetDatabase.SaveAssets();
         }
 
-        private static TMP_FontAsset CreateFontAsset(string sourcePath, string assetPath, string assetName, int samplingSize = 90, int padding = 9)
+        private static TMP_FontAsset CreateFontAsset(string sourcePath, string assetPath, string assetName, int samplingSize = 90, int padding = 9, int atlasSize = 1024)
         {
             var existing = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(assetPath);
             if (existing != null) return existing;
@@ -132,8 +135,8 @@ namespace Cevir.Setup.Editor
                 return null;
             }
 
-            TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font, samplingSize, padding, GlyphRenderMode.SDFAA, 1024, 1024,
-                AtlasPopulationMode.Dynamic, true);
+            TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font, samplingSize, padding, GlyphRenderMode.SDFAA, atlasSize, atlasSize,
+                AtlasPopulationMode.Dynamic, atlasSize == 1024);
             asset.name = assetName;
             AssetDatabase.CreateAsset(asset, assetPath);
 
