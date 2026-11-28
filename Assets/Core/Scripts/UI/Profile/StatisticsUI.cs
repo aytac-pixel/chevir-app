@@ -85,7 +85,7 @@ namespace Cevir.Core.UI
             _weekMinutes = Tile(kit, grid, "WeekMinutes", iconChart, UIPalette.Primary, Loc.Pick("Minutes this week", "Bu həftə dəqiqə", "Минут за неделю"));
 
             _minutesChart = BuildChart(kit, content, "MinutesChart", Loc.Pick("Minutes per day", "Hər gün neçə dəqiqə", "Минут в день"),
-                Loc.Pick("Time with Chevir open, this week", "Bu həftə Chevir-də keçirdiyin vaxt", "Время в Chevir на этой неделе"), out _);
+                Loc.Pick("Time with Chevir I/O open, this week", "Bu həftə Chevir I/O-da keçirdiyin vaxt", "Время в Chevir I/O на этой неделе"), out _);
             _xpChart = BuildChart(kit, content, "XpChart", Loc.Pick("XP per day", "Hər gün yığılan XP", "XP в день"),
                 null, out _weekXp);
         }

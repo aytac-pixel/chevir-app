@@ -22,11 +22,11 @@ namespace Cevir.Core.UI
         [SerializeField] private Sprite iconBack;
         [SerializeField] private Sprite iconCamera;
 
-        public static string Title => Loc.T("Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et");
+        public static string Title => Loc.T("Məlumatlarımla Chevir I/O-nu inkişaf etdirməyə kömək et");
 
         public static string Body => Loc.T(
-            "Kamera qarşısında işarə göstərəndə Chevir bu cəhdi saxlaya bilər: əlinin, üzünün və bədəninin nöqtələri və " +
-            "3 saniyəlik kiçik video. Bunlarla Chevir işarə dilini daha yaxşı tanımağı öyrənir. Məlumatlar yalnız Chevir " +
+            "Kamera qarşısında işarə göstərəndə Chevir I/O bu cəhdi saxlaya bilər: əlinin, üzünün və bədəninin nöqtələri və " +
+            "3 saniyəlik kiçik video. Bunlarla Chevir I/O işarə dilini daha yaxşı tanımağı öyrənir. Məlumatlar yalnız Chevir I/O " +
             "komandasında qalır, heç kimə göstərilmir. İstədiyin vaxt Hesab ayarlarından söndürə bilərsən.");
 
         private GameObject _panel;
@@ -78,7 +78,7 @@ namespace Cevir.Core.UI
                 {
                     if (CevirUIRoot.Instance != null && error == null)
                     {
-                        CevirUIRoot.Instance.ShowToast(allowed ? Loc.T("Təşəkkürlər! Chevir-i birlikdə inkişaf etdiririk") : Loc.T("Yadda saxlandı"));
+                        CevirUIRoot.Instance.ShowToast(allowed ? Loc.T("Təşəkkürlər! Chevir I/O-nu birlikdə inkişaf etdiririk") : Loc.T("Yadda saxlandı"));
                     }
                 }));
             }

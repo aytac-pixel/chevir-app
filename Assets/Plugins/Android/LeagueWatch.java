@@ -162,7 +162,7 @@ public final class LeagueWatch {
 
     private static void notify(Context context, boolean up, int steps, int rank) {
         SharedPreferences p = prefs(context);
-        String title = p.getString(up ? "titleUp" : "titleDown", "Chevir");
+        String title = p.getString(up ? "titleUp" : "titleDown", "Chevir I/O");
         String body = p.getString(up ? "bodyUp" : "bodyDown", "{1}")
                 .replace("{0}", Integer.toString(steps))
                 .replace("{1}", p.getBoolean("azOrdinal", false) ? ordinalAz(rank) : Integer.toString(rank));

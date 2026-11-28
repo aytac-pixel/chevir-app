@@ -1,7 +1,7 @@
 # Builds the Android APK on every push to main and publishes it on the Releases page.
 # The release "demo" is replaced each time, so the latest release always holds the current APK:
-#   https://github.com/aytac-pixel/chevir-app/releases/latest
-#   https://github.com/aytac-pixel/chevir-app/releases/latest/download/Cevir.apk
+#   https://github.com/aytac-pixel/chevir-io/releases/latest
+#   https://github.com/aytac-pixel/chevir-io/releases/latest/download/ChevirIO.apk
 #
 # Needs three repository secrets (Settings > Secrets and variables > Actions):
 #   UNITY_LICENSE  contents of Unity_lic.ulf (a free Personal licence works)
@@ -24,7 +24,7 @@ concurrency:
 
 env:
   RELEASE_TAG: demo
-  APK_NAME: Chevir.apk
+  APK_NAME: ChevirIO.apk
   # Older download link that is already shared; the same APK is also published under this name.
   OLD_APK_NAME: Cevir.apk
 
@@ -133,7 +133,7 @@ jobs:
           built_at="$(TZ=Asia/Baku date '+%d.%m.%Y %H:%M')"
           version="0.1.${GITHUB_RUN_NUMBER}"
           cat > notes.md <<EOF
-          ## Chevir — Android APK
+          ## Chevir I/O — Android APK
 
           **Yüklə:** [${APK_NAME}](https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/${APK_NAME})
 
@@ -153,8 +153,8 @@ jobs:
           git push -f origin "refs/tags/$RELEASE_TAG"
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release edit "$RELEASE_TAG" --title "Chevir ${version} — Android APK" --notes-file notes.md --latest --draft=false --prerelease=false
+            gh release edit "$RELEASE_TAG" --title "Chevir I/O ${version} — Android APK" --notes-file notes.md --latest --draft=false --prerelease=false
           else
-            gh release create "$RELEASE_TAG" --title "Chevir ${version} — Android APK" --notes-file notes.md --latest
+            gh release create "$RELEASE_TAG" --title "Chevir I/O ${version} — Android APK" --notes-file notes.md --latest
           fi
           gh release upload "$RELEASE_TAG" "release/$APK_NAME" "release/$OLD_APK_NAME" --clobber

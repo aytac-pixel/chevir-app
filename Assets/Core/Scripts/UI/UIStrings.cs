@@ -81,7 +81,7 @@ namespace Cevir.Core.UI
 
         public static string ThirdFailRequeue => Loc.Pick("We'll come back to this sign later.", "Bu işarəyə sonra qayıdacağıq.");
         public static string CameraStarting => Loc.Pick("Starting camera...", "Kamera açılır...");
-        public static string CameraDenied => Loc.Pick("Chevir needs the camera.\nAllow it in Settings > Apps > Chevir.", "Kameraya icazə lazımdır.\nTelefonun Ayarlar > Tətbiqlər > Chevir bölməsində kameranı aç.");
+        public static string CameraDenied => Loc.Pick("Chevir I/O needs the camera.\nAllow it in Settings > Apps > Chevir I/O.", "Kameraya icazə lazımdır.\nTelefonun Ayarlar > Tətbiqlər > Chevir I/O bölməsində kameranı aç.");
         public static string CameraMissing => Loc.Pick("The camera module isn't installed.", "Kamera modulu quraşdırılmayıb.");
 
         // ---------------------------------------------------------------- tabs and home
@@ -163,9 +163,9 @@ namespace Cevir.Core.UI
         public static string FriendsTitle => Loc.Pick("Learning together is more fun!", "Birlikdə öyrənmək daha maraqlıdır!");
         public static string FriendsBody => Loc.Pick("Invite friends and share your streak.", "Dostlarını dəvət et və seriyanı paylaş.");
         public static string InviteFriends => Loc.Pick("Invite friends", "Dostları dəvət et");
-        public static string InviteMessage => Loc.Pick("I'm learning Azerbaijani Sign Language with Chevir. My flame: {0} days! Download it and join me: {1}",
-            "Chevir ilə Azərbaycan işarə dilini öyrənirəm. Alovum: {0} gün! Sən də yüklə və qoşul: {1}",
-            "Я учу азербайджанский жестовый язык с Chevir. Мой огонёк: {0} дн.! Скачай и присоединяйся: {1}");
+        public static string InviteMessage => Loc.Pick("I'm learning Azerbaijani Sign Language with Chevir I/O. My flame: {0} days! Download it and join me: {1}",
+            "Chevir I/O ilə Azərbaycan işarə dilini öyrənirəm. Alovum: {0} gün! Sən də yüklə və qoşul: {1}",
+            "Я учу азербайджанский жестовый язык с Chevir I/O. Мой огонёк: {0} дн.! Скачай и присоединяйся: {1}");
         public static string LinkCopied => Loc.Pick("Invite link copied", "Dəvət linki kopyalandı");
         public static string Save => Loc.Pick("SAVE", "YADDA SAXLA");
         public static string AppLanguage => Loc.Pick("App language", "Tətbiqin dili");

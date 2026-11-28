@@ -1,4 +1,4 @@
-# Chevir: telefona quraşdırma
+# Chevir I/O: telefona quraşdırma
 
 Bu qovluq tam Unity layihəsidir. Aşağıdakı addımlarla Android telefonda (və ya iPhone-da) işləyən tətbiq alırsan.
 
@@ -63,8 +63,8 @@ Dərsdə video varsa video, yoxdursa şəkil göstərilir.
 ## 5. Kompütersiz, buludda APK (istəyə görə)
 
 `.github/workflows/build-android.yml` `main`-ə hər push-dan sonra APK-ni GitHub-da avtomatik yığır və **Releases** səhifəsinə qoyur (ən son buraxılış həmişə ən təzə APK-dır):
-- https://github.com/aytac-pixel/chevir-app/releases/latest
-- Birbaşa yükləmə: https://github.com/aytac-pixel/chevir-app/releases/latest/download/Cevir.apk
+- https://github.com/aytac-pixel/chevir-io/releases/latest
+- Birbaşa yükləmə: https://github.com/aytac-pixel/chevir-io/releases/latest/download/ChevirIO.apk
 
 Bunun üçün bir dəfə repozitoriyada *Settings > Secrets and variables > Actions* bölməsinə `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD` əlavə et (pulsuz Unity Personal lisenziyası olar; game.ci/docs/github/activation). Əl ilə yenidən yığmaq üçün: *Actions > Build Android APK > Run workflow*.
 

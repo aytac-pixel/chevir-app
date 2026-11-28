@@ -219,8 +219,8 @@
   "en": "Starting camera...",
   "src": "UIStrings.cs"
  },
- "Kameraya icazə lazımdır.\nTelefonun Ayarlar > Tətbiqlər > Chevir bölməsində kameranı aç.": {
-  "en": "Chevir needs the camera.\nAllow it in Settings > Apps > Chevir.",
+ "Kameraya icazə lazımdır.\nTelefonun Ayarlar > Tətbiqlər > Chevir I/O bölməsində kameranı aç.": {
+  "en": "Chevir I/O needs the camera.\nAllow it in Settings > Apps > Chevir I/O.",
   "src": "UIStrings.cs"
  },
  "Kamera modulu quraşdırılmayıb.": {
@@ -491,8 +491,8 @@
   "en": "Invite friends",
   "src": "UIStrings.cs"
  },
- "Chevir ilə Azərbaycan İşarə Dilini öyrənirəm. Seriyam: {0} gün! Sən də qoşul: {1}": {
-  "en": "I'm learning Azerbaijani Sign Language with Chevir. My streak: {0} days! Join me: {1}",
+ "Chevir I/O ilə Azərbaycan İşarə Dilini öyrənirəm. Seriyam: {0} gün! Sən də qoşul: {1}": {
+  "en": "I'm learning Azerbaijani Sign Language with Chevir I/O. My streak: {0} days! Join me: {1}",
   "src": "UIStrings.cs"
  },
  "Dəvət linki kopyalandı": {
@@ -579,7 +579,7 @@
   "en": "Left",
   "src": "UIStrings.cs"
  },
- "Bildirişlərə icazə verilmədi. Telefonun Ayarlar > Tətbiqlər > Chevir > Bildirişlər bölməsində aç.": {
+ "Bildirişlərə icazə verilmədi. Telefonun Ayarlar > Tətbiqlər > Chevir I/O > Bildirişlər bölməsində aç.": {
   "en": null,
   "src": "ReminderSettingsUI.cs"
  },
@@ -699,15 +699,15 @@
   "en": null,
   "src": "NameSignPickerUI.cs"
  },
- "Məlumatlarımla Chevir-i inkişaf etdirməyə kömək et": {
+ "Məlumatlarımla Chevir I/O-nu inkişaf etdirməyə kömək et": {
   "en": null,
   "src": "DataConsentUI.cs"
  },
- "Kamera qarşısında işarə göstərəndə Chevir bu cəhdi saxlaya bilər: əlinin, üzünün və bədəninin nöqtələri və 3 saniyəlik kiçik video. Bunlarla Chevir işarə dilini daha yaxşı tanımağı öyrənir. Məlumatlar yalnız Chevir komandasında qalır, heç kimə göstərilmir. İstədiyin vaxt Hesab ayarlarından söndürə bilərsən.": {
+ "Kamera qarşısında işarə göstərəndə Chevir I/O bu cəhdi saxlaya bilər: əlinin, üzünün və bədəninin nöqtələri və 3 saniyəlik kiçik video. Bunlarla Chevir I/O işarə dilini daha yaxşı tanımağı öyrənir. Məlumatlar yalnız Chevir I/O komandasında qalır, heç kimə göstərilmir. İstədiyin vaxt Hesab ayarlarından söndürə bilərsən.": {
   "en": null,
   "src": "DataConsentUI.cs"
  },
- "Təşəkkürlər! Chevir-i birlikdə inkişaf etdiririk": {
+ "Təşəkkürlər! Chevir I/O-nu birlikdə inkişaf etdiririk": {
   "en": null,
   "src": "DataConsentUI.cs"
  },
@@ -799,7 +799,7 @@
   "en": null,
   "src": "AccountSettingsUI.cs"
  },
- "Təşəkkürlər! Cəhdlərin Chevir-i inkişaf etdirməyə kömək edəcək.": {
+ "Təşəkkürlər! Cəhdlərin Chevir I/O-nu inkişaf etdirməyə kömək edəcək.": {
   "en": null,
   "src": "AccountSettingsUI.cs"
  },
@@ -847,7 +847,7 @@
   "en": null,
   "src": "AccountSettingsUI.cs"
  },
- "Kamerada göstərdiyin işarələrin nöqtələri və 3 saniyəlik kiçik video saxlanılır ki, Chevir işarə dilini daha yaxşı tanısın. Söndürəndə əvvəl saxlananlar da silinir.": {
+ "Kamerada göstərdiyin işarələrin nöqtələri və 3 saniyəlik kiçik video saxlanılır ki, Chevir I/O işarə dilini daha yaxşı tanısın. Söndürəndə əvvəl saxlananlar da silinir.": {
   "en": null,
   "src": "AccountSettingsUI.cs"
  },

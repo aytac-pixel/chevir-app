@@ -46,14 +46,14 @@ namespace Cevir.Core.UI
             IconTileCentered(kit, invite, iconUsers, UIPalette.Primary, UIPalette.CyanLight, 150f);
             kit.Text(invite, "Title", Loc.Pick("Learning together is more fun!", "Birlikdə öyrənmək daha maraqlıdır!", "Учиться вместе веселее!"),
                 40f, UIPalette.TextPrimary, TextAlignmentOptions.Center);
-            kit.Text(invite, "Body", Loc.Pick("Send your friends the link to the newest Chevir app.",
-                    "Dostlarına Chevir tətbiqinin ən yeni versiyasının linkini göndər.",
-                    "Отправь друзьям ссылку на новую версию приложения Chevir."),
+            kit.Text(invite, "Body", Loc.Pick("Send your friends the link to the newest Chevir I/O app.",
+                    "Dostlarına Chevir I/O tətbiqinin ən yeni versiyasının linkini göndər.",
+                    "Отправь друзьям ссылку на новую версию приложения Chevir I/O."),
                 29f, UIPalette.TextSecondary, TextAlignmentOptions.Center, false);
             kit.Button(invite, "InviteButton", Loc.Pick("INVITE FRIENDS", "DOSTLARI DƏVƏT ET", "ПРИГЛАСИТЬ ДРУЗЕЙ"), Color.white, Color.white, 124f, true, Invite);
 
             RectTransform follow = kit.Card(content, "Follow", 40, 18f);
-            kit.Text(follow, "Title", Loc.Pick("Follow Chevir", "Chevir-i izlə", "Следи за Chevir"), 36f, UIPalette.TextPrimary);
+            kit.Text(follow, "Title", Loc.Pick("Follow Chevir I/O", "Chevir I/O-nu izlə", "Следи за Chevir I/O"), 36f, UIPalette.TextPrimary);
             LinkRow(kit, follow, "Instagram", iconInstagram, new Color32(0xC1, 0x35, 0x84, 0xFF), "Instagram", "@chevir_app",
                 () => Application.OpenURL(InstagramLink));
             LinkRow(kit, follow, "Website", logo != null ? logo : iconGlobe, logo != null ? Color.white : UIPalette.Primary,

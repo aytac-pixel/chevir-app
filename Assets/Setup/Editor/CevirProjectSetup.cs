@@ -214,7 +214,7 @@ namespace Cevir.Setup.Editor
         private static void ConfigurePlayer()
         {
             PlayerSettings.companyName = "Chevir";
-            PlayerSettings.productName = "Chevir";
+            PlayerSettings.productName = "Chevir I/O";
             if (string.IsNullOrEmpty(PlayerSettings.bundleVersion) || PlayerSettings.bundleVersion == "0.1" || PlayerSettings.bundleVersion == "1.0")
             {
                 PlayerSettings.bundleVersion = "0.1.0";
@@ -244,7 +244,7 @@ namespace Cevir.Setup.Editor
             // iOS
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.iOS, BundleId);
             PlayerSettings.iOS.cameraUsageDescription =
-                "Chevir işarələrini yoxlamaq üçün kameradan istifadə edir. Görüntü telefondan çıxmır.";
+                "Chevir I/O işarələrini yoxlamaq üçün kameradan istifadə edir. Görüntü telefondan çıxmır.";
             PlayerSettings.iOS.targetOSVersionString = "13.0";
         }
     }

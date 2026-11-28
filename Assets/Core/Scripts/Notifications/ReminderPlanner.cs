@@ -213,7 +213,7 @@ namespace Cevir.Core.Notifications
         private static void AddSplit(List<PlannedReminder> plan, DateTime now, DateTime date, int minutes, string message)
         {
             int cut = message.IndexOf('!');
-            string title = cut > 0 ? message.Substring(0, cut + 1) : "Chevir";
+            string title = cut > 0 ? message.Substring(0, cut + 1) : "Chevir I/O";
             string body = cut > 0 ? message.Substring(cut + 1).Trim() : message;
             Add(plan, now, date, minutes, title, body.Length > 0 ? body : message);
         }

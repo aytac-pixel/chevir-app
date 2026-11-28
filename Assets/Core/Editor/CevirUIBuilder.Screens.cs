@@ -683,7 +683,7 @@ namespace Cevir.Core.Editor
             Image logo = Img(content, "Logo", Sprite("Brand", "cevir_logo"), Color.white);
             Layout(logo.gameObject, preferredWidth: 300f, preferredHeight: 300f);
             logo.GetComponent<LayoutElement>().flexibleWidth = 0f;
-            TextMeshProUGUI brand = Text(content, "Brand", "Chevir", 96f, UIPalette.PrimaryDark, TextAlignmentOptions.Center, true);
+            TextMeshProUGUI brand = Text(content, "Brand", "Chevir I/O", 96f, UIPalette.PrimaryDark, TextAlignmentOptions.Center, true);
             Layout(brand.gameObject, preferredHeight: 120f);
             TextMeshProUGUI tagline = Label(content, "Tagline", "Learn Azerbaijani Sign Language", "Azərbaycan İşarə Dilini öyrən", 36f,
                 UIPalette.TextSecondary, TextAlignmentOptions.Center, false);

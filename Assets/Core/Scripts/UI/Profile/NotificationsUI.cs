@@ -49,9 +49,9 @@ namespace Cevir.Core.UI
         protected override void BuildContent(UIKit kit, RectTransform content)
         {
             _denied = kit.Text(content, "Denied", Loc.Pick(
-                    "Notifications are blocked on this phone. Allow them for Chevir in the phone's settings.",
-                    "Bu telefonda bildirişlər bağlıdır. Telefonun ayarlarında Chevir üçün icazə ver.",
-                    "Уведомления на этом телефоне выключены. Разреши их для Chevir в настройках телефона."),
+                    "Notifications are blocked on this phone. Allow them for Chevir I/O in the phone's settings.",
+                    "Bu telefonda bildirişlər bağlıdır. Telefonun ayarlarında Chevir I/O üçün icazə ver.",
+                    "Уведомления на этом телефоне выключены. Разреши их для Chevir I/O в настройках телефона."),
                 28f, UIPalette.RedDark, TextAlignmentOptions.Center, false);
             _denied.gameObject.SetActive(false);
 

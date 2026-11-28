@@ -8,6 +8,6 @@ namespace Cevir.Core.Social
 
     public sealed class InviteOnlySocialService : ISocialService
     {
-        public string InviteLink => "https://github.com/aytac-pixel/chevir-app/releases/latest/download/Cevir.apk"; // newest APK
+        public string InviteLink => "https://github.com/aytac-pixel/chevir-io/releases/latest/download/ChevirIO.apk"; // newest APK
     }
 }

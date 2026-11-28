@@ -126,7 +126,7 @@ namespace Cevir.Core.UI
             {
                 if (!granted && _draft.enabled)
                 {
-                    _hint.text = Loc.T("Bildirişlərə icazə verilmədi. Telefonun Ayarlar > Tətbiqlər > Chevir > Bildirişlər bölməsində aç.");
+                    _hint.text = Loc.T("Bildirişlərə icazə verilmədi. Telefonun Ayarlar > Tətbiqlər > Chevir I/O > Bildirişlər bölməsində aç.");
                     _hint.gameObject.SetActive(true);
                     if (CevirUIRoot.Instance != null) CevirUIRoot.Instance.ShowToast(Loc.T("Bildirişlərə icazə verilmədi"));
                     return;

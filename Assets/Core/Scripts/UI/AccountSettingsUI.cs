@@ -360,7 +360,7 @@ namespace Cevir.Core.UI
                 SetBusy(false);
                 Render();
                 if (error != null) Message(error, true);
-                else Message(allowed ? Loc.T("Təşəkkürlər! Cəhdlərin Chevir-i inkişaf etdirməyə kömək edəcək.")
+                else Message(allowed ? Loc.T("Təşəkkürlər! Cəhdlərin Chevir I/O-nu inkişaf etdirməyə kömək edəcək.")
                     : Loc.T("Söndürüldü. Əvvəl saxlanan cəhdlərin silindi."), false);
             });
         }
@@ -510,7 +510,7 @@ namespace Cevir.Core.UI
             RectTransform data = kit.Card(content, "DataConsent", 40, 16f);
             _dataCard = data.gameObject;
             kit.Text(data, "Title", DataConsentUI.Title, 34f, UIPalette.TextPrimary);
-            kit.Text(data, "Body", Loc.T("Kamerada göstərdiyin işarələrin nöqtələri və 3 saniyəlik kiçik video saxlanılır ki, Chevir " +
+            kit.Text(data, "Body", Loc.T("Kamerada göstərdiyin işarələrin nöqtələri və 3 saniyəlik kiçik video saxlanılır ki, Chevir I/O " +
                 "işarə dilini daha yaxşı tanısın. Söndürəndə əvvəl saxlananlar da silinir."), 28f, UIPalette.TextSecondary,
                 TextAlignmentOptions.TopLeft, false);
             RectTransform dataRow = UIKit.Rect("Choice", data);
