@@ -51,7 +51,6 @@ namespace Cevir.Core.UI
         private Texture2D _photoTexture;
         private Button _dayTheme;
         private Button _nightTheme;
-        private Button[] _languageButtons = new Button[0];
 
         public static AccountSettingsUI Instance { get; private set; }
 
@@ -109,12 +108,6 @@ namespace Cevir.Core.UI
             if (open) Open();
         }
 
-        private void SetLanguage(string code)
-        {
-            if (GameManager.Instance != null) GameManager.Instance.SetUiLanguage(code);
-            else Loc.SetLanguage(code);
-        }
-
         private void OnEnable()
         {
             ReminderRefresh();
@@ -146,7 +139,6 @@ namespace Cevir.Core.UI
             _deleteLabel.text = _deleteArmed ? Loc.T("TƏSDİQLƏ: HESABI SİL") : Loc.T("HESABI SİL");
             UIKit.Select(_dayTheme, !ThemeManager.IsDark);
             UIKit.Select(_nightTheme, ThemeManager.IsDark);
-            for (int i = 0; i < _languageButtons.Length; i++) UIKit.Select(_languageButtons[i], Loc.Supported[i] == Loc.Language);
             UIKit.Select(_rightHand, !_leftHanded);
             UIKit.Select(_leftHand, _leftHanded);
             ReminderRefresh();
@@ -513,18 +505,6 @@ namespace Cevir.Core.UI
             UIKit.Layout(_dayTheme.gameObject, flexibleWidth: 1f);
             _nightTheme = kit.Button(lookRow, "Night", Loc.T("GECƏ"), UIPalette.Surface, UIPalette.TextSecondary, 96f, false, () => ThemeManager.SetDark(true));
             UIKit.Layout(_nightTheme.gameObject, flexibleWidth: 1f);
-
-            // Interface language: every label, lesson, story and message follows it.
-            RectTransform language = kit.Card(content, "Language", 40, 18f);
-            kit.Text(language, "Title", Loc.T("Tətbiqin dili"), 36f, UIPalette.TextPrimary);
-            _languageButtons = new Button[Loc.Supported.Length];
-            for (int i = 0; i < Loc.Supported.Length; i++)
-            {
-                string code = Loc.Supported[i];
-                _languageButtons[i] = kit.Button(language, "Language_" + code, Loc.NativeName(code), UIPalette.Surface, UIPalette.TextSecondary, 96f, false,
-                    () => SetLanguage(code));
-                UIKit.Layout(_languageButtons[i].gameObject, flexibleWidth: 1f);
-            }
 
             // Data permission (sign samples for the dataset).
             RectTransform data = kit.Card(content, "DataConsent", 40, 16f);

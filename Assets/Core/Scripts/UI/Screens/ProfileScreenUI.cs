@@ -12,7 +12,7 @@ namespace Cevir.Core.UI
 {
     /// <summary>
     /// Profile tab: the profile card (photo, name, join date, ləqəb, current flame, total XP) and four pages under it:
-    /// Statistics, Notifications, Friends and Account. Built at runtime in the interface language.
+    /// Statistics, Notifications, Friends, Account and Languages. Built at runtime in the interface language.
     /// </summary>
     public sealed class ProfileScreenUI : MonoBehaviour
     {
@@ -26,6 +26,7 @@ namespace Cevir.Core.UI
         [SerializeField] private Sprite iconBell;
         [SerializeField] private Sprite iconUsers;
         [SerializeField] private Sprite iconSettings;
+        [SerializeField] private Sprite iconLanguages;
 
         private GameManager _game;
         private RectTransform _root;
@@ -38,6 +39,7 @@ namespace Cevir.Core.UI
         private TextMeshProUGUI _xp;
         private TextMeshProUGUI _notificationsNote;
         private TextMeshProUGUI _accountNote;
+        private TextMeshProUGUI _languageNote;
         private string _avatarUrlShown;
         private Texture2D _avatarTexture;
         private float _nextRefresh;
@@ -129,6 +131,8 @@ namespace Cevir.Core.UI
                     ? Loc.Pick("Daily greetings on", "Gündəlik salamlar açıqdır", "Приветствия дня включены")
                     : Loc.Pick("Greetings off", "Salamlar bağlıdır", "Приветствия выключены");
 
+            _languageNote.text = Loc.NativeName(Loc.Language);
+
             CloudService cloud = CloudService.Instance;
             bool signedIn = cloud != null && cloud.State == CloudState.SignedIn;
             _accountNote.text = signedIn && !string.IsNullOrEmpty(cloud.Email)
@@ -205,6 +209,9 @@ namespace Cevir.Core.UI
                 () => { if (FriendsUI.Instance != null) FriendsUI.Instance.Open(); });
             _accountNote = Entry(kit, content, "Account", iconSettings != null ? iconSettings : iconUser, UIPalette.TextSecondary, UIPalette.Surface,
                 Loc.Pick("Account", "Hesab", "Аккаунт"), "", OpenAccount);
+            _languageNote = Entry(kit, content, "Languages", iconLanguages, UIPalette.Primary, UIPalette.CyanLight,
+                Loc.Pick("Languages", "Dillər", "Языки"), "",
+                () => { if (LanguagesUI.Instance != null) LanguagesUI.Instance.Open(); });
         }
 
         /// <summary>The profile card: photo and name with join date and ləqəb, then the flame and XP.</summary>

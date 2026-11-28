@@ -652,6 +652,7 @@ namespace Cevir.Core.Editor
             Set(ui, "iconBell", IconSprite("bell"));
             Set(ui, "iconUsers", IconSprite("users"));
             Set(ui, "iconSettings", IconSprite("settings"));
+            Set(ui, "iconLanguages", IconSprite("languages"));
             return ui;
         }
 

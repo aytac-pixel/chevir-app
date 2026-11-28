@@ -87,6 +87,7 @@ namespace Cevir.Core.Editor
             BuildRuntimePanel<StatisticsUI>(canvasGo.transform, "StatisticsLayer", theme);
             BuildRuntimePanel<NotificationsUI>(canvasGo.transform, "NotificationsLayer", theme);
             BuildRuntimePanel<FriendsUI>(canvasGo.transform, "FriendsLayer", theme);
+            BuildRuntimePanel<LanguagesUI>(canvasGo.transform, "LanguagesLayer", theme);
             BuildRuntimePanel<AccountSettingsUI>(canvasGo.transform, "AccountSettingsLayer", theme);
             BuildRuntimePanel<ReminderSettingsUI>(canvasGo.transform, "ReminderSettingsLayer", theme);
             BuildAuthScreen(canvasGo.transform);
@@ -279,6 +280,7 @@ namespace Cevir.Core.Editor
                 Set(ui, "iconTrophy", IconSprite("trophy"));
             }
 
+            if (typeof(T) == typeof(LanguagesUI)) Set(ui, "iconCheck", IconSprite("check"));
             if (typeof(T) == typeof(FriendsUI))
             {
                 Set(ui, "iconUsers", IconSprite("users"));

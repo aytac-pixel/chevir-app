@@ -48,6 +48,15 @@ namespace Cevir.Core.Notifications
             _game.ProfileChanged += Reschedule;
             _game.ProfileChanged += SyncLeagueWatch;
             if (Cloud.CloudService.Instance != null) Cloud.CloudService.Instance.StateChanged += state => SyncLeagueWatch();
+            // A new interface language: the planned messages and the morning league texts are written again in it.
+            Loc.LanguageChanged += language =>
+            {
+#if UNITY_ANDROID && !UNITY_EDITOR
+                _watchStarted = false;
+#endif
+                Reschedule();
+                SyncLeagueWatch();
+            };
             Reschedule();
             SyncLeagueWatch();
             AskPermissionOnce();

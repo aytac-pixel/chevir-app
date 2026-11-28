@@ -555,6 +555,7 @@ namespace Cevir.Core.Localization
             new[] { "Quş", "Bird", "Птица" },
             new[] { "At", "Horse", "Лошадь" },
             new[] { "Canavar", "Wolf", "Волк" },
+            new[] { "Telefon nömrəsi (istəyə bağlı)", "Phone number (optional)", "Номер телефона (необязательно)" },
         };
 
         private static Dictionary<string, string[]> _byAz;

@@ -84,10 +84,7 @@ namespace Cevir.Core.Notifications
                 bool playedToday = day == 0 && streak != null && streak.IsActiveToday(now);
 
                 int weekday = ((int)date.DayOfWeek + 6) % 7; // Monday = 0
-                if (Loc.IsAz) AddSplit(plan, now, date, MorningMinutes, MorningAz[weekday]);
-                else Add(plan, now, date, MorningMinutes, Loc.Pick("Good morning! ☀", "Sabahınız xeyir! ☀", "Доброе утро! ☀"),
-                    Loc.Pick("Ready for today? A short lesson is waiting for you.", "Bu günə hazırsan? Qısa bir dərs səni gözləyir.",
-                        "Готов к новому дню? Тебя ждёт короткий урок."));
+                AddSplit(plan, now, date, MorningMinutes, Loc.Pick(MorningEn[weekday], MorningAz[weekday], MorningRu[weekday]));
 
                 if (record == null || !record.openedMorning)
                 {
@@ -103,20 +100,16 @@ namespace Cevir.Core.Notifications
                             "Когда начнём? Сегодняшний урок ждёт тебя."));
                 }
 
-                if (Loc.IsAz) AddSplit(plan, now, date, NightMinutes, playedToday ? NightPlayedAz[weekday] : NightNotPlayedAz[weekday]);
-                else Add(plan, now, date, NightMinutes, Loc.Pick("Good night! 🌙", "Gecəniz xeyrə qarşı! 🌙", "Спокойной ночи! 🌙"),
-                    playedToday
-                        ? Loc.Pick("You did great today. See you tomorrow!", "Bu gün əla işlədin. Sabah görüşənədək!",
-                            "Сегодня ты молодец. До завтра!")
-                        : Loc.Pick("Rest well. Tomorrow we'll learn new signs together.", "Yaxşı dincəl. Sabah yeni işarələri birlikdə öyrənərik.",
-                            "Хорошо отдохни. Завтра выучим новые жесты вместе."));
+                AddSplit(plan, now, date, NightMinutes, playedToday
+                    ? Loc.Pick(NightPlayedEn[weekday], NightPlayedAz[weekday], NightPlayedRu[weekday])
+                    : Loc.Pick(NightNotPlayedEn[weekday], NightNotPlayedAz[weekday], NightNotPlayedRu[weekday]));
             }
 
             return plan;
         }
 
         // The 07:00 and 22:00 messages change with the day of the week (Monday first); 22:00 depends on whether the
-        // learner did a lesson that day. Texts chosen by Gulshan (2026-11-28).
+        // learner did a lesson that day. Texts chosen by Gulshan (2026-11-28), with English and Russian versions.
         private static readonly string[] MorningAz =
         {
             "Sabahınız xeyir! Yeni həftə, yeni işarələr. Hazırsan? ☀",
@@ -148,6 +141,72 @@ namespace Cevir.Core.Notifications
             "Gecəniz xeyrə qarşı! Hər gün bir az daha irəlidəsən.",
             "Əla iş! Gecəniz xeyrə qarşı 🌟",
             "Həftəni gözəl bitirdin! Gecəniz xeyrə qarşı 🌙"
+        };
+
+        private static readonly string[] MorningEn =
+        {
+            "Good morning! New week, new signs. Ready? ☀",
+            "Good morning! How about learning one sign today?",
+            "Morning! Warm up your hands, a lesson is waiting 👋",
+            "Good morning! Keep your flame alive, let's go on today too 🔥",
+            "Have a nice morning! 5 minutes is enough, shall we start?",
+            "Good morning! The weekend is the best time to learn 🌤",
+            "Morning! Let's end the week well, one lesson?"
+        };
+
+        private static readonly string[] MorningRu =
+        {
+            "Доброе утро! Новая неделя, новые жесты. Готов? ☀",
+            "Доброе утро! Как насчёт выучить сегодня один жест?",
+            "С добрым утром! Разомни руки, урок ждёт 👋",
+            "Доброе утро! Не дай огоньку погаснуть, продолжаем и сегодня 🔥",
+            "Хорошего утра! Хватит и 5 минут, начнём?",
+            "Доброе утро! Выходные — лучшее время учиться 🌤",
+            "С добрым утром! Закончим неделю красиво, один урок?"
+        };
+
+        private static readonly string[] NightNotPlayedEn =
+        {
+            "Good night! Let's start again tomorrow 🌙",
+            "Good night! A sign is waiting for you tomorrow.",
+            "Sweet dreams! Let's continue together tomorrow ✨",
+            "Good night! Don't forget to light your flame tomorrow 🔥",
+            "Good night! Tomorrow is a new day, a new lesson.",
+            "Sleep well! Shall we take 5 minutes tomorrow? 🌙",
+            "Good night! Get ready for a new week."
+        };
+
+        private static readonly string[] NightNotPlayedRu =
+        {
+            "Спокойной ночи! Завтра начнём снова 🌙",
+            "Спокойной ночи! Завтра тебя ждёт новый жест.",
+            "Сладких снов! Завтра продолжим вместе ✨",
+            "Спокойной ночи! Не забудь завтра зажечь огонёк 🔥",
+            "Спокойной ночи! Завтра новый день и новый урок.",
+            "Спокойного сна! Найдём завтра 5 минут? 🌙",
+            "Спокойной ночи! Готовься к новой неделе."
+        };
+
+        private static readonly string[] NightPlayedEn =
+        {
+            "Good night! You did great today 🌟",
+            "Well done! You learned today too. Sweet dreams 🌙",
+            "Good night! Your flame is burning, let's go on tomorrow 🔥",
+            "You were great today! Sleep well ✨",
+            "Good night! Every day you are a bit further ahead.",
+            "Great job! Good night 🌟",
+            "You ended the week beautifully! Good night 🌙"
+        };
+
+        private static readonly string[] NightPlayedRu =
+        {
+            "Спокойной ночи! Сегодня ты отлично поработал 🌟",
+            "Молодец! Сегодня ты тоже учился. Сладких снов 🌙",
+            "Спокойной ночи! Огонёк горит, завтра продолжим 🔥",
+            "Сегодня ты был молодцом! Спокойного сна ✨",
+            "Спокойной ночи! С каждым днём ты всё дальше.",
+            "Отличная работа! Спокойной ночи 🌟",
+            "Ты красиво закончил неделю! Спокойной ночи 🌙"
         };
 
         /// <summary>One message as title (up to the first "!") and text (the rest).</summary>

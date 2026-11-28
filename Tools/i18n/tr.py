@@ -559,4 +559,6 @@ TR = {
 'Quş': ('Bird', 'Птица'),
 'At': ('Horse', 'Лошадь'),
 'Canavar': ('Wolf', 'Волк'),
+# profile, 2026-11-28
+'Telefon nömrəsi (istəyə bağlı)': ('Phone number (optional)', 'Номер телефона (необязательно)'),
 }
