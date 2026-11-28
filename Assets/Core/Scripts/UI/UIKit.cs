@@ -215,6 +215,7 @@ namespace Cevir.Core.UI
             field.characterLimit = limit;
             field.lineType = TMP_InputField.LineType.SingleLine;
             field.contentType = type;
+            field.shouldHideMobileInput = true; // no extra text strip above the phone keyboard
             if (field.textViewport != null) Stretch(field.textViewport, 32f, 32f, 12f, 12f);
             if (field.textComponent != null)
             {

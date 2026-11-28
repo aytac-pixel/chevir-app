@@ -24,7 +24,7 @@ El və üz modelləri (`hand_landmarker`, `face_landmarker`) layihəyə artıq d
 1. Unity Hub > **Add** > bu qovluğu seç və aç (ilk açılış bir neçə dəqiqə çəkir).
 2. Menyuda **Chevir > Setup > 1. Configure Mobile Project (one click)**.
    - TextMeshPro resursları idxal olunarsa, eyni menyunu bir dəfə də bas.
-   - Bu addım AzSLD dil paketini (A1 səviyyəsi, 10 bölmə, 10 hekayə), Galmuri11 piksel şriftini (Azərbaycan hərfləri və kiril daxil), əsas səhnəni (`Assets/Scenes/Main.unity`), dörd əsas ekranı (Dərs, Hekayə, Liqa, Profil), giriş/qeydiyyat ekranını, dərs və hekayə ekranlarını, Android/iOS ayarlarını (portret, kamera və internet icazəsi, loqodan tətbiq ikonu, `com.chevirapp.cevir`) hazırlayır.
+   - Bu addım AzSLD dil paketini (A1 səviyyəsi, 10 bölmə, 10 hekayə), Nunito şriftini (Azərbaycan hərfləri və kiril daxil), əsas səhnəni (`Assets/Scenes/Main.unity`), dörd əsas ekranı (Dərs, Hekayə, Liqa, Profil), giriş/qeydiyyat ekranını, dərs və hekayə ekranlarını, Android/iOS ayarlarını (portret, kamera və internet icazəsi, loqodan tətbiq ikonu, `com.chevirapp.cevir`) hazırlayır.
 3. **Play** düyməsinə bas. Verilənlər bazası qoşulubsa (aşağıda, 3a), əvvəlcə qeydiyyat/giriş ekranı açılır; sonra Dərs ekranı, 1-ci bölmə (Əlifba: 25 hərf, 5 dərs + təkrar; hərəkətli hərflər Ç, G, Ğ, Ö, Ü, Y, Z çıxarılıb) aktivdir. Kompüterin kamerası ilə də yoxlaya bilərsən.
 
 ## 3a. Verilənlər bazası (Supabase): hesablar, irəliləyiş və liqa

@@ -35,7 +35,7 @@ Assets/
     Sprites/                    UI (pixel panels with dark borders, from Tools/ui_art/make_pixel_sprites.py), Icons (Lucide, pixelated), Story (10 pixel scenes, girl, hands), Units (unit icons), Decor (home-screen day/night decorations) from Tools/ui_art/make_pixel_art.py, Brand (logo)
     Brand/                      app icon (from the logo)
     Resources/                  CevirCloudConfig (server URL + public key, created by setup)
-    Fonts/                      Galmuri11 pixel font, covers Azerbaijani and Cyrillic (+ DejaVu Sans fallback)
+    Fonts/                      Nunito SemiBold/ExtraBold, covers Azerbaijani and Cyrillic (+ DejaVu Sans fallback)
     Data/  Prefabs/  Audio/  Scenes/
   Integrations/MediaPipe/       MediaPipeLandmarkProvider + bundled hand/face models (compiles when the plugin is installed)
   Setup/Editor/                 one-click project setup and build menu / CI entry points
@@ -58,7 +58,7 @@ Short version (step-by-step guide in Azerbaijani: `QURASDIRMA.md`):
 
 1. Open this folder with Unity 2022.3 LTS and the Android (or iOS) build modules installed.
 2. Install the MediaPipe Unity Plugin: `Tools/setup/install_mediapipe_plugin.ps1` (Windows) or `bash Tools/setup/install_mediapipe_plugin.sh`. The bridge assembly turns itself on when the package `com.github.homuler.mediapipe` is present, so there is no define to add. The hand and face models are already in `Assets/Integrations/MediaPipe/Models/`.
-3. **Chevir > Setup > 1. Configure Mobile Project (one click)**: imports TMP resources, creates the Galmuri11 pixel TMP font (DejaVu Sans as fallback; both cover Ə/ə and Cyrillic), builds the AzSLD pack, creates `Assets/Core/Resources/CevirCloudConfig.asset`, generates `Assets/Scenes/Main.unity` with the full UI, sets build settings and Android/iOS player settings (portrait, IL2CPP ARM64, min API 24, GLES3, camera usage text, internet permission, app icon from the logo, bundle id `com.chevirapp.cevir`).
+3. **Chevir > Setup > 1. Configure Mobile Project (one click)**: imports TMP resources, creates the Nunito TMP fonts (SemiBold + ExtraBold for bold text, DejaVu Sans as fallback; both cover Ə/ə and Cyrillic), builds the AzSLD pack, creates `Assets/Core/Resources/CevirCloudConfig.asset`, generates `Assets/Scenes/Main.unity` with the full UI, sets build settings and Android/iOS player settings (portrait, IL2CPP ARM64, min API 24, GLES3, camera usage text, internet permission, app icon from the logo, bundle id `com.chevirapp.cevir`).
 4. Database: create a Supabase project, run `Tools/supabase/schema.sql` in its SQL Editor, and paste the project URL and anon key into `CevirCloudConfig` (details in `QURASDIRMA.md`). Without it the app runs on the phone only, with no accounts or league ranking.
 5. **Chevir > Build > Android APK** (writes `Builds/Android/Cevir.apk`), **Android App Bundle** or **iOS Xcode Project**.
 6. CI: `.github/workflows/build-android.yml` builds the APK with game-ci from a fresh clone (`Cevir.Setup.Editor.CevirBuild.CiBuildAndroid` runs the setup, then the build). It runs on every push to `main` and publishes the APK to the `demo` release (always the latest: `releases/latest/download/Cevir.apk`). It needs `UNITY_LICENSE`, `UNITY_EMAIL` and `UNITY_PASSWORD` secrets.
@@ -153,12 +153,12 @@ Functions: `league_standings(week, tier)` and `settle_league(current_week)`. The
 
 ## Licences of bundled assets
 
-Galmuri11 font: SIL Open Font License (`Assets/Core/Fonts/Galmuri-OFL.txt`). DejaVu Sans: free licence (`DejaVu-LICENSE.txt`). Icons: Lucide, ISC licence (`Assets/Core/Sprites/Icons/LUCIDE-LICENSE.txt`); Instagram and Facebook glyphs from Simple Icons (CC0). Story art and voice clips were made for this project.
+Nunito font: SIL Open Font License (`Assets/Core/Fonts/Nunito-OFL.txt`). DejaVu Sans: free licence (`DejaVu-LICENSE.txt`). Icons: Lucide, ISC licence (`Assets/Core/Sprites/Icons/LUCIDE-LICENSE.txt`); Instagram and Facebook glyphs from Simple Icons (CC0). Story art and voice clips were made for this project.
 
 ## Status
 
 Not yet run in the Unity editor or on a phone:
-- Layout and spacing of the generated screens (expect tweaks), sprite slicing, the Galmuri11 font asset creation, night-theme colours, TMP rendering of Ə.
+- Layout and spacing of the generated screens (expect tweaks), sprite slicing, the Nunito font asset creation, night-theme colours, TMP rendering of Ə.
 - The sign-in screen and sync against a real Supabase project (the database schema itself was tested on Postgres 16: tables, access rules, tier protection and weekly settlement).
 - The MediaPipe bridge: API names, the `Mediapipe.Runtime` assembly name, camera rotation and handedness on each phone.
 - Matcher thresholds against real AzSLD data and pilot users.

@@ -297,6 +297,7 @@ namespace Cevir.Core.Editor
             field.fontAsset = _font;
             field.pointSize = 40f;
             field.characterLimit = 30;
+            field.shouldHideMobileInput = true; // no extra text strip above the phone keyboard
             field.lineType = TMP_InputField.LineType.SingleLine;
             if (field.textViewport != null) Stretch(field.textViewport, 32f, 32f, 14f, 14f);
             if (field.textComponent != null)

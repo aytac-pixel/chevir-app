@@ -134,8 +134,8 @@ namespace Cevir.Core.Editor
             _circle = Sprite("UI", "circle") ?? AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
 
             // A project font in Assets/Core/Fonts wins: the TMP default (LiberationSans) has no Ə/ə glyph.
-            // Galmuri11 (the design's pixel font) first, then any other font asset there.
-            _font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontFolder + "/Galmuri11 SDF.asset");
+            // Nunito (the app's main font) first, then any other font asset there.
+            _font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontFolder + "/Nunito SDF.asset");
             string[] fonts = _font == null ? AssetDatabase.FindAssets("t:TMP_FontAsset", new[] { FontFolder }) : new string[0];
             foreach (string guid in fonts)
             {

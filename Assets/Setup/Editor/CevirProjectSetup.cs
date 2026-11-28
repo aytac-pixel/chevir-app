@@ -26,24 +26,20 @@ namespace Cevir.Setup.Editor
 
         private const string FontSource = "Assets/Core/Fonts/DejaVuSans.ttf";
         private const string FontAssetPath = "Assets/Core/Fonts/DejaVuSans SDF.asset";
-        private const string MainFontSource = "Assets/Core/Fonts/Galmuri11.ttf";
-        private const string MainFontAssetPath = "Assets/Core/Fonts/Galmuri11 SDF.asset";
+        private const string MainFontSource = "Assets/Core/Fonts/Nunito-SemiBold.ttf";
+        private const string MainFontAssetPath = "Assets/Core/Fonts/Nunito SDF.asset";
+        private const string BoldFontSource = "Assets/Core/Fonts/Nunito-ExtraBold.ttf";
+        private const string BoldFontAssetPath = "Assets/Core/Fonts/Nunito ExtraBold SDF.asset";
 
         /// <summary>
-        /// Galmuri11 is a calm, evenly spaced pixel typeface (12-pixel grid) with every Azerbaijani letter (Ə/ə
-        /// included) and full Cyrillic for the Russian interface. At 0.95 its letters stand about a fifth taller than
-        /// the old VT323 setting while lines stay about as wide, so every label is easier to read and still fits.
+        /// Nunito is a clean, rounded sans (not a pixel font) that reads easily on small phone screens and sits well next
+        /// to the pixel art. It covers every Azerbaijani letter (Ə/ə included) and full Cyrillic for the Russian interface.
+        /// At 1.05 a line is a little narrower than the old pixel font setting, so every label still fits.
         /// </summary>
-        private const float MainFontScale = 0.95f;
+        private const float MainFontScale = 1.05f;
 
-        /// <summary>Faux bold kept light so the pixel shapes stay crisp (TMP default 0.75).</summary>
-        private const float MainBoldStyle = 0.45f;
-
-        /// <summary>
-        /// Atlas sampling size: about 7 atlas pixels per font pixel (12-pixel em), so edges stay sharp squares, while
-        /// every Azerbaijani, Latin and Cyrillic letter still fits in one 2048 atlas (a second atlas page fails in batch mode).
-        /// </summary>
-        private const int MainSamplingSize = 80;
+        /// <summary>Atlas sampling size: large enough for sharp edges, small enough that all letters fit one 2048 atlas.</summary>
+        private const int MainSamplingSize = 72;
 
         /// <summary>Letters the UI needs up front; anything else is added to the dynamic atlas on demand.</summary>
         private const string Prewarm =
@@ -94,33 +90,52 @@ namespace Cevir.Setup.Editor
         }
 
         /// <summary>
-        /// Galmuri11 (the pixel typeface of the design; covers Azerbaijani, Ə/ə included, English and Russian) with
-        /// DejaVu Sans as the fallback for anything it lacks (arrows, symbols). One weight, so bold text is TMP's faux
-        /// bold, kept light. All atlases are dynamic.
+        /// Nunito SemiBold for normal text and Nunito ExtraBold for bold text (a real bold face through the font weight
+        /// table, so no faux bold), with DejaVu Sans as the fallback for anything they lack (arrows, symbols).
+        /// All atlases are dynamic.
         /// </summary>
         private static void EnsureFontAsset()
         {
             TMP_FontAsset fallback = CreateFontAsset(FontSource, FontAssetPath, "DejaVuSans SDF");
-            TMP_FontAsset main = CreateFontAsset(MainFontSource, MainFontAssetPath, "Galmuri11 SDF", MainSamplingSize, 8, 2048);
+            TMP_FontAsset main = CreateFontAsset(MainFontSource, MainFontAssetPath, "Nunito SDF", MainSamplingSize, 8, 2048);
             if (main == null) return;
-            main.boldStyle = MainBoldStyle;
+            TMP_FontAsset bold = CreateFontAsset(BoldFontSource, BoldFontAssetPath, "Nunito ExtraBold SDF", MainSamplingSize, 8, 2048);
 
-            var so = new SerializedObject(main);
+            SetScale(main);
+            if (bold != null)
+            {
+                SetScale(bold);
+                TMP_FontWeightPair[] weights = main.fontWeightTable;
+                if (weights != null && weights.Length > 7)
+                {
+                    weights[7].regularTypeface = bold; // FontWeight.Bold (700) = what FontStyles.Bold uses (array of structs, set in place)
+                }
+            }
+
+            if (fallback != null)
+            {
+                foreach (TMP_FontAsset asset in new[] { main, bold })
+                {
+                    if (asset == null) continue;
+                    if (asset.fallbackFontAssetTable == null) asset.fallbackFontAssetTable = new System.Collections.Generic.List<TMP_FontAsset>();
+                    if (!asset.fallbackFontAssetTable.Contains(fallback)) asset.fallbackFontAssetTable.Add(fallback);
+                    EditorUtility.SetDirty(asset);
+                }
+            }
+
+            EditorUtility.SetDirty(main);
+            AssetDatabase.SaveAssets();
+        }
+
+        private static void SetScale(TMP_FontAsset asset)
+        {
+            var so = new SerializedObject(asset);
             SerializedProperty scale = so.FindProperty("m_FaceInfo.m_Scale");
             if (scale != null && !Mathf.Approximately(scale.floatValue, MainFontScale))
             {
                 scale.floatValue = MainFontScale;
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
-
-            if (fallback != null)
-            {
-                if (main.fallbackFontAssetTable == null) main.fallbackFontAssetTable = new System.Collections.Generic.List<TMP_FontAsset>();
-                if (!main.fallbackFontAssetTable.Contains(fallback)) main.fallbackFontAssetTable.Add(fallback);
-            }
-
-            EditorUtility.SetDirty(main);
-            AssetDatabase.SaveAssets();
         }
 
         private static TMP_FontAsset CreateFontAsset(string sourcePath, string assetPath, string assetName, int samplingSize = 90, int padding = 9, int atlasSize = 1024)
