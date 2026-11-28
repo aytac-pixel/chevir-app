@@ -83,6 +83,11 @@ namespace Cevir.Core.Editor
             theme.nightDecor = new Sprite[night.Length];
             for (int i = 0; i < day.Length; i++) theme.dayDecor[i] = Sprite("Decor", day[i]);
             for (int i = 0; i < night.Length; i++) theme.nightDecor[i] = Sprite("Decor", night[i]);
+
+            // Learn page sky: one picture per time of day and weather (see HomeSkyUI.Mood).
+            string[] skies = { "morning", "noon", "evening", "night", "rain", "rain_night", "snow", "snow_night" };
+            theme.homeSkies = new Sprite[skies.Length];
+            for (int i = 0; i < skies.Length; i++) theme.homeSkies[i] = Sprite("Home", "home_bg_" + skies[i]);
             EditorUtility.SetDirty(theme);
             return theme;
         }

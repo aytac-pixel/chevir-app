@@ -48,7 +48,8 @@ namespace Cevir.Core.Editor
 
         private static bool IsPixelArt(string path)
         {
-            return path.StartsWith(SpriteRoot + "Story/") || path.StartsWith(SpriteRoot + "Decor/") || path.StartsWith(SpriteRoot + "Units/");
+            return path.StartsWith(SpriteRoot + "Story/") || path.StartsWith(SpriteRoot + "Decor/") || path.StartsWith(SpriteRoot + "Units/") ||
+                   path.StartsWith(SpriteRoot + "Home/");
         }
 
         /// <summary>Re-imports any sprite that was imported before these rules existed (first project open).</summary>

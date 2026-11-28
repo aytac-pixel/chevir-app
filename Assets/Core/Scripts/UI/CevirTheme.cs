@@ -39,5 +39,10 @@ namespace Cevir.Core.UI
         [Header("Home decor (pixel art)")]
         public Sprite[] dayDecor;
         public Sprite[] nightDecor;
+
+        [Header("Home sky (pixel art)")]
+        [Tooltip("Full-screen Learn page backgrounds in HomeSky.Mood order: morning, noon, evening, night, rain, " +
+                 "rain at night, snow, snow at night.")]
+        public Sprite[] homeSkies;
     }
 }

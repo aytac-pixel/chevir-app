@@ -29,11 +29,23 @@ namespace Cevir.Core.UI
         private RectTransform _layer;
         private CevirTheme _theme;
         private bool _night;
+        private bool _skyKnown;
+        private bool _skyNight;
+        private bool _skyWeather;
 
         public void Configure(RectTransform layer, CevirTheme theme)
         {
             _layer = layer;
             _theme = theme;
+        }
+
+        /// <summary>Follows the page's sky: stars and the moon under a night sky, none while it rains or snows.</summary>
+        public void SetSky(bool night, bool weather)
+        {
+            _skyKnown = true;
+            _skyNight = night;
+            _skyWeather = weather;
+            ApplySprites();
         }
 
         private void OnEnable()
@@ -104,10 +116,16 @@ namespace Cevir.Core.UI
         private void ApplySprites()
         {
             if (_theme == null) return;
-            _night = ThemeManager.IsDark;
+            _night = _skyKnown ? _skyNight : ThemeManager.IsDark;
             Sprite[] set = _night ? _theme.nightDecor : _theme.dayDecor;
             foreach (Item item in _items)
             {
+                if (_skyKnown && _skyWeather)
+                {
+                    item.Image.enabled = false; // rain or snow fills the screen instead
+                    continue;
+                }
+
                 Sprite sprite = set != null && set.Length > 0 ? set[(item.Slot * 7 + 3) % set.Length] : null;
                 item.Image.sprite = sprite;
                 item.Image.enabled = sprite != null;

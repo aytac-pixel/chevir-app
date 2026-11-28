@@ -37,7 +37,7 @@ namespace Cevir.Core.UI
         [SerializeField] private RectTransform pathLayer;
         [SerializeField] private UnitNodeUI nodePrefab;
         [SerializeField] private CevirTheme theme;
-        [SerializeField] private float headerHeight = 300f;
+        [SerializeField] private float headerHeight = 250f;
         [SerializeField] private float unitSpacing = 380f;
         [SerializeField] private float bottomPadding = 260f;
         [SerializeField] private float dotSpacing = 34f;
@@ -70,6 +70,7 @@ namespace Cevir.Core.UI
             Loc.LanguageChanged += OnLanguageChanged;
 
             if (sheet != null) sheet.Hide();
+            Sky();
             _scrollPending = true;
             Refresh();
         }
@@ -185,6 +186,16 @@ namespace Cevir.Core.UI
         }
 
         private HomeDecorUI _decor;
+        private HomeSkyUI _sky;
+
+        /// <summary>The time-of-day / weather sky behind the whole page (created once).</summary>
+        private HomeSkyUI Sky()
+        {
+            if (_sky != null) return _sky;
+            _sky = HomeSkyUI.Create((RectTransform)transform, theme);
+            _sky.MoodChanged += mood => { if (_decor != null) _decor.SetSky(_sky.IsNight, _sky.HasWeather); };
+            return _sky;
+        }
 
         private HomeDecorUI Decor()
         {
@@ -199,6 +210,7 @@ namespace Cevir.Core.UI
             layer.offsetMin = layer.offsetMax = Vector2.zero;
             _decor = go.AddComponent<HomeDecorUI>();
             _decor.Configure(layer, theme);
+            if (_sky != null) _decor.SetSky(_sky.IsNight, _sky.HasWeather);
             return _decor;
         }
 

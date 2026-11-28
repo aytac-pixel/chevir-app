@@ -26,12 +26,26 @@ namespace Cevir.Core.Curriculum
         public string Guidebook => guidebook;
         public IReadOnlyList<LessonData> Lessons => lessons;
         public bool IsCheckpoint => checkpoint;
+        [Tooltip("Pixel picture that fills the unit's tile on the home path.")]
+        [SerializeField] private Sprite picture;
+
+        [Tooltip("Blurred, paler copy of the picture shown while the unit is locked (a padlock sits on top).")]
+        [SerializeField] private Sprite lockedPicture;
+
         public Sprite Icon => icon;
+        public Sprite Picture => picture;
+        public Sprite LockedPicture => lockedPicture;
 
 #if UNITY_EDITOR
         public void EditorSetIcon(Sprite unitIcon)
         {
             icon = unitIcon;
+        }
+
+        public void EditorSetPictures(Sprite unitPicture, Sprite lockedUnitPicture)
+        {
+            picture = unitPicture;
+            lockedPicture = lockedUnitPicture;
         }
 
         public void EditorSetContent(Color color, List<LessonData> lessonList)

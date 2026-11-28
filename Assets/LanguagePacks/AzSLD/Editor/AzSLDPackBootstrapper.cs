@@ -425,6 +425,10 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
                 unit.EditorSetIcon(string.IsNullOrEmpty(spec.Icon) ? null
                     : AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Core/Sprites/Units/unit_" + spec.Icon + ".png"));
+                unit.EditorSetPictures(string.IsNullOrEmpty(spec.Icon) ? null
+                        : AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Core/Sprites/Units/unitpic_" + spec.Icon + ".png"),
+                    string.IsNullOrEmpty(spec.Icon) ? null
+                        : AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Core/Sprites/Units/unitpic_" + spec.Icon + "_locked.png"));
 
                 List<LessonData> lessons;
                 if (u == 0) lessons = CreateUnit1Lessons(unitId, letters);

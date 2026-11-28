@@ -29,6 +29,9 @@ namespace Cevir.Core.UI
 
         private const float TileSize = 164f;
         private const float LockedTileSize = 104f;
+        private const float LockedPictureTile = 156f;
+
+        private Image _plate;
 
         private Action<UnitPathEntry> _onTap;
         private UnitPathEntry _entry;
@@ -61,9 +64,73 @@ namespace Cevir.Core.UI
                 title.color = UIPalette.Primary;
             }
 
+            Sprite picture = entry.Unit != null ? (locked ? entry.Unit.LockedPicture : entry.Unit.Picture) : null;
+            if (picture == null && locked && entry.Unit != null) picture = entry.Unit.Picture;
+            if (picture != null) BindPicture(theme, picture, locked, active);
+            else BindIcon(entry, theme, locked, active);
+
+            FitCaptionPlate(theme);
+            if (glow != null) glow.gameObject.SetActive(false); // no glow in the pixel design
+            if (startPill != null) startPill.SetActive(!locked && !entry.IsCheckpoint);
+            if (startLabel != null) startLabel.text = done ? UIStrings.PracticeAgain : UIStrings.Start;
+            if (entranceLabel != null)
+            {
+                entranceLabel.gameObject.SetActive(entry.IsCheckpoint && !active);
+                entranceLabel.text = UIStrings.Entrance;
+            }
+        }
+
+        /// <summary>
+        /// The unit's picture fills the tile inside a dark pixel frame (blue frame on the unit to do now). A locked
+        /// unit shows a blurred, paler copy of the picture with a padlock in the middle; once it opens the picture
+        /// shows normally.
+        /// </summary>
+        private void BindPicture(CevirTheme theme, Sprite picture, bool locked, bool active)
+        {
+            float size = locked ? LockedPictureTile : TileSize;
+            if (edge != null)
+            {
+                edge.sprite = theme.panel;
+                edge.color = UIPalette.Ink;
+                edge.rectTransform.sizeDelta = new Vector2(size, size);
+                edge.rectTransform.anchoredPosition = locked ? new Vector2(6f, -6f) : new Vector2(10f, -10f);
+            }
+
+            if (face != null)
+            {
+                face.sprite = active ? theme.tileActiveGradient : theme.panel;
+                face.type = Image.Type.Simple;
+                face.color = active ? Color.white : UIPalette.Ink;
+                face.rectTransform.sizeDelta = new Vector2(size, size);
+            }
+
+            if (icon != null)
+            {
+                icon.sprite = picture;
+                icon.color = Color.white;
+                icon.preserveAspect = true;
+                float inner = size - (active ? 20f : 12f);
+                icon.rectTransform.sizeDelta = new Vector2(inner, inner);
+            }
+
+            if (lockBadge != null)
+            {
+                lockBadge.SetActive(locked);
+                if (locked)
+                {
+                    var badge = (RectTransform)lockBadge.transform;
+                    badge.anchoredPosition = Vector2.zero;
+                    badge.sizeDelta = new Vector2(50f, 50f);
+                    if (badge.childCount > 0) ((RectTransform)badge.GetChild(0)).sizeDelta = new Vector2(30f, 30f);
+                }
+            }
+        }
+
+        /// <summary>Older look for a unit without a picture: its white pixel icon on a tile.</summary>
+        private void BindIcon(UnitPathEntry entry, CevirTheme theme, bool locked, bool active)
+        {
             Sprite tileShape = entry.IsCheckpoint ? theme.circle : theme.panel;
             if (rim != null) rim.sprite = tileShape;
-            // Pixel style: locked units are smaller tiles; the edge is the tile's hard dark shadow.
             float size = locked ? LockedTileSize : TileSize;
             if (edge != null)
             {
@@ -90,8 +157,6 @@ namespace Cevir.Core.UI
 
             if (icon != null)
             {
-                // Every unit has its own pixel icon (letters, a waving hand, a clock...); locked units show it greyed
-                // with a small padlock, so the path already tells what is coming.
                 Sprite unitIcon = entry.Unit != null ? entry.Unit.Icon : null;
                 if (unitIcon != null) icon.sprite = unitIcon;
                 else if (entry.IsCheckpoint) icon.sprite = theme.iconTrophy;
@@ -110,17 +175,46 @@ namespace Cevir.Core.UI
                 {
                     var badge = (RectTransform)lockBadge.transform;
                     badge.anchoredPosition = new Vector2(size * 0.5f, size * 0.5f);
+                    badge.sizeDelta = new Vector2(56f, 56f);
+                    if (badge.childCount > 0) ((RectTransform)badge.GetChild(0)).sizeDelta = new Vector2(30f, 30f);
                 }
             }
+        }
 
-            if (glow != null) glow.gameObject.SetActive(false); // no glow in the pixel design
-            if (startPill != null) startPill.SetActive(!locked && !entry.IsCheckpoint);
-            if (startLabel != null) startLabel.text = done ? UIStrings.PracticeAgain : UIStrings.Start;
-            if (entranceLabel != null)
+        /// <summary>
+        /// A light plate behind "UNIT n" and the title, so they stay readable over every sky (night, sunset, rain).
+        /// Sized to the text, at most the caption's width.
+        /// </summary>
+        private void FitCaptionPlate(CevirTheme theme)
+        {
+            if (title == null) return;
+            var caption = title.transform.parent as RectTransform;
+            if (caption == null) return;
+
+            if (_plate == null)
             {
-                entranceLabel.gameObject.SetActive(entry.IsCheckpoint && !active);
-                entranceLabel.text = UIStrings.Entrance;
+                var go = new GameObject("Plate", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+                go.GetComponent<LayoutElement>().ignoreLayout = true;
+                go.transform.SetParent(caption, false);
+                go.transform.SetAsFirstSibling();
+                _plate = go.GetComponent<Image>();
+                _plate.raycastTarget = false;
+                _plate.type = Image.Type.Sliced;
+                RectTransform rt = _plate.rectTransform;
+                rt.anchorMin = new Vector2(0.5f, 0f);
+                rt.anchorMax = new Vector2(0.5f, 1f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
             }
+
+            _plate.sprite = theme != null ? theme.panel : null;
+            _plate.color = UIPalette.Surface;
+            float maxWidth = caption.rect.width > 1f ? caption.rect.width : 500f;
+            float width = title.GetPreferredValues(title.text).x;
+            if (kicker != null) width = Mathf.Max(width, kicker.GetPreferredValues(kicker.text).x);
+            width = Mathf.Min(maxWidth, width) + 44f;
+            RectTransform plate = _plate.rectTransform;
+            plate.sizeDelta = new Vector2(width, 24f);
+            plate.anchoredPosition = Vector2.zero;
         }
     }
 }

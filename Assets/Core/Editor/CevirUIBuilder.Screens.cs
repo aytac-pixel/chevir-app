@@ -210,18 +210,22 @@ namespace Cevir.Core.Editor
             RectTransform pathLayer = Rect("PathDots", content);
             Stretch(pathLayer);
 
+            // Level card: title, unit count and progress bar on a white pixel panel, so it reads over every sky.
             RectTransform header = Rect("LevelHeader", content);
-            Place(header, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -50f), new Vector2(960f, 200f));
-            TextMeshProUGUI kicker = Label(header, "Kicker", "LEARNING PATH", "ÖYRƏNMƏ YOLU", 30f, UIPalette.Primary);
-            Place(kicker.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), Vector2.zero, new Vector2(600f, 40f));
-            kicker.characterSpacing = 4f;
-            TextMeshProUGUI levelTitle = Text(header, "Title", "A1 Level", 66f, UIPalette.TextPrimary, TextAlignmentOptions.BottomLeft, true);
-            Place(levelTitle.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, -40f), new Vector2(640f, 90f));
-            TextMeshProUGUI units = Text(header, "Units", "0 / 10 units", 30f, UIPalette.TextSecondary, TextAlignmentOptions.BottomRight, true);
-            Place(units.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(0f, -40f), new Vector2(340f, 80f));
+            Place(header, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(980f, 190f));
+            Image headerCard = header.gameObject.AddComponent<Image>();
+            headerCard.sprite = Panel(24);
+            headerCard.type = Image.Type.Sliced;
+            headerCard.color = UIPalette.Surface;
+            headerCard.raycastTarget = false;
+            HardShadow(header.gameObject);
+            TextMeshProUGUI levelTitle = Text(header, "Title", "A1 Level", 62f, UIPalette.TextPrimary, TextAlignmentOptions.MidlineLeft, true);
+            Place(levelTitle.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -18f), new Vector2(600f, 90f));
+            TextMeshProUGUI units = Text(header, "Units", "0 / 10 units", 30f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineRight, true);
+            Place(units.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-40f, -18f), new Vector2(340f, 90f));
             // Thin bar with a dark border; the blue fill sits inside the border.
             Image track = Img(header, "ProgressTrack", Sprite("UI", "pill"), Color.white, true);
-            Place(track.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), new Vector2(960f, 30f));
+            Place(track.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -130f), new Vector2(900f, 30f));
             Image fill = Img(track.transform, "Fill", Sprite("UI", "white"), UIPalette.Primary, false);
             fill.preserveAspect = false;
             Stretch(fill.rectTransform, 6f, 6f, 6f, 6f);
