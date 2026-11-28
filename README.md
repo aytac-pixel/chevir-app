@@ -20,7 +20,7 @@
 
 ## Niyə Chevir I/O?
 
-Azərbaycanda minlərlə kar və eşitmə qüsurlu insan gündəlik ünsiyyətdə işarə dilindən istifadə edir, amma onların ailələri, dostları və müəllimləri üçün bu dili öyrənməyin rahat yolu demək olar ki, yoxdur. Kitab və videolar işarəni göstərir, lakin **səni yoxlamır**.
+Azərbaycanda minlərlə eşitmə qüsurlu insan gündəlik ünsiyyətdə işarə dilindən istifadə edir, amma onların ailələri, dostları və müəllimləri üçün bu dili öyrənməyin rahat yolu demək olar ki, yoxdur. Kitab və videolar işarəni göstərir, lakin **səni yoxlamır**.
 
 Chevir I/O bu boşluğu doldurur: öyrənən işarəni telefonun ön kamerasına göstərir, tətbiq əl, barmaq və üz hərəkətlərini **cihazın özündə** analiz edir və dərhal "Düzgün!" və ya "Barmaq bucağını düzəlt" kimi konkret məsləhət verir. Hamısı qısa dərslər, hekayələr, alov seriyası və liqalarla, hər gün qayıtmaq istədiyin bir oyun formasında.
 
