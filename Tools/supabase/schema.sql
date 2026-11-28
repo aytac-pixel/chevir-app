@@ -54,6 +54,23 @@ create table if not exists public.period_xp (
 );
 create index if not exists period_xp_rank on public.period_xp (period, xp desc);
 
+-- Private contact details: only the owner can read them (profiles are visible to other learners, so the phone
+-- number is kept here instead).
+create table if not exists public.private_profiles (
+    id         uuid primary key references auth.users (id) on delete cascade,
+    phone      text not null default '' check (phone ~ '^(\+?[0-9]{7,15})?$'),
+    updated_at timestamptz not null default now()
+);
+
+-- Phones that may ask for their owner's weekly league place while the app is closed (a random token per phone and
+-- account; see league_place_for_device). Gone with the account.
+create table if not exists public.league_devices (
+    token      uuid primary key,
+    user_id    uuid not null references auth.users (id) on delete cascade,
+    created_at timestamptz not null default now()
+);
+create index if not exists league_devices_user on public.league_devices (user_id);
+
 -- Weeks already settled for a learner (so promotion / demotion happens once per week).
 create table if not exists public.league_settlements (
     user_id  uuid not null references auth.users (id) on delete cascade,
@@ -105,6 +122,16 @@ alter table public.weekly_xp          enable row level security;
 alter table public.period_xp          enable row level security;
 alter table public.league_settlements enable row level security;
 alter table public.sign_samples       enable row level security;
+alter table public.private_profiles   enable row level security;
+alter table public.league_devices     enable row level security;
+
+drop policy if exists "own private profile" on public.private_profiles;
+create policy "own private profile" on public.private_profiles
+    for all to authenticated using (id = auth.uid()) with check (id = auth.uid());
+
+drop policy if exists "own league devices" on public.league_devices;
+create policy "own league devices" on public.league_devices
+    for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
 
 drop policy if exists "profiles readable by signed-in users" on public.profiles;
 create policy "profiles readable by signed-in users" on public.profiles
@@ -301,6 +328,34 @@ begin
     perform set_config('cevir.settling', 'off', true);
     return v_tier;
 end $$;
+
+-- The weekly place of the account a phone token belongs to (this week in Baku time, in the learner's tier), for the
+-- check the app runs in the background while closed. Needs only the token, never a password or session.
+create or replace function public.league_place_for_device(p_token uuid)
+returns table (week text, rank int, players int)
+language sql stable security definer set search_path = public as $$
+    with me as (
+        select d.user_id, to_char(now() at time zone 'Asia/Baku', 'IYYY-"W"IW') as wk
+        from public.league_devices d
+        where d.token = p_token
+    ), mine as (
+        select me.user_id, me.wk, w.tier
+        from me
+        join public.weekly_xp w on w.user_id = me.user_id and w.week = me.wk
+    ), ranked as (
+        select w.user_id,
+               (row_number() over (order by w.xp desc, w.updated_at asc))::int as place,
+               (count(*) over ())::int as total
+        from public.weekly_xp w
+        join mine on w.week = mine.wk and w.tier = mine.tier
+    )
+    select mine.wk, r.place, r.total
+    from ranked r
+    join mine on r.user_id = mine.user_id;
+$$;
+
+revoke all on function public.league_place_for_device(uuid) from public;
+grant execute on function public.league_place_for_device(uuid) to anon, authenticated;
 
 revoke all on function public.league_standings(text, int) from public, anon;
 revoke all on function public.period_standings(text) from public, anon;

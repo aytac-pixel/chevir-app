@@ -1,4 +1,5 @@
 using Cevir.Core.Cloud;
+using Cevir.Core.Game;
 using Cevir.Core.Localization;
 using Cevir.Core.Stories;
 using TMPro;
@@ -24,6 +25,8 @@ namespace Cevir.Core.UI
         [SerializeField] private TextMeshProUGUI nameSignLabel;
         [SerializeField] private TextMeshProUGUI nameSignHint;
         [SerializeField] private TMP_InputField emailField;
+        [Tooltip("Phone number, asked at sign-up (optional).")]
+        [SerializeField] private TMP_InputField phoneField;
         [SerializeField] private TMP_InputField passwordField;
         [SerializeField] private TMP_InputField codeField;
         [SerializeField] private Button primaryButton;
@@ -71,6 +74,13 @@ namespace Cevir.Core.UI
             {
                 passwordField.contentType = TMP_InputField.ContentType.Password;
                 passwordField.characterLimit = 72;
+            }
+
+            if (phoneField != null)
+            {
+                phoneField.contentType = TMP_InputField.ContentType.Standard;
+                phoneField.keyboardType = TouchScreenKeyboardType.PhonePad;
+                phoneField.characterLimit = 20;
             }
 
             if (emailField != null)
@@ -149,6 +159,7 @@ namespace Cevir.Core.UI
 
             if (titleLabel != null) titleLabel.text = _reset ? Loc.T("Yeni şifrə") : _signUp ? UIStrings.SignUpTitle : UIStrings.SignInTitle;
             if (nameRow != null) nameRow.SetActive(_signUp && !_reset);
+            if (phoneField != null) phoneField.gameObject.SetActive(_signUp && !_reset);
             if (nameSignButton != null) nameSignButton.gameObject.SetActive(_signUp && !_reset);
             if (nameSignLabel != null)
             {
@@ -182,6 +193,13 @@ namespace Cevir.Core.UI
             if (_signUp && !_reset && nameSignButton != null && nameSign.Length == 0) { Message(UIStrings.NeedNameSign, true); return; }
             if (email.Length < 3 || !email.Contains("@")) { Message(UIStrings.NeedEmail, true); return; }
             if (password.Length < 6) { Message(UIStrings.NeedPassword, true); return; }
+            string phone = phoneField != null ? phoneField.text.Trim() : string.Empty;
+            if (_signUp && !_reset && phone.Length > 0 && GameManager.CleanPhone(phone).Length == 0)
+            {
+                Message(Loc.Pick("Write the phone number with digits only, e.g. +994501234567.",
+                    "Telefon nömrəsini rəqəmlərlə yaz, məs. +994501234567.", "Напиши номер цифрами, например +994501234567."), true);
+                return;
+            }
 
             // Like the camera permission: ask before the account is created (once; the answer is sent with the sign-up).
             if (_signUp && !_reset && !_dataConsent.HasValue && DataConsentUI.Instance != null)
@@ -216,6 +234,7 @@ namespace Cevir.Core.UI
 
             if (_signUp)
             {
+                _cloud.RememberSignUpPhone(GameManager.CleanPhone(phone));
                 _cloud.SignUp(name, nameSign, _dataConsent, email, password, (error, needsConfirmation) =>
                 {
                     SetBusy(false);

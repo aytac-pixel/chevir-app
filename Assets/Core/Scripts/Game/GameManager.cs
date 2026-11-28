@@ -328,6 +328,29 @@ namespace Cevir.Core.Game
         }
 
         /// <summary>The learner's name sign (ad işarəsi): nickname or most recognisable feature.</summary>
+        /// <summary>Phone number (digits, spaces and a leading +), kept private on the server.</summary>
+        public void SetPhone(string phone)
+        {
+            Progress.phone = CleanPhone(phone);
+            Save();
+            RaiseProfileChanged();
+        }
+
+        /// <summary>Keeps a leading + and the digits; "" when there are fewer than 7 digits.</summary>
+        public static string CleanPhone(string phone)
+        {
+            if (string.IsNullOrEmpty(phone)) return string.Empty;
+            var b = new System.Text.StringBuilder();
+            foreach (char c in phone.Trim())
+            {
+                if (char.IsDigit(c)) b.Append(c);
+                else if (c == '+' && b.Length == 0) b.Append(c);
+            }
+
+            int digits = b.Length > 0 && b[0] == '+' ? b.Length - 1 : b.Length;
+            return digits >= 7 && digits <= 15 ? b.ToString() : string.Empty;
+        }
+
         public void SetNameSign(string nameSign)
         {
             Progress.nameSign = (nameSign ?? string.Empty).Trim();

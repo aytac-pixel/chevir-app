@@ -46,6 +46,32 @@ namespace Cevir.Core.Cloud
         public string Email => _client != null ? _client.Email : null;
         public string UserId => _client != null ? _client.UserId : null;
 
+        /// <summary>Server address and public key, for the league check that runs while the app is closed.</summary>
+        public string BaseUrl => _config != null ? _config.BaseUrl : null;
+        public string AnonKey => _config != null ? _config.anonKey : null;
+
+        private const string PendingPhoneKey = "cevir.auth.pendingPhone";
+
+        /// <summary>Phone number typed at sign-up; saved to the profile at the first sign-in.</summary>
+        public void RememberSignUpPhone(string phone)
+        {
+            PlayerPrefs.SetString(PendingPhoneKey, (phone ?? string.Empty).Trim());
+            PlayerPrefs.Save();
+        }
+
+        /// <summary>Lets this phone ask for its owner's league place with <paramref name="token"/> (no sign-in needed).</summary>
+        public void RegisterLeagueDevice(string token, Action<bool> done)
+        {
+            if (_client == null || !_client.HasSession)
+            {
+                done(false);
+                return;
+            }
+
+            var row = new LeagueDeviceRow { token = token, user_id = _client.UserId };
+            _client.Upsert("league_devices", "token", JsonUtility.ToJson(row), response => done(response.Ok));
+        }
+
         /// <summary>The server client, for the sign-sample uploads (null when no server is configured).</summary>
         internal SupabaseClient Client => _client;
 
@@ -482,6 +508,13 @@ namespace Cevir.Core.Cloud
                     ScheduleUpload(0f);
                 }
 
+                string pendingPhone = PlayerPrefs.GetString(PendingPhoneKey, string.Empty);
+                if (pendingPhone.Length > 0)
+                {
+                    _game.SetPhone(pendingPhone);
+                    PlayerPrefs.DeleteKey(PendingPhoneKey);
+                }
+
                 _pendingName = null;
                 PlayerPrefs.DeleteKey(PendingNameKey);
                 _pendingNameSign = null;
@@ -569,6 +602,9 @@ namespace Cevir.Core.Cloud
                     // It is also kept in the progress JSON above.
                     var nameSign = new ProfileNameSignRow { id = userId, name_sign = progress.nameSign ?? string.Empty };
                     _client.Upsert("profiles", "id", JsonUtility.ToJson(nameSign), r4 => { });
+                    // The phone number is private: its own table that only the owner can read.
+                    var contact = new PrivateProfileRow { id = userId, phone = progress.phone ?? string.Empty };
+                    _client.Upsert("private_profiles", "id", JsonUtility.ToJson(contact), r5 => { });
                     if (progress.dataConsentAsked) UploadConsent(progress.dataConsent, null);
                     UploadPeriodXp(userId);
 

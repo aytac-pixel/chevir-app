@@ -35,6 +35,8 @@ namespace Cevir.Core.UI
         private TextMeshProUGUI _emailCurrent;
         private TMP_InputField _newEmail;
         private GameObject _passwordCard;
+        private TextMeshProUGUI _phoneCurrent;
+        private TMP_InputField _newPhone;
         private TMP_InputField _newPassword;
         private TMP_InputField _repeatPassword;
         private TextMeshProUGUI _remindersStatus;
@@ -136,6 +138,10 @@ namespace Cevir.Core.UI
             bool consent = GameManager.Instance != null && GameManager.Instance.Progress.dataConsent;
             UIKit.Select(_dataOn, consent);
             UIKit.Select(_dataOff, !consent);
+            string phoneNow = GameManager.Instance != null ? GameManager.Instance.Progress.phone : string.Empty;
+            _phoneCurrent.text = string.IsNullOrEmpty(phoneNow)
+                ? Loc.Pick("Not added yet", "Hələ əlavə olunmayıb", "Ещё не добавлен")
+                : Loc.T("Hazırkı: ") + "<b>" + phoneNow + "</b>";
             _emailCurrent.text = signedIn ? Loc.T("Hazırkı: ") + "<b>" + cloud.Email + "</b>" : string.Empty;
             _deleteLabel.text = _deleteArmed ? Loc.T("TƏSDİQLƏ: HESABI SİL") : Loc.T("HESABI SİL");
             UIKit.Select(_dayTheme, !ThemeManager.IsDark);
@@ -299,6 +305,26 @@ namespace Cevir.Core.UI
             });
         }
 
+        private void SavePhone()
+        {
+            GameManager game = GameManager.Instance;
+            if (game == null) return;
+            string typed = _newPhone.text.Trim();
+            string phone = GameManager.CleanPhone(typed);
+            if (typed.Length > 0 && phone.Length == 0)
+            {
+                Message(Loc.Pick("Write the phone number with digits only, e.g. +994501234567.",
+                    "Telefon nömrəsini rəqəmlərlə yaz, məs. +994501234567.", "Напиши номер цифрами, например +994501234567."), true);
+                return;
+            }
+
+            game.SetPhone(phone);
+            _newPhone.text = string.Empty;
+            Message(phone.Length > 0 ? Loc.Pick("Phone number saved.", "Telefon nömrəsi yadda saxlandı.", "Номер сохранён.")
+                : Loc.Pick("Phone number removed.", "Telefon nömrəsi silindi.", "Номер удалён."), false);
+            Render();
+        }
+
         private void ChangePassword()
         {
             CloudService cloud = CloudService.Instance;
@@ -414,15 +440,19 @@ namespace Cevir.Core.UI
             bg.color = background != null ? Color.white : UIPalette.Background;
             bg.raycastTarget = true;
             _panel = panel.gameObject;
+            HomeSkyUI.Create(panel, theme); // the same sky as the Learn page (time of day and weather)
 
             RectTransform safe = UIKit.Rect("SafeArea", panel);
             UIKit.Stretch(safe);
             safe.gameObject.AddComponent<SafeAreaFitter>();
             RectTransform content = kit.Scroll(safe, new RectOffset(60, 60, 40, 100), 30f);
 
-            RectTransform top = UIKit.Rect("Top", content);
-            UIKit.Row(top.gameObject, 20f);
-            UIKit.Layout(top.gameObject, preferredHeight: 96f);
+            // Title bar on a white card, so it reads on every sky.
+            RectTransform top = kit.Card(content, "Top", 0, 0f);
+            DestroyImmediate(top.GetComponent<VerticalLayoutGroup>());
+            HorizontalLayoutGroup topRow = UIKit.Row(top.gameObject, 20f);
+            topRow.padding = new RectOffset(20, 20, 16, 16);
+            UIKit.Layout(top.gameObject, preferredHeight: 128f);
             kit.IconButton(top, "Back", iconBack, "‹", 96f, UIPalette.TextPrimary, Color.white, Close);
             TextMeshProUGUI heading = kit.Text(top, "Heading", Loc.Pick("Account", "Hesab", "Аккаунт"), 46f, UIPalette.TextPrimary);
             UIKit.Layout(heading.gameObject, flexibleWidth: 1f);
@@ -521,6 +551,16 @@ namespace Cevir.Core.UI
             _newEmail = kit.Input(emailCard, "NewEmail", Loc.T("Yeni e-poçt"), TMP_InputField.ContentType.EmailAddress, 254);
             kit.Button(emailCard, "ChangeEmail", Loc.T("E-POÇTU DƏYİŞ"), UIPalette.CyanLight, UIPalette.Primary, 104f, false, ChangeEmail);
 
+            // Phone number (private: only the learner sees it).
+            RectTransform phoneCard = kit.Card(content, "Phone", 40, 18f);
+            kit.Text(phoneCard, "Title", Loc.Pick("Phone number", "Telefon nömrəsi", "Номер телефона"), 36f, UIPalette.TextPrimary);
+            _phoneCurrent = kit.Text(phoneCard, "Current", "", 30f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
+            _newPhone = kit.Input(phoneCard, "NewPhone", Loc.Pick("New number, e.g. +994501234567", "Yeni nömrə, məs. +994501234567",
+                "Новый номер, например +994501234567"), TMP_InputField.ContentType.Standard, 20);
+            _newPhone.keyboardType = TouchScreenKeyboardType.PhonePad;
+            kit.Button(phoneCard, "SavePhone", Loc.Pick("SAVE NUMBER", "NÖMRƏNİ YADDA SAXLA", "СОХРАНИТЬ НОМЕР"), UIPalette.CyanLight,
+                UIPalette.Primary, 104f, false, SavePhone);
+
             // Password.
             RectTransform passwordCard = kit.Card(content, "Password", 40, 18f);
             _passwordCard = passwordCard.gameObject;
@@ -537,8 +577,9 @@ namespace Cevir.Core.UI
             kit.Button(danger, "Delete", Loc.T("HESABI SİL"), UIPalette.RedLight, UIPalette.RedDark, 104f, false, out deleteLabel, DeleteAccount);
             _deleteLabel = deleteLabel;
 
-            // The registered e-mail comes first, right under the title.
+            // The registered e-mail and phone number come first, right under the title.
             emailCard.SetSiblingIndex(_message.transform.GetSiblingIndex() + 1);
+            phoneCard.SetSiblingIndex(emailCard.GetSiblingIndex() + 1);
         }
     }
 }

@@ -72,15 +72,19 @@ namespace Cevir.Core.UI
             bg.color = background != null ? Color.white : UIPalette.Background;
             bg.raycastTarget = true;
             _panel = panel.gameObject;
+            HomeSkyUI.Create(panel, theme); // the same sky as the Learn page (time of day and weather)
 
             RectTransform safe = UIKit.Rect("SafeArea", panel);
             UIKit.Stretch(safe);
             safe.gameObject.AddComponent<SafeAreaFitter>();
             RectTransform content = kit.Scroll(safe, new RectOffset(60, 60, 40, 100), 30f);
 
-            RectTransform top = UIKit.Rect("Top", content);
-            UIKit.Row(top.gameObject, 20f);
-            UIKit.Layout(top.gameObject, preferredHeight: 96f);
+            // Title bar on a white card, so it reads on every sky.
+            RectTransform top = kit.Card(content, "Top", 0, 0f);
+            DestroyImmediate(top.GetComponent<VerticalLayoutGroup>());
+            HorizontalLayoutGroup topRow = UIKit.Row(top.gameObject, 20f);
+            topRow.padding = new RectOffset(20, 20, 16, 16);
+            UIKit.Layout(top.gameObject, preferredHeight: 128f);
             kit.IconButton(top, "Back", iconBack, "‹", 96f, UIPalette.TextPrimary, Color.white, Close);
             TextMeshProUGUI heading = kit.Text(top, "Heading", Title, 46f, UIPalette.TextPrimary);
             UIKit.Layout(heading.gameObject, flexibleWidth: 1f);

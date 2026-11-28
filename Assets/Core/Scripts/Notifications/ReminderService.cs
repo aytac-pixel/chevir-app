@@ -49,7 +49,10 @@ namespace Cevir.Core.Notifications
             _game.Streak.StreakChanged += state => Reschedule();
             _game.ProfileChanged += Reschedule;
             _game.ProfileChanged += CheckLeaguePlace;
+            _game.ProfileChanged += SyncLeagueWatch;
+            if (Cloud.CloudService.Instance != null) Cloud.CloudService.Instance.StateChanged += state => SyncLeagueWatch();
             Reschedule();
+            SyncLeagueWatch();
             AskPermissionOnce();
         }
 
@@ -88,12 +91,8 @@ namespace Cevir.Core.Notifications
             Social.LeagueEntry you = league != null ? league.You : null;
             if (league == null || league.Offline || you == null || you.Rank <= 0 || league.Entries == null || league.Entries.Count < 2) return;
 
-            string week = StreakSystemWeek();
-            int last = PlayerPrefs.GetString(LeagueWeekKey, string.Empty) == week ? PlayerPrefs.GetInt(LeagueRankKey, 0) : 0;
+            int last = ExchangePlace(StreakSystemWeek(), you.Rank);
             if (last == you.Rank) return;
-            PlayerPrefs.SetString(LeagueWeekKey, week);
-            PlayerPrefs.SetInt(LeagueRankKey, you.Rank);
-            PlayerPrefs.Save();
 
             ReminderSettings r = _game.Progress.reminders;
             if (last == 0 || r == null || !r.leagueAlerts) return; // the first look this week is the starting point
@@ -110,6 +109,146 @@ namespace Cevir.Core.Notifications
                     "Теперь ты на " + you.Rank + "-м месте за неделю. Один урок вернёт тебе место.");
             SendNow(title, body);
         }
+
+        // ------------------------------------------------------------------ league check while the app is closed
+
+        private const string DeviceTokenKey = "chevir.league.deviceToken";
+        private const string DeviceUserKey = "chevir.league.deviceUser";
+        private bool _registering;
+
+        /// <summary>
+        /// The place the app has just seen goes into the same store the background check uses (Android), so a change is
+        /// announced once. Returns the place stored before for the same week, 0 when none.
+        /// </summary>
+        private static int ExchangePlace(string week, int rank)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using (AndroidJavaObject context = AppContext())
+                using (var watch = new AndroidJavaClass("com.chevir.leaguewatch.LeagueWatch"))
+                {
+                    return watch.CallStatic<int>("exchange", context, week, rank);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("[Chevir] League watch unavailable: " + e.Message);
+            }
+#endif
+            int last = PlayerPrefs.GetString(LeagueWeekKey, string.Empty) == week ? PlayerPrefs.GetInt(LeagueRankKey, 0) : 0;
+            PlayerPrefs.SetString(LeagueWeekKey, week);
+            PlayerPrefs.SetInt(LeagueRankKey, rank);
+            PlayerPrefs.Save();
+            return last;
+        }
+
+        /// <summary>
+        /// Turns the background league check on (signed in, league messages on) or off. The phone gets a random token
+        /// the server links to the account, so the check can ask for the place without the learner's password or session.
+        /// </summary>
+        private void SyncLeagueWatch()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if (_game == null || _game.Progress == null || _registering) return;
+            Cloud.CloudService cloud = Cloud.CloudService.Instance;
+            ReminderSettings r = _game.Progress.reminders;
+            bool wanted = cloud != null && cloud.State == Cloud.CloudState.SignedIn && r != null && r.leagueAlerts
+                          && !string.IsNullOrEmpty(cloud.BaseUrl) && !string.IsNullOrEmpty(cloud.AnonKey);
+            if (!wanted)
+            {
+                if (!_stopSent) CallWatch("stop");
+                _stopSent = true;
+                return;
+            }
+
+            _stopSent = false;
+
+            string token = PlayerPrefs.GetString(DeviceTokenKey, string.Empty);
+            bool sameUser = PlayerPrefs.GetString(DeviceUserKey, string.Empty) == cloud.UserId;
+            if (token.Length == 0 || !sameUser)
+            {
+                // A new token for every account on this phone (a token stays linked to the account that registered it).
+                token = Guid.NewGuid().ToString();
+                PlayerPrefs.SetString(DeviceTokenKey, token);
+                PlayerPrefs.Save();
+            }
+
+            if (sameUser)
+            {
+                StartWatch(cloud, token);
+                return;
+            }
+
+            _registering = true;
+            cloud.RegisterLeagueDevice(token, ok =>
+            {
+                _registering = false;
+                if (!ok) return; // e.g. schema.sql not run again yet; tried again on the next profile change
+                PlayerPrefs.SetString(DeviceUserKey, cloud.UserId);
+                PlayerPrefs.Save();
+                StartWatch(cloud, token);
+            });
+#endif
+        }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+        private bool _watchStarted;
+        private bool _stopSent;
+
+        private void StartWatch(Cloud.CloudService cloud, string token)
+        {
+            if (_watchStarted) return;
+            try
+            {
+                using (AndroidJavaObject context = AppContext())
+                using (var watch = new AndroidJavaClass("com.chevir.leaguewatch.LeagueWatch"))
+                {
+                    watch.CallStatic("start", context, cloud.BaseUrl, cloud.AnonKey, token,
+                        Loc.Pick("You moved up in the league! 🏆", "Liqada irəlilədin! 🏆", "Ты поднялся в лиге! 🏆"),
+                        Loc.Pick("Someone passed you in the league", "Liqada səni ötdülər", "Тебя обогнали в лиге"),
+                        Loc.Pick("You are now #{0} this week. Keep going!", "Həftəlik reytinqdə indi {0} yerdəsən. Belə davam et!",
+                            "Теперь ты на {0}-м месте за неделю. Так держать!"),
+                        Loc.Pick("You are now #{0} this week. One lesson can win your place back.",
+                            "Həftəlik reytinqdə indi {0} yerdəsən. Bir dərslə yerini geri ala bilərsən.",
+                            "Теперь ты на {0}-м месте за неделю. Один урок вернёт тебе место."),
+                        Loc.Pick("League", "Liqa", "Лига"), Loc.IsAz);
+                }
+
+                _watchStarted = true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("[Chevir] League watch could not start: " + e.Message);
+            }
+        }
+
+        private void CallWatch(string method)
+        {
+            _watchStarted = false;
+            try
+            {
+                using (AndroidJavaObject context = AppContext())
+                using (var watch = new AndroidJavaClass("com.chevir.leaguewatch.LeagueWatch"))
+                {
+                    watch.CallStatic(method, context);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("[Chevir] League watch: " + e.Message);
+            }
+        }
+
+        private static AndroidJavaObject AppContext()
+        {
+            using (var player = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (AndroidJavaObject activity = player.GetStatic<AndroidJavaObject>("currentActivity"))
+            {
+                return activity.Call<AndroidJavaObject>("getApplicationContext");
+            }
+        }
+#endif
 
         private string StreakSystemWeek()
         {

@@ -109,6 +109,22 @@ namespace Cevir.Core.Cloud
         public string practice_to;
     }
 
+    /// <summary>Private contact details, visible only to their owner (private_profiles).</summary>
+    [Serializable]
+    public sealed class PrivateProfileRow
+    {
+        public string id;
+        public string phone;
+    }
+
+    /// <summary>A phone that may ask for its owner's league place while the app is closed (league_devices).</summary>
+    [Serializable]
+    public sealed class LeagueDeviceRow
+    {
+        public string token;
+        public string user_id;
+    }
+
     /// <summary>Only the name sign column of a profile (sent on its own, see CloudService.UploadNow).</summary>
     [Serializable]
     public sealed class ProfileNameSignRow

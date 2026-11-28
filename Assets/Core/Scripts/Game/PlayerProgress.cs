@@ -21,6 +21,9 @@ namespace Cevir.Core.Game
         /// <summary>Name sign (ad işarəsi): a nickname or the most recognisable feature, e.g. "eynək".</summary>
         public string nameSign = "";
 
+        /// <summary>Phone number given at sign-up or in Profile > Account (kept private on the server).</summary>
+        public string phone = "";
+
         /// <summary>Interface language: "az" (default) or "en".</summary>
         public string uiLanguage = "az";
 

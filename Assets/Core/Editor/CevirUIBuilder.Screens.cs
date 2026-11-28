@@ -718,6 +718,7 @@ namespace Cevir.Core.Editor
                 "Karlar bir-birini ləqəb və ya ən tanınan xüsusiyyətlə çağırır: məs. eynək, saqqal, gülümsəmək.", 28f, UIPalette.TextSecondary,
                 TextAlignmentOptions.TopLeft, false);
             TMP_InputField email = InputField(card.transform, "Email", "E-mail", "E-poçt");
+            TMP_InputField phone = InputField(card.transform, "Phone", "Phone number (optional)", "Telefon nömrəsi (istəyə bağlı)");
             TMP_InputField code = InputField(card.transform, "Code", "6-digit code from the e-mail", "E-poçta gələn 6 rəqəmli kod");
             code.gameObject.SetActive(false);
             TMP_InputField password = InputField(card.transform, "Password", "Password", "Şifrə");
@@ -741,6 +742,7 @@ namespace Cevir.Core.Editor
             Set(ui, "nameSignLabel", nameSignLabel);
             Set(ui, "nameSignHint", nameSignHint);
             Set(ui, "emailField", email);
+            Set(ui, "phoneField", phone);
             Set(ui, "passwordField", password);
             Set(ui, "codeField", code);
             Set(ui, "primaryButton", primary);

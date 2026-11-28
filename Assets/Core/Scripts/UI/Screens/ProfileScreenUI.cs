@@ -45,6 +45,7 @@ namespace Cevir.Core.UI
         private void Awake()
         {
             Build();
+            HomeSkyUI.Create((RectTransform)transform, theme); // the same sky as the Learn page, behind everything
         }
 
         private void OnEnable()
