@@ -337,8 +337,20 @@ namespace Cevir.Core.Game
 
         public LeagueSnapshot GetLeagueSnapshot()
         {
+            return GetLeagueSnapshot(LeaguePeriod.Week);
+        }
+
+        /// <summary>This week's tier league, or the monthly / yearly ranking of all learners by XP.</summary>
+        public LeagueSnapshot GetLeagueSnapshot(LeaguePeriod period)
+        {
             DateTime now = LocalNow();
-            return League.GetSnapshot(Progress.leagueTier, LearnerName, Xp.WeeklyFor(now), now);
+            LeagueSnapshot snapshot = period == LeaguePeriod.Week
+                ? League.GetSnapshot(Progress.leagueTier, LearnerName, Xp.WeeklyFor(now), now)
+                : League.GetPeriodSnapshot(period, LearnerName, period == LeaguePeriod.Month ? Xp.MonthlyFor(now) : Xp.YearlyFor(now), now);
+            snapshot.Period = period;
+            LeagueEntry you = snapshot.You;
+            if (you != null) you.AvatarUrl = Progress.avatarUrl ?? string.Empty;
+            return snapshot;
         }
 
         /// <summary>The server settled a finished week: store the learner's new tier.</summary>

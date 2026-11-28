@@ -482,7 +482,26 @@ namespace Cevir.Core.Editor
             ScrollRect scrollRect;
             RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(60, 60, 70, 80), 26f, out scrollRect);
 
-            // Weekly ranking card: kicker, cup in a square, league name and the time left, all centred.
+            // Three ranking tabs: this week (opens first), this month, this year.
+            RectTransform tabs = Rect("PeriodTabs", content);
+            HorizontalLayoutGroup tabRow = Row(tabs.gameObject, 18f, TextAnchor.MiddleCenter);
+            tabRow.childForceExpandWidth = true;
+            tabRow.padding = new RectOffset(0, 10, 0, 10); // room for the hard shadow
+            Layout(tabs.gameObject, preferredHeight: 106f);
+            string[][] tabNames = { new[] { "Weekly", "Həftəlik" }, new[] { "Monthly", "Aylıq" }, new[] { "Yearly", "İllik" } };
+            var periodTabs = new Button[tabNames.Length];
+            var periodLabels = new TextMeshProUGUI[tabNames.Length];
+            for (int i = 0; i < tabNames.Length; i++)
+            {
+                TextMeshProUGUI tabLabel;
+                periodTabs[i] = MakeButton(tabs, "Tab_" + tabNames[i][0], tabNames[i][1], UIPalette.Surface, UIPalette.TextPrimary, 96f, out tabLabel);
+                tabLabel.fontSize = 34f;
+                periodLabels[i] = tabLabel;
+                Layout(periodTabs[i].gameObject, preferredHeight: 96f, flexibleWidth: 1f, minHeight: 96f);
+                HardShadow(periodTabs[i].gameObject);
+            }
+
+            // Ranking card: kicker, cup in a square, league / period name and the time left, all centred.
             Image header = Glass(content, "Header", 48, Color.white);
             VerticalLayoutGroup headerColumn = Column(header.gameObject, 44, 22f, TextAnchor.UpperCenter);
             headerColumn.childControlWidth = true;
@@ -504,22 +523,28 @@ namespace Cevir.Core.Editor
             TextMeshProUGUI time = Text(timePill.transform, "Label", "2 days left", 28f, new Color32(0x8A, 0x5A, 0x00, 0xFF), TextAlignmentOptions.Center, true);
             time.enableWordWrapping = false;
 
-            TextMeshProUGUI promote = NoteRow(content, "PromoteNote", "arrow_up", UIPalette.Primary);
-            TextMeshProUGUI rankingTitle = Label(content, "RankingTitle", "RANKING", "SIRALAMA", 28f, UIPalette.Ink);
-            rankingTitle.characterSpacing = 4f;
+            // "You are 3rd in the weekly ranking."
+            TextMeshProUGUI promote = NoteRow(content, "PlaceNote", "trophy", UIPalette.Primary);
+            promote.color = UIPalette.TextPrimary;
+            promote.fontStyle = FontStyles.Bold;
             RectTransform list = Rect("Rows", content);
             Column(list.gameObject, 0, 18f);
             list.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(0, 10, 0, 10); // room for the hard shadow
             list.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             TextMeshProUGUI demote = NoteRow(content, "DemoteNote", "arrow_down", UIPalette.Red);
 
-            // Encouragement card under the ranking.
-            Image goal = Glass(content, "GoalCard", 36, UIPalette.Surface);
-            Column(goal.gameObject, 40, 12f);
-            Label(goal.transform, "Title", "First step to the top!", "Zirvəyə ilk addım!", 46f, UIPalette.Primary);
-            Label(goal.transform, "Body", "Finish lessons, earn XP and keep your place in the league.",
-                "Dərsləri tamamla, XP topla və liqada yerini qoru.", 32f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
-
+            var leagueSo = new UnityEditor.SerializedObject(ui);
+            UnityEditor.SerializedProperty tabList = leagueSo.FindProperty("periodTabs");
+            UnityEditor.SerializedProperty tabLabelList = leagueSo.FindProperty("periodTabLabels");
+            tabList.arraySize = periodTabs.Length;
+            tabLabelList.arraySize = periodLabels.Length;
+            for (int i = 0; i < periodTabs.Length; i++)
+            {
+                tabList.GetArrayElementAtIndex(i).objectReferenceValue = periodTabs[i];
+                tabLabelList.GetArrayElementAtIndex(i).objectReferenceValue = periodLabels[i];
+            }
+            leagueSo.ApplyModifiedPropertiesWithoutUndo();
+            Set(ui, "kicker", kicker);
             Set(ui, "tierCup", cup);
             Set(ui, "tierCupBackdrop", cupBackdrop);
             Set(ui, "leagueName", name);

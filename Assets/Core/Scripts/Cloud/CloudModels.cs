@@ -146,12 +146,24 @@ namespace Cevir.Core.Cloud
         public int xp;
     }
 
+    /// <summary>XP in one month ("2026-11") or year ("2026"): the monthly and yearly rankings.</summary>
+    [Serializable]
+    public sealed class PeriodXpRow
+    {
+        public string user_id;
+        public string period;
+        public int xp;
+    }
+
     [Serializable]
     public sealed class StandingRow
     {
         public string display_name;
+        public string avatar_url;
         public int xp;
         public bool is_you;
+        /// <summary>Place in the whole ranking (period_standings only; 0 from league_standings).</summary>
+        public int rank;
     }
 
     [Serializable]
@@ -159,6 +171,12 @@ namespace Cevir.Core.Cloud
     {
         public string p_week;
         public int p_tier;
+    }
+
+    [Serializable]
+    public sealed class PeriodStandingsRequest
+    {
+        public string p_period;
     }
 
     [Serializable]

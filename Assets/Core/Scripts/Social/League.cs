@@ -13,9 +13,19 @@ namespace Cevir.Core.Social
         Demote
     }
 
+    /// <summary>The three rankings on the League page: this week (the tier league), this month and this year.</summary>
+    public enum LeaguePeriod
+    {
+        Week,
+        Month,
+        Year
+    }
+
     public sealed class LeagueEntry
     {
         public int Rank;
+        /// <summary>Profile photo address (public "avatars" bucket); empty shows the initials.</summary>
+        public string AvatarUrl = "";
         public string DisplayName;
         public string Initials;
         public int Xp;
@@ -26,6 +36,7 @@ namespace Cevir.Core.Social
 
     public sealed class LeagueSnapshot
     {
+        public LeaguePeriod Period;
         public int Tier;
         public TimeSpan TimeLeft;
         public int PromoteCount;
@@ -50,6 +61,12 @@ namespace Cevir.Core.Social
     {
         /// <summary>Standings of the learner's group. <paramref name="youWeeklyXp"/> is the learner's XP this week.</summary>
         LeagueSnapshot GetSnapshot(int tier, string youName, int youWeeklyXp, DateTime localNow);
+
+        /// <summary>
+        /// Monthly or yearly ranking of all learners by the XP earned in that month / year (no tiers, no zones).
+        /// <paramref name="youXp"/> is the learner's XP in that period.
+        /// </summary>
+        LeagueSnapshot GetPeriodSnapshot(LeaguePeriod period, string youName, int youXp, DateTime localNow);
 
         /// <summary>True when finished weeks are settled by the server (promotion needs the whole group's results).</summary>
         bool SettlesOnServer { get; }
@@ -105,11 +122,26 @@ namespace Cevir.Core.Social
             return snapshot;
         }
 
+        public LeagueSnapshot GetPeriodSnapshot(LeaguePeriod period, string youName, int youXp, DateTime localNow)
+        {
+            var snapshot = new LeagueSnapshot { Period = period, TimeLeft = TimeUntilPeriodEnd(period, localNow), Offline = true };
+            snapshot.Entries.Add(You(youName, youXp));
+            RankPlain(snapshot);
+            return snapshot;
+        }
+
+        /// <summary>The learner's row: their own name with "(you)" after it, e.g. "Aysel Məmmədova (sən)".</summary>
+        public static string YouLabel(string youName)
+        {
+            string you = Loc.Pick("you", "sən", "ты");
+            return string.IsNullOrEmpty(youName) ? Loc.Pick("You", "Sən", "Ты") : youName + " (" + you + ")";
+        }
+
         public static LeagueEntry You(string youName, int youWeeklyXp)
         {
             return new LeagueEntry
             {
-                DisplayName = Loc.Pick("You", "Sən"),
+                DisplayName = YouLabel(youName),
                 Initials = string.IsNullOrEmpty(youName) ? Loc.Pick("Y", "S") : InitialsOf(youName),
                 Xp = youWeeklyXp,
                 AvatarColor = new Color32(0x00, 0x6E, 0xF0, 0xFF),
@@ -137,6 +169,35 @@ namespace Cevir.Core.Social
                 else if (i >= count - snapshot.DemoteCount) e.Zone = LeagueZone.Demote;
                 else e.Zone = LeagueZone.Stay;
             }
+        }
+
+        /// <summary>Sorts by XP (ties to the learner) and numbers the rows; monthly / yearly rankings have no zones.</summary>
+        public static void RankPlain(LeagueSnapshot snapshot)
+        {
+            snapshot.Entries.Sort((a, b) => a.Xp != b.Xp ? b.Xp.CompareTo(a.Xp) : (a.IsYou ? -1 : b.IsYou ? 1 : 0));
+            snapshot.PromoteCount = snapshot.DemoteCount = 0;
+            for (int i = 0; i < snapshot.Entries.Count; i++)
+            {
+                snapshot.Entries[i].Rank = i + 1;
+                snapshot.Entries[i].Zone = LeagueZone.Stay;
+            }
+        }
+
+        public static TimeSpan TimeUntilPeriodEnd(LeaguePeriod period, DateTime localNow)
+        {
+            if (period == LeaguePeriod.Week) return TimeUntilWeekEnd(localNow);
+            DateTime end = period == LeaguePeriod.Month
+                ? new DateTime(localNow.Year, localNow.Month, 1).AddMonths(1)
+                : new DateTime(localNow.Year + 1, 1, 1);
+            return end - localNow;
+        }
+
+        /// <summary>"2026-11" for the month, "2026" for the year: the keys of the server's period_xp table.</summary>
+        public static string PeriodKey(LeaguePeriod period, DateTime localNow)
+        {
+            return period == LeaguePeriod.Month
+                ? localNow.Year.ToString("0000") + "-" + localNow.Month.ToString("00")
+                : localNow.Year.ToString("0000");
         }
 
         public static TimeSpan TimeUntilWeekEnd(DateTime localNow)

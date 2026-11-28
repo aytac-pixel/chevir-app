@@ -44,6 +44,16 @@ create table if not exists public.weekly_xp (
 );
 create index if not exists weekly_xp_group on public.weekly_xp (week, tier, xp desc);
 
+-- XP per month ("2026-11") and per year ("2026"): the monthly and yearly rankings (everyone, no tiers).
+create table if not exists public.period_xp (
+    user_id uuid not null references auth.users (id) on delete cascade,
+    period  text not null check (period ~ '^[0-9]{4}(-[0-9]{2})?$'),
+    xp      int  not null default 0 check (xp >= 0),
+    updated_at timestamptz not null default now(),
+    primary key (user_id, period)
+);
+create index if not exists period_xp_rank on public.period_xp (period, xp desc);
+
 -- Weeks already settled for a learner (so promotion / demotion happens once per week).
 create table if not exists public.league_settlements (
     user_id  uuid not null references auth.users (id) on delete cascade,
@@ -92,6 +102,7 @@ create index if not exists sign_samples_user on public.sign_samples (user_id, cr
 alter table public.profiles           enable row level security;
 alter table public.progress           enable row level security;
 alter table public.weekly_xp          enable row level security;
+alter table public.period_xp          enable row level security;
 alter table public.league_settlements enable row level security;
 alter table public.sign_samples       enable row level security;
 
@@ -111,6 +122,10 @@ create policy "own progress" on public.progress
 
 drop policy if exists "own weekly xp" on public.weekly_xp;
 create policy "own weekly xp" on public.weekly_xp
+    for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+drop policy if exists "own period xp" on public.period_xp;
+create policy "own period xp" on public.period_xp
     for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
 
 drop policy if exists "own settlements" on public.league_settlements;
@@ -196,11 +211,14 @@ create trigger on_auth_user_created after insert on auth.users
 
 -- ---------------------------------------------------------------- league functions
 
--- Ranking of the caller's league group for a week: everyone in that tier and week, most XP first (top 30).
+-- Ranking of the caller's league group for a week: everyone in that tier and week, most XP first (top 30),
+-- with each learner's profile photo. (Dropped first: the result columns changed when avatar_url was added.)
+drop function if exists public.league_standings(text, int);
 create or replace function public.league_standings(p_week text, p_tier int)
-returns table (display_name text, xp int, is_you boolean)
+returns table (display_name text, avatar_url text, xp int, is_you boolean)
 language sql stable security definer set search_path = public as $$
     select coalesce(nullif(p.display_name, ''), '?') as display_name,
+           coalesce(p.avatar_url, '') as avatar_url,
            w.xp,
            w.user_id = auth.uid() as is_you
     from public.weekly_xp w
@@ -208,6 +226,29 @@ language sql stable security definer set search_path = public as $$
     where w.week = p_week and w.tier = p_tier and auth.uid() is not null
     order by w.xp desc, w.updated_at asc
     limit 30;
+$$;
+
+-- Monthly ("2026-11") or yearly ("2026") ranking of all learners by XP: the top 50, plus the caller's own row
+-- with their place even when they are further down.
+create or replace function public.period_standings(p_period text)
+returns table (display_name text, avatar_url text, xp int, is_you boolean, rank int)
+language sql stable security definer set search_path = public as $$
+    with ranked as (
+        select x.user_id, x.xp, x.updated_at,
+               (rank() over (order by x.xp desc))::int as place
+        from public.period_xp x
+        where x.period = p_period and auth.uid() is not null
+    )
+    select coalesce(nullif(p.display_name, ''), '?') as display_name,
+           coalesce(p.avatar_url, '') as avatar_url,
+           r.xp,
+           r.user_id = auth.uid() as is_you,
+           r.place as rank
+    from ranked r
+    join public.profiles p on p.id = r.user_id
+    where r.place <= 50 or r.user_id = auth.uid()
+    order by (r.user_id = auth.uid()) desc, r.xp desc, r.updated_at asc
+    limit 51;
 $$;
 
 -- Settles every finished week (before p_week) the caller has not settled yet, in order, and returns the tier.
@@ -262,8 +303,10 @@ begin
 end $$;
 
 revoke all on function public.league_standings(text, int) from public, anon;
+revoke all on function public.period_standings(text) from public, anon;
 revoke all on function public.settle_league(text) from public, anon;
 grant execute on function public.league_standings(text, int) to authenticated;
+grant execute on function public.period_standings(text) to authenticated;
 grant execute on function public.settle_league(text) to authenticated;
 
 -- ---------------------------------------------------------------- profile photos

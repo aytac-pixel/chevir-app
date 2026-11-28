@@ -570,6 +570,7 @@ namespace Cevir.Core.Cloud
                     var nameSign = new ProfileNameSignRow { id = userId, name_sign = progress.nameSign ?? string.Empty };
                     _client.Upsert("profiles", "id", JsonUtility.ToJson(nameSign), r4 => { });
                     if (progress.dataConsentAsked) UploadConsent(progress.dataConsent, null);
+                    UploadPeriodXp(userId);
 
                     if (progress.xp == null || string.IsNullOrEmpty(progress.xp.week))
                     {
@@ -585,6 +586,17 @@ namespace Cevir.Core.Cloud
                     });
                 });
             });
+        }
+
+        /// <summary>This month's and this year's XP for the monthly and yearly rankings (one request, two rows).</summary>
+        private void UploadPeriodXp(string userId)
+        {
+            DateTime now = _game.LocalNow();
+            var month = new PeriodXpRow { user_id = userId, period = Gamification.XpSystem.MonthKey(now), xp = _game.Xp.MonthlyFor(now) };
+            var year = new PeriodXpRow { user_id = userId, period = Gamification.XpSystem.YearKey(now), xp = _game.Xp.YearlyFor(now) };
+            string json = "[" + JsonUtility.ToJson(month) + "," + JsonUtility.ToJson(year) + "]";
+            // A database without the period_xp table yet (schema.sql not run again) only loses these rankings.
+            _client.Upsert("period_xp", "user_id,period", json, r => { if (r.Ok) RefreshLeague(); });
         }
 
         private void HandleSessionLost()

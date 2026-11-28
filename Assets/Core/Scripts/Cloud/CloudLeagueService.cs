@@ -2,6 +2,7 @@ using System;
 using Cevir.Core.Gamification;
 using Cevir.Core.Social;
 
+
 namespace Cevir.Core.Cloud
 {
     /// <summary>
@@ -17,6 +18,9 @@ namespace Cevir.Core.Cloud
         private string _rowsWeek;
         private int _rowsTier = -1;
         private bool _loading;
+        private readonly System.Collections.Generic.Dictionary<string, StandingRows> _periodRows =
+            new System.Collections.Generic.Dictionary<string, StandingRows>();
+        private readonly System.Collections.Generic.HashSet<string> _periodLoading = new System.Collections.Generic.HashSet<string>();
 
         public event Action Updated;
 
@@ -45,13 +49,7 @@ namespace Cevir.Core.Cloud
                 {
                     if (row.is_you) continue; // the learner's own row uses the live local XP below
                     string name = string.IsNullOrEmpty(row.display_name) ? "?" : row.display_name;
-                    snapshot.Entries.Add(new LeagueEntry
-                    {
-                        DisplayName = name,
-                        Initials = LocalLeagueService.InitialsOf(name),
-                        Xp = row.xp,
-                        AvatarColor = AvatarColor(name)
-                    });
+                    snapshot.Entries.Add(Entry(row));
                 }
             }
 
@@ -60,7 +58,81 @@ namespace Cevir.Core.Cloud
             return snapshot;
         }
 
+        /// <summary>
+        /// Monthly / yearly ranking of everyone by XP in that period (top 50 from the server). The learner's row uses
+        /// the live local XP; when they are below the loaded rows, their place comes from the server.
+        /// </summary>
+        public LeagueSnapshot GetPeriodSnapshot(LeaguePeriod period, string youName, int youXp, DateTime localNow)
+        {
+            string key = LocalLeagueService.PeriodKey(period, localNow);
+            StandingRows rows;
+            var snapshot = new LeagueSnapshot
+            {
+                Period = period,
+                TimeLeft = LocalLeagueService.TimeUntilPeriodEnd(period, localNow),
+                Offline = !_periodRows.TryGetValue(key, out rows) || rows == null
+            };
+
+            int serverRank = 0, others = 0;
+            if (!snapshot.Offline)
+            {
+                foreach (StandingRow row in rows.items)
+                {
+                    if (row.is_you)
+                    {
+                        serverRank = row.rank;
+                        continue;
+                    }
+
+                    snapshot.Entries.Add(Entry(row));
+                    others++;
+                }
+            }
+
+            LeagueEntry you = LocalLeagueService.You(youName, youXp);
+            snapshot.Entries.Add(you);
+            LocalLeagueService.RankPlain(snapshot);
+            // Only the top of the ranking is loaded: below it, the server knows the learner's place.
+            if (others >= PeriodTop && you.Rank == snapshot.Entries.Count && serverRank > you.Rank) you.Rank = serverRank;
+            return snapshot;
+        }
+
+        private const int PeriodTop = 50;
+
+        private LeagueEntry Entry(StandingRow row)
+        {
+            string name = string.IsNullOrEmpty(row.display_name) ? "?" : row.display_name;
+            return new LeagueEntry
+            {
+                DisplayName = name,
+                Initials = LocalLeagueService.InitialsOf(name),
+                Xp = row.xp,
+                AvatarColor = AvatarColor(name),
+                AvatarUrl = row.avatar_url ?? string.Empty
+            };
+        }
+
         public void Refresh(int tier, DateTime localNow)
+        {
+            RefreshPeriod(LocalLeagueService.PeriodKey(LeaguePeriod.Month, localNow));
+            RefreshPeriod(LocalLeagueService.PeriodKey(LeaguePeriod.Year, localNow));
+            RefreshWeek(tier, localNow);
+        }
+
+        private void RefreshPeriod(string key)
+        {
+            if (!_client.HasSession || _periodLoading.Contains(key)) return;
+            _periodLoading.Add(key);
+            _client.Rpc("period_standings", UnityEngine.JsonUtility.ToJson(new PeriodStandingsRequest { p_period = key }), response =>
+            {
+                _periodLoading.Remove(key);
+                if (!response.Ok) return; // e.g. schema.sql not run again yet: the screen says the ranking is offline
+                _periodRows[key] = SupabaseClient.ParseArray<StandingRows>(response.Body);
+                if (Updated != null) Updated();
+            });
+        }
+
+        private void RefreshWeek(int tier, DateTime localNow)
         {
             if (_loading || !_client.HasSession) return;
             _loading = true;
@@ -79,6 +151,7 @@ namespace Cevir.Core.Cloud
 
         public void Clear()
         {
+            _periodRows.Clear();
             _rows = null;
             _rowsWeek = null;
             _rowsTier = -1;
