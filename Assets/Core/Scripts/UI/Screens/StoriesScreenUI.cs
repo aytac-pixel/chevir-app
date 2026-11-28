@@ -22,12 +22,15 @@ namespace Cevir.Core.UI
 
         private readonly List<StoryCardUI> _cards = new List<StoryCardUI>();
         private GameManager _game;
+        private HomeSkyUI _sky;
 
         private void OnEnable()
         {
             _game = GameManager.Instance;
             Loc.LanguageChanged += OnLanguageChanged;
             if (_game != null) _game.PathChanged += OnPathChanged;
+            // Same time-of-day / weather sky as the Learn page.
+            if (_sky == null) _sky = HomeSkyUI.Create((RectTransform)transform, theme);
             Refresh();
         }
 

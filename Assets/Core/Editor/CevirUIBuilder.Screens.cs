@@ -364,10 +364,12 @@ namespace Cevir.Core.Editor
             ScrollRect scrollRect;
             RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(60, 60, 70, 80), 26f, out scrollRect);
 
-            TextMeshProUGUI kicker = Label(content, "Kicker", "STORIES", "HEKAYƏLƏR", 30f, UIPalette.Primary);
-            kicker.characterSpacing = 4f;
-            Label(content, "Title", "Sign Language Stories", "İşarə Dili Hekayələri", 60f, UIPalette.TextPrimary);
-            RectTransform levelRow = Rect("LevelRow", content);
+            // Title and level on a white card, so they read over the time-of-day sky behind the page.
+            Image header = Glass(content, "Header", 24, UIPalette.Surface);
+            VerticalLayoutGroup headerColumn = Column(header.gameObject, 0, 6f);
+            headerColumn.padding = new RectOffset(40, 40, 30, 30);
+            Label(header.transform, "Title", "Sign Language Stories", "İşarə Dili Hekayələri", 58f, UIPalette.TextPrimary);
+            RectTransform levelRow = Rect("LevelRow", header.transform);
             Row(levelRow.gameObject, 22f);
             TextMeshProUGUI level = Text(levelRow, "Level", "A1 Level", 34f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, true);
             level.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -398,50 +400,61 @@ namespace Cevir.Core.Editor
             return ui;
         }
 
+        /// <summary>
+        /// Story card: the story's own wide pixel picture fills the card; a dark fade on the left carries the number
+        /// tile, the title and the status in white; one badge on the right shows lock, play or done.
+        /// </summary>
         private static StoryCardUI BuildStoryCardPrefab()
         {
             var root = new GameObject("StoryCard", typeof(RectTransform));
             var rt = (RectTransform)root.transform;
-            rt.sizeDelta = new Vector2(984f, 176f);
+            rt.sizeDelta = new Vector2(984f, 236f);
             Image background = root.AddComponent<Image>();
             background.sprite = Panel(36);
             background.type = Image.Type.Sliced;
             background.pixelsPerUnitMultiplier = 1f;
+            background.color = UIPalette.Ink;
             HardShadow(root);
             Button button = root.AddComponent<Button>();
             button.targetGraphic = background;
-            Layout(root, preferredHeight: 196f, minHeight: 196f);
+            Layout(root, preferredHeight: 236f, minHeight: 236f);
 
-            HorizontalLayoutGroup row = Row(root, 30f);
-            row.padding = new RectOffset(28, 32, 0, 0);
+            HorizontalLayoutGroup row = Row(root, 28f);
+            row.padding = new RectOffset(34, 34, 0, 0);
 
-            // The story's pixel scene in a bordered square, the story number on a small tag at its corner.
-            Image frame = Img(rt, "Scene", Panel(24), UIPalette.Ink, true);
-            Layout(frame.gameObject, preferredWidth: 144f, preferredHeight: 144f).minWidth = 144f;
-            RectTransform window = Rect("Window", frame.transform);
+            // Picture inside the dark border, then the fade over its left part.
+            RectTransform window = Rect("Window", rt);
+            Layout(window.gameObject).ignoreLayout = true;
             Stretch(window, 6f, 6f, 6f, 6f);
             window.gameObject.AddComponent<RectMask2D>();
-            Image sceneArt = Img(window, "Art", Sprite("Story", "story_bg_01"), Color.white);
+            Image sceneArt = Img(window, "Art", Sprite("Story", "story_card_01"), Color.white);
             sceneArt.preserveAspect = false;
-            // 216 x 384 scene shown 132 wide: the sky, the place and the horizon, cropped above the ground.
-            Place(sceneArt.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, 40f), new Vector2(132f, 235f));
+            Stretch(sceneArt.rectTransform);
+            Image shade = Img(window, "Shade", Sprite("UI", "card_shade"), Color.white);
+            shade.preserveAspect = false;
+            shade.rectTransform.anchorMin = new Vector2(0f, 0f);
+            shade.rectTransform.anchorMax = new Vector2(0.75f, 1f);
+            shade.rectTransform.offsetMin = shade.rectTransform.offsetMax = Vector2.zero;
 
-            Image numberBox = Img(frame.transform, "NumberBox", Panel(24), Color.white, true);
-            Place(numberBox.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(-10f, -10f), new Vector2(60f, 60f));
-            TextMeshProUGUI number = Text(numberBox.transform, "Number", "1", 32f, UIPalette.Ink, TextAlignmentOptions.Center, true);
+            // Story number on a white pixel tile (replaces the old picture thumbnail).
+            Image numberBox = Img(rt, "NumberBox", Panel(24), Color.white, true);
+            Layout(numberBox.gameObject, preferredWidth: 104f, preferredHeight: 104f).minWidth = 104f;
+            HardShadow(numberBox.gameObject);
+            TextMeshProUGUI number = Text(numberBox.transform, "Number", "1", 52f, UIPalette.Primary, TextAlignmentOptions.Center, true);
             Stretch(number.rectTransform);
 
             RectTransform texts = Rect("Texts", rt);
-            Column(texts.gameObject, 0, 6f, TextAnchor.MiddleLeft);
+            Column(texts.gameObject, 0, 4f, TextAnchor.MiddleLeft);
             Layout(texts.gameObject, flexibleWidth: 1f);
-            TextMeshProUGUI title = Text(texts, "Title", "Hello, my name is...", 38f, UIPalette.TextPrimary, TextAlignmentOptions.MidlineLeft, true);
+            TextMeshProUGUI title = Text(texts, "Title", "Hello, my name is...", 42f, Color.white, TextAlignmentOptions.MidlineLeft, true);
             title.enableWordWrapping = false;
             title.overflowMode = TextOverflowModes.Ellipsis;
-            TextMeshProUGUI status = Text(texts, "Status", "LOCKED", 26f, UIPalette.TextMuted, TextAlignmentOptions.MidlineLeft, true);
+            TextMeshProUGUI status = Text(texts, "Status", "LOCKED", 26f, Color.white, TextAlignmentOptions.MidlineLeft, true);
             status.characterSpacing = 4f;
 
-            Image badge = Img(rt, "Badge", Panel(24), new Color(1f, 1f, 1f, 0f), true);
-            Layout(badge.gameObject, preferredWidth: 88f, preferredHeight: 88f);
+            Image badge = Img(rt, "Badge", Panel(24), Color.white, true);
+            Layout(badge.gameObject, preferredWidth: 88f, preferredHeight: 88f).minWidth = 88f;
+            HardShadow(badge.gameObject);
             Image badgeIcon = Img(badge.transform, "Icon", IconSprite("lock"), UIPalette.LockedIcon);
             Place(badgeIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(48f, 48f));
 

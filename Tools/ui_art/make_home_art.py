@@ -448,6 +448,185 @@ def make_skies(preview):
         sheet.save(os.path.join(PREVIEW, "home_skies.png"))
 
 
+# ------------------------------------------------------------------------------------------ story cards
+# 216 x 50 strips (the Stories list card shows them 4.5x): a slice of the story's own scene with the people or
+# things the story is about drawn in front.
+
+CW, CH = 216, 50
+STORY = os.path.join(ROOT, "Story")
+
+
+def wave_person(cv, x, y_feet, shirt, **kw):
+    person(cv, x, y_feet, shirt, **kw)
+    skin = kw.get("skin", rgb("F2C29B"))
+    h = kw.get("h", 18)
+    cv.rect(x + 4, y_feet - h + 4, 2, 6, shirt)  # raised arm
+    cv.rect(x + 4, y_feet - h + 1, 2, 3, skin)
+
+
+def small_bubble(cv, x, y, ch, colour):
+    cv.rect(x, y, 11, 11, INK)
+    cv.rect(x + 1, y + 1, 9, 9, WHITE)
+    cv.rect(x + 2, y + 11, 2, 2, INK)
+    glyph(cv, ch, x + 3, y + 2, colour)
+
+
+def heart(cv, x, y, c=rgb("FF4D6D")):
+    for dx, dy in ((0, 0), (1, 0), (3, 0), (4, 0), (-1, 1), (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1),
+                   (0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (1, 3), (2, 3), (3, 3), (2, 4)):
+        cv.put(x + dx, y + dy, c)
+
+
+def backpack(cv, x, y):
+    cv.rect(x, y, 14, 16, INK)
+    cv.rect(x + 1, y + 1, 12, 14, rgb("FF6B6B"))
+    cv.rect(x + 3, y + 7, 8, 6, rgb("C94545"))
+    cv.rect(x + 4, y - 3, 6, 3, INK)
+    cv.rect(x + 5, y - 2, 4, 2, rgb("FF6B6B"))
+    cv.rect(x + 6, y + 9, 2, 2, rgb("FFC93C"))
+
+
+def firework(cv, x, y, c):
+    for k in range(8):
+        a = k * math.pi / 4
+        for r in (3, 4, 5):
+            cv.put(int(round(x + math.cos(a) * r)), int(round(y + math.sin(a) * r)), c)
+    cv.put(x, y, WHITE)
+
+
+FIGURE_SHIFT = 46  # the card text covers the left side, so the people and things move right
+
+
+def story_base(index, top):
+    """A clear canvas for the people and things; the scene slice travels with it as .bg."""
+    scene = Image.open(os.path.join(STORY, "story_bg_%02d.png" % index)).convert("RGBA")
+    cv = Canvas(CW, CH)
+    cv.bg = scene.crop((0, top, CW, top + CH))
+    return cv
+
+
+def compose_card(cv):
+    img = cv.bg.copy()
+    img.alpha_composite(cv.img, (FIGURE_SHIFT, 0))
+    return img
+
+
+def card_01():
+    cv = story_base(1, 236)
+    wave_person(cv, 92, 48, rgb("2F7BFF"), h=24)
+    wave_person(cv, 124, 48, rgb("FF6B9A"), hair=rgb("7A4E2D"), long_hair=True, h=23)
+    small_bubble(cv, 104, 4, "A", rgb("2F7BFF"))
+    return cv
+
+
+def card_02():
+    cv = story_base(2, 196)
+    wave_person(cv, 112, 48, rgb("FFC93C"), h=24)
+    return cv
+
+
+def card_03():
+    cv = story_base(3, 232)
+    person(cv, 90, 48, rgb("45CF8A"), h=23)
+    person(cv, 120, 48, rgb("7C5CFF"), hair=rgb("7A4E2D"), long_hair=True, h=22)
+    small_bubble(cv, 126, 4, "?", rgb("7C5CFF"))
+    return cv
+
+
+def card_04():
+    cv = story_base(4, 230)
+    person(cv, 70, 48, rgb("2F7BFF"), h=24)
+    cv.rect(74, 33, 8, 2, rgb("2F7BFF"))
+    cv.rect(82, 33, 2, 2, rgb("F2C29B"))
+    person(cv, 150, 48, rgb("FF8A3D"), h=22)
+    small_bubble(cv, 76, 8, "?", rgb("FF8A3D"))
+    return cv
+
+
+def card_05():
+    cv = story_base(5, 228)
+    person(cv, 80, 48, rgb("2F7BFF"), h=26)
+    person(cv, 96, 48, rgb("FF6B9A"), hair=rgb("7A4E2D"), long_hair=True, h=25)
+    person(cv, 112, 48, rgb("FFC93C"), h=18)
+    person(cv, 124, 48, rgb("45CF8A"), hair=rgb("7A4E2D"), long_hair=True, h=15)
+    heart(cv, 100, 6)
+    return cv
+
+
+def card_06():
+    cv = story_base(6, 244)
+    for i, ch in enumerate("123"):
+        bevel_block(cv, 86 + i * 15, 6 + (i % 2) * 4, 13, rgb("2F7BFF"), rgb("7FB0FF"), rgb("1A4FC2"))
+        glyph(cv, ch, 90 + i * 15, 9 + (i % 2) * 4, WHITE)
+    person(cv, 108, 49, rgb("FF6B6B"), h=20)
+    return cv
+
+
+def card_07():
+    cv = story_base(7, 120)
+    person(cv, 70, 48, rgb("FFC93C"), h=22)
+    return cv
+
+
+def card_08():
+    cv = story_base(8, 226)
+    backpack(cv, 150, 30)
+    person(cv, 120, 48, rgb("2F7BFF"), h=24)
+    return cv
+
+
+def card_09():
+    cv = story_base(9, 226)
+    person(cv, 80, 48, rgb("FF6B9A"), hair=rgb("7A4E2D"), long_hair=True, h=22)
+    person(cv, 96, 48, rgb("2F7BFF"), h=23)
+    # map pin
+    cv.disc(140, 10, 4, rgb("FF4D6D"))
+    cv.disc(140, 10, 1.5, WHITE)
+    cv.tri([(137, 12), (143, 12), (140, 18)], rgb("FF4D6D"))
+    return cv
+
+
+def card_10():
+    cv = story_base(10, 196)
+    firework(cv, 40, 10, rgb("FFC93C"))
+    firework(cv, 176, 14, rgb("FF6B9A"))
+    firework(cv, 110, 6, rgb("7FB0FF"))
+    wave_person(cv, 96, 48, rgb("2F7BFF"), h=24)
+    wave_person(cv, 122, 48, rgb("FF6B9A"), hair=rgb("7A4E2D"), long_hair=True, h=23)
+    return cv
+
+
+CARDS = [card_01, card_02, card_03, card_04, card_05, card_06, card_07, card_08, card_09, card_10]
+
+
+def locked_card(img):
+    big = img.resize((CW * 4, CH * 4), Image.NEAREST).filter(ImageFilter.GaussianBlur(6))
+    small = big.resize((CW, CH), Image.BILINEAR)
+    grey = small.convert("L").convert("RGBA")
+    return Image.blend(Image.blend(small, grey, 0.35), Image.new("RGBA", (CW, CH), (40, 52, 80, 255)), 0.12)
+
+
+def make_story_cards(preview):
+    sheet = Image.new("RGBA", (2 * (CW * 3 + 8), len(CARDS) * (CH * 3 + 8)), (255, 255, 255, 255))
+    for i, draw in enumerate(CARDS):
+        img = compose_card(draw())
+        img.save(os.path.join(STORY, "story_card_%02d.png" % (i + 1)))
+        lock = locked_card(img)
+        lock.save(os.path.join(STORY, "story_card_%02d_locked.png" % (i + 1)))
+        sheet.paste(img.resize((CW * 3, CH * 3), Image.NEAREST), (0, i * (CH * 3 + 8)))
+        sheet.paste(lock.resize((CW * 3, CH * 3), Image.NEAREST), (CW * 3 + 8, i * (CH * 3 + 8)))
+    # Dark fade under the card text: left side darker, fading out to the right (smooth, not pixel art).
+    shade = Image.new("RGBA", (128, 4))
+    for x in range(128):
+        t = x / 127.0
+        a = int(215 * max(0.0, 1.0 - t / 0.75) ** 1.3)
+        for y in range(4):
+            shade.putpixel((x, y), (10, 25, 49, a))
+    shade.save(os.path.join(ROOT, "UI", "card_shade.png"))
+    if preview:
+        sheet.save(os.path.join(PREVIEW, "story_cards.png"))
+
+
 if __name__ == "__main__":
     if not os.path.isdir(UNITS):
         sys.exit("Run from the repository root.")
@@ -456,4 +635,5 @@ if __name__ == "__main__":
         os.makedirs(PREVIEW, exist_ok=True)
     make_pictures(want_preview)
     make_skies(want_preview)
+    make_story_cards(want_preview)
     print("Home art written to " + ROOT)

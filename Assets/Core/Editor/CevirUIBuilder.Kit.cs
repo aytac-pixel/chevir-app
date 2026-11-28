@@ -88,6 +88,18 @@ namespace Cevir.Core.Editor
             string[] skies = { "morning", "noon", "evening", "night", "rain", "rain_night", "snow", "snow_night" };
             theme.homeSkies = new Sprite[skies.Length];
             for (int i = 0; i < skies.Length; i++) theme.homeSkies[i] = Sprite("Home", "home_bg_" + skies[i]);
+
+            // Stories page: one wide picture per story card, and a blurred copy for locked stories.
+            const int storyCount = 10;
+            theme.storyCards = new Sprite[storyCount];
+            theme.storyCardsLocked = new Sprite[storyCount];
+            for (int i = 0; i < storyCount; i++)
+            {
+                string card = "story_card_" + (i + 1).ToString("00");
+                theme.storyCards[i] = Sprite("Story", card);
+                theme.storyCardsLocked[i] = Sprite("Story", card + "_locked");
+            }
+            theme.cardShade = Sprite("UI", "card_shade");
             EditorUtility.SetDirty(theme);
             return theme;
         }

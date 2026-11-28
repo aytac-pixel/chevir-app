@@ -44,5 +44,13 @@ namespace Cevir.Core.UI
         [Tooltip("Full-screen Learn page backgrounds in HomeSky.Mood order: morning, noon, evening, night, rain, " +
                  "rain at night, snow, snow at night.")]
         public Sprite[] homeSkies;
+
+        [Header("Story cards (pixel art)")]
+        [Tooltip("Wide picture for each story's card on the Stories page, story 1 first.")]
+        public Sprite[] storyCards;
+        [Tooltip("Blurred copies shown while a story is locked.")]
+        public Sprite[] storyCardsLocked;
+        [Tooltip("Dark fade behind the card text.")]
+        public Sprite cardShade;
     }
 }
