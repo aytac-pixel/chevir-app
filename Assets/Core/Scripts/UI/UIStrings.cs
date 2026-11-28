@@ -47,8 +47,9 @@ namespace Cevir.Core.UI
         public static string GatePassed => Loc.Pick("Checkpoint passed!", "İmtahan keçildi!");
         public static string GateFailed => Loc.Pick("Checkpoint not passed", "İmtahan keçilmədi");
         public static string OutOfHeartsTitle => Loc.Pick("Out of hearts", "Canın qalmadı");
-        public static string OutOfHeartsBody => Loc.Pick("A heart comes back every 2 hours. A practice lesson also wins hearts back.",
-            "Hər 2 saatdan bir 1 can bərpa olunur. Təkrar dərsi ilə də can qazana bilərsən.");
+        public static string OutOfHeartsBody => Loc.Pick("A heart comes back every 12 minutes, all 10 in 2 hours. A practice lesson also wins hearts back.",
+            "Hər 12 dəqiqədən bir 1 can bərpa olunur, 2 saata 10 canın hamısı dolur. Təkrar dərsi ilə də can qazana bilərsən.",
+            "Каждые 12 минут восстанавливается 1 жизнь, все 10 — за 2 часа. Жизни можно вернуть и уроком повторения.");
         public static string NoHeartsToStart => Loc.Pick("No hearts left. The next one comes back in {0}, or do a practice lesson.",
             "Canın qalmayıb. Növbəti can {0} sonra gələcək, ya da təkrar dərsi et.");
         public static string NextHeartIn => Loc.Pick("+1 heart in {0}", "+1 can: {0}");

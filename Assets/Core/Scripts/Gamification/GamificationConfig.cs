@@ -12,7 +12,7 @@ namespace Cevir.Core.Gamification
         [Min(1)] public int maxHearts = 10;
 
         [Tooltip("One heart comes back every this many minutes until the hearts are full.")]
-        [Min(1)] public int heartRegenMinutes = 120;
+        [Min(1)] public int heartRegenMinutes = 12; // +1 heart every 12 min: empty to full (10) in 2 hours
 
         [Tooltip("A wrong camera attempt costs a heart after this many failed attempts on one exercise (1 = every wrong attempt).")]
         [Min(1)] public int softFailuresPerHeart = 1;

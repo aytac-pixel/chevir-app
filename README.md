@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/aytac-pixel/chevir-io/releases/latest/download/ChevirIO.apk"><b>⬇ Android APK-nı yüklə</b></a> ·
+  <a href="https://github.com/aytac-pixel/chevir-io/releases/latest/download/ChevirIO.apk"><b>Android APK-nı yüklə</b></a> ·
   <a href="https://chevirapp.com">chevirapp.com</a> ·
   <a href="https://chevirapp.com/tercume/">Onlayn tərcüməçi</a> ·
   <a href="https://www.instagram.com/chevir_app/">Instagram @chevir_app</a>
@@ -28,18 +28,18 @@ Chevir I/O bu boşluğu doldurur: öyrənən işarəni telefonun ön kamerasına
 
 | | |
 |---|---|
-| 🤟 **Kamera ilə işarə tanıma** | MediaPipe əl, üz və bədən nöqtələri telefonda real vaxtda hesablanır. Video heç yerə göndərilmir. Əl forması, hərəkət trayektoriyası, yer və mimika ayrı-ayrı qiymətləndirilir. |
-| 📚 **A1 kursu** | Əlifbadan başlayıb salamlaşma, əvəzliklər, sual sözləri, ailə, rəqəmlər, vaxt, əşyalar və vacib yerlərə qədər 10 bölmə. Hər işarə üçün real video, şəkil və yavaş göstərmə var. |
-| 🎭 **İnteraktiv hekayələr** | 10 piksel-art səhnəsi: personajla danışırsan, cavabı işarə dilində kameraya göstərirsən. Hekayədə öz **ad işarən (ləqəbin)** ilə tanış olursan, karlar bir-birini belə çağırır. |
-| 🔥 **Motivasiya sistemi** | XP, gündəlik alov seriyası, 10 can (hər 2 saatdan bir bərpa olunur), səviyyələr və təkrar dərsləri. |
-| 🏆 **Liqalar** | Həftəlik, aylıq və illik reytinq, profil şəkilləri, Bürüncdən Almaza qədər 5 liqa, həftənin sonunda yüksəlmə və enmə. |
-| 📊 **Statistika** | Hər gün neçə dəqiqə məşğul olduğun, yığdığın XP, ən uzun alov, səviyyə və öyrəndiyin işarələrin sayı. |
-| 🌤 **Canlı fon** | Dərs ekranının arxasında Bakı panoraması saata (səhər, günorta, axşam, gecə) və real havaya (yağış, qar) görə dəyişir. |
-| 🔔 **Ağıllı bildirişlər** | Həftənin hər günü üçün fərqli səhər və gecə salamı, öz seçdiyin saatlarda məşq xatırlatması və hər səhər liqada neçə pillə qalxdığın barədə bir mesaj. Tətbiqə artıq girmisənsə, artıq xatırlatma gəlmir. |
-| 🌍 **3 dil** | Bütün interfeys, dərslər, hekayələr və bildirişlər Azərbaycan, ingilis və rus dillərində. Dil istənilən vaxt Profildən dəyişir. |
-| 🌙 **Gecə rejimi** | Gündüz və gecə temaları, göz yormayan Nunito şrifti və piksel-art üslubu. |
-| ☁️ **Hesab və sinxronizasiya** | E-poçtla qeydiyyat, telefonlar arasında irəliləyişin saxlanması, profil şəkli, ad, ləqəb və telefon nömrəsi. |
-| 🔒 **Məxfilik və etik məlumat toplama** | İşarə nümunələri yalnız istifadəçinin açıq razılığı ilə saxlanılır və istənilən vaxt silinə bilər. Telefon nömrəsi yalnız sahibinə görünür. |
+| **Kamera ilə işarə tanıma** | MediaPipe əl, üz və bədən nöqtələri telefonda real vaxtda hesablanır. Video heç yerə göndərilmir. Əl forması, hərəkət trayektoriyası, yer və mimika ayrı-ayrı qiymətləndirilir. |
+| **A1 kursu** | Əlifbadan başlayıb salamlaşma, əvəzliklər, sual sözləri, ailə, rəqəmlər, vaxt, əşyalar və vacib yerlərə qədər 10 bölmə. Hər işarə üçün real video, şəkil və yavaş göstərmə var. |
+| **İnteraktiv hekayələr** | 10 piksel-art səhnəsi: personajla danışırsan, cavabı işarə dilində kameraya göstərirsən. Hekayədə öz **ad işarən (ləqəbin)** ilə tanış olursan, karlar bir-birini belə çağırır. |
+| **Motivasiya sistemi** | XP, gündəlik alov seriyası, 10 can (hər 12 dəqiqədən bir +1 can, 2 saata tam dolur, oynayarkən də), səviyyələr və təkrar dərsləri. |
+| **Liqalar** | Həftəlik, aylıq və illik reytinq, profil şəkilləri, Bürüncdən Almaza qədər 5 liqa, həftənin sonunda yüksəlmə və enmə. |
+| **Statistika** | Hər gün neçə dəqiqə məşğul olduğun, yığdığın XP, ən uzun alov, səviyyə və öyrəndiyin işarələrin sayı. |
+| **Canlı fon** | Dərs ekranının arxasında Bakı panoraması saata (səhər, günorta, axşam, gecə) və real havaya (yağış, qar) görə dəyişir. |
+| **Ağıllı bildirişlər** | Həftənin hər günü üçün fərqli səhər və gecə salamı, öz seçdiyin saatlarda məşq xatırlatması və hər səhər liqada neçə pillə qalxdığın barədə bir mesaj. Tətbiqə artıq girmisənsə, artıq xatırlatma gəlmir. |
+| **3 dil** | Bütün interfeys, dərslər, hekayələr və bildirişlər Azərbaycan, ingilis və rus dillərində. Dil istənilən vaxt Profildən dəyişir. |
+| **Gecə rejimi** | Gündüz və gecə temaları, göz yormayan Nunito şrifti və piksel-art üslubu. |
+| **Hesab və sinxronizasiya** | E-poçtla qeydiyyat, telefonlar arasında irəliləyişin saxlanması, profil şəkli, ad, ləqəb və telefon nömrəsi. |
+| **Məxfilik və etik məlumat toplama** | İşarə nümunələri yalnız istifadəçinin açıq razılığı ilə saxlanılır və istənilən vaxt silinə bilər. Telefon nömrəsi yalnız sahibinə görünür. |
 
 ## Necə işləyir
 

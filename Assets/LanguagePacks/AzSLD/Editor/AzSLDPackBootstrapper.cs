@@ -321,7 +321,11 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
             ImportMediaInternal(dictionary);
 
-            CevirAssetUtility.LoadOrCreate<GamificationConfig>(CoreData + "/GamificationConfig.asset");
+            var gamification = CevirAssetUtility.LoadOrCreate<GamificationConfig>(CoreData + "/GamificationConfig.asset");
+            // Hearts: 10 at most, +1 every 12 minutes (empty to full in 2 hours); older assets kept 120 minutes per heart.
+            gamification.maxHearts = 10;
+            gamification.heartRegenMinutes = 12;
+            EditorUtility.SetDirty(gamification);
             var registry = CevirAssetUtility.LoadOrCreate<LanguagePackRegistry>(CoreData + "/LanguagePackRegistry.asset");
             AddToRegistry(registry, pack);
 
