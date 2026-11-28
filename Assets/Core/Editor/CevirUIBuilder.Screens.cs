@@ -715,8 +715,8 @@ namespace Cevir.Core.Editor
                 UIPalette.TextSecondary, 110f, out nameSignLabel);
             nameSignLabel.fontSize = 32f;
             TextMeshProUGUI nameSignHint = Label(card.transform, "NameSignHint",
-                "Deaf people call each other by a nickname or best-known feature, e.g. glasses, a beard, a smile.",
-                "Karlar bir-birini ləqəb və ya ən tanınan xüsusiyyətlə çağırır: məs. eynək, saqqal, gülümsəmək.", 28f, UIPalette.TextSecondary,
+                "In sign language we also call each other by a nickname or best-known feature, e.g. glasses, a beard, a smile.",
+                "İşarə dilində bir-birimizi addan əlavə, ləqəb və ya ən tanınan xüsusiyyətlə də çağırırıq: məs. eynək, saqqal, gülümsəmək.", 28f, UIPalette.TextSecondary,
                 TextAlignmentOptions.TopLeft, false);
             TMP_InputField email = InputField(card.transform, "Email", "E-mail", "E-poçt");
             TMP_InputField phone = InputField(card.transform, "Phone", "Phone number (optional)", "Telefon nömrəsi (istəyə bağlı)");

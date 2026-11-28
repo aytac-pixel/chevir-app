@@ -179,11 +179,11 @@ TR = {
 'Ad və soyad': ('Name and surname', 'Имя и фамилия'),
 'E-poçt': ('E-mail', 'Эл. почта'),
 'E-poçta gələn 6 rəqəmli kod': ('6-digit code from the e-mail', '6-значный код из письма'),
-'Karlar bir-birini ləqəb və ya ən tanınan xüsusiyyətlə çağırır: məs. eynək, saqqal, gülümsəmək.': (None, 'Глухие называют друг друга по прозвищу или самой заметной черте: например, очки, борода, улыбка.'),
+'İşarə dilində bir-birimizi addan əlavə, ləqəb və ya ən tanınan xüsusiyyətlə də çağırırıq: məs. eynək, saqqal, gülümsəmək.': (None, 'В языке жестов мы зовём друг друга не только по имени, но и по прозвищу или самой заметной черте: например, очки, борода, улыбка.'),
 # name sign picker
 'Ləqəbin / ən tanınan xüsusiyyətin nədir?': ('What is your nickname / best-known feature?', 'Какое у тебя прозвище / самая заметная черта?'),
 'Ləqəb': ('Nickname', 'Прозвище'),
-'Karlar bir-birini adla yox, ləqəb və ya ən tanınan xüsusiyyətlə çağırır. Sənə ən uyğun olanı seç: hekayələrdə bu işarəni göstərəcəksən.': ('Deaf people call each other not by name but by a nickname or best-known feature. Pick the one that fits you best: you will show this sign in the stories.', 'Глухие зовут друг друга не по имени, а по прозвищу или самой заметной черте. Выбери то, что подходит тебе больше всего: этот жест ты покажешь в историях.'),
+'İşarə dilində bir-birimizi adımızdan əlavə, ləqəb və ya ən tanınan xüsusiyyətimizlə də çağırırıq. Sənə ən uyğun olanı seç: hekayələrdə bu işarəni göstərəcəksən.': ('In sign language we call each other not only by name, but also by a nickname or best-known feature. Pick the one that fits you best: you will show this sign in the stories.', 'В языке жестов мы зовём друг друга не только по имени, но и по прозвищу или самой заметной черте. Выбери то, что подходит тебе больше всего: этот жест ты покажешь в историях.'),
 # data consent
 'Məlumatlarımla Chevir I/O-nu inkişaf etdirməyə kömək et': ('Help improve Chevir I/O with my data', 'Помочь улучшить Chevir I/O моими данными'),
 'Kamera qarşısında işarə göstərəndə Chevir I/O bu cəhdi saxlaya bilər: əlinin, üzünün və bədəninin nöqtələri və 3 saniyəlik kiçik video. Bunlarla Chevir I/O işarə dilini daha yaxşı tanımağı öyrənir. Məlumatlar yalnız Chevir I/O komandasında qalır, heç kimə göstərilmir. İstədiyin vaxt Hesab ayarlarından söndürə bilərsən.': ('When you sign in front of the camera, Chevir I/O can keep that attempt: the points of your hands, face and body and a short 3-second video. With them Chevir I/O learns to recognise sign language better. The data stays with the Chevir I/O team and is never shown to anyone. You can turn this off any time in Account settings.', 'Когда ты показываешь жест перед камерой, Chevir I/O может сохранить эту попытку: точки рук, лица и тела и короткое видео на 3 секунды. По ним Chevir I/O учится лучше распознавать жестовый язык. Данные остаются только у команды Chevir I/O и никому не показываются. Выключить это можно в любой момент в настройках аккаунта.'),
@@ -257,7 +257,7 @@ TR = {
 'Dərsləri tamamla, XP topla və liqada yerini qoru.': (None, 'Проходи уроки, набирай XP и держи своё место в лиге.'),
 # stories
 'Aysel': (None, 'Айсель'),
-'Salam! Karlar bir-birinin adını hərf-hərf demir: bir-birimizi ləqəb və ya ən tanınan xüsusiyyətlə çağırırıq.': (None, 'Привет! Глухие не называют имена друг друга по буквам: мы зовём друг друга по прозвищу или самой заметной черте.'),
+'Salam! İşarə dilində bir-birimizi adımızdan əlavə, ləqəb və ya ən tanınan xüsusiyyətimizlə də çağırırıq.': (None, 'Привет! В языке жестов мы зовём друг друга не только по имени, но и по прозвищу или самой заметной черте.'),
 'Sənin ləqəbin / ən tanınan xüsusiyyətin nədir?': (None, 'Какое у тебя прозвище / самая заметная черта?'),
 '«{namesign}» işarəsini göstər': (None, 'Покажи жест «{namesign}»'),
 'Tanış olduğuma şadam, {name}!': (None, 'Приятно познакомиться, {name}!'),

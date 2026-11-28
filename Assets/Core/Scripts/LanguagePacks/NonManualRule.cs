@@ -27,7 +27,7 @@ namespace Cevir.Core.LanguagePacks
 
     /// <summary>
     /// Non-manual grammar for a sign or sentence type: brow raise, mouth shape, head tilt and so on.
-    /// The project plan requires these to be written by sign-language linguists and Deaf community
+    /// The project plan requires these to be written by sign-language linguists and sign language community
     /// members, so a rule is only enforced once it is marked approved.
     /// </summary>
     [CreateAssetMenu(menuName = "Chevir/Language Pack/Non-Manual Rule", fileName = "NMRule_")]
@@ -40,7 +40,7 @@ namespace Cevir.Core.LanguagePacks
 
         [SerializeField] private List<NonManualRequirement> requirements = new List<NonManualRequirement>();
 
-        [Tooltip("Set only after review by the language's linguists / Deaf community advisers.")]
+        [Tooltip("Set only after review by the language's linguists / sign language community advisers.")]
         [SerializeField] private bool approved;
 
         [SerializeField] private string reviewedBy;

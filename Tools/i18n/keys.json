@@ -695,7 +695,7 @@
   "en": null,
   "src": "NameSignPickerUI.cs"
  },
- "Karlar bir-birini adla yox, ləqəb və ya ən tanınan xüsusiyyətlə çağırır. Sənə ən uyğun olanı seç: hekayələrdə bu işarəni göstərəcəksən.": {
+ "İşarə dilində bir-birimizi adımızdan əlavə, ləqəb və ya ən tanınan xüsusiyyətimizlə də çağırırıq. Sənə ən uyğun olanı seç: hekayələrdə bu işarəni göstərəcəksən.": {
   "en": null,
   "src": "NameSignPickerUI.cs"
  },
@@ -1315,8 +1315,8 @@
   "en": "Name and surname",
   "src": "CevirUIBuilder.Screens.cs"
  },
- "Karlar bir-birini ləqəb və ya ən tanınan xüsusiyyətlə çağırır: məs. eynək, saqqal, gülümsəmək.": {
-  "en": "Deaf people call each other by a nickname or best-known feature, e.g. glasses, a beard, a smile.",
+ "İşarə dilində bir-birimizi addan əlavə, ləqəb və ya ən tanınan xüsusiyyətlə də çağırırıq: məs. eynək, saqqal, gülümsəmək.": {
+  "en": "In sign language we also call each other by a nickname or best-known feature, e.g. glasses, a beard, a smile.",
   "src": "CevirUIBuilder.Screens.cs"
  },
  "E-poçta gələn 6 rəqəmli kod": {
@@ -1327,8 +1327,8 @@
   "en": "Aysel",
   "src": "AzSLDPackBootstrapper.cs"
  },
- "Salam! Karlar bir-birinin adını hərf-hərf demir: bir-birimizi ləqəb və ya ən tanınan xüsusiyyətlə çağırırıq.": {
-  "en": "Hello! Deaf people don't spell each other's names: we call each other by a nickname or best-known feature.",
+ "Salam! İşarə dilində bir-birimizi adımızdan əlavə, ləqəb və ya ən tanınan xüsusiyyətimizlə də çağırırıq.": {
+  "en": "Hello! In sign language we call each other not only by name, but also by a nickname or best-known feature.",
   "src": "AzSLDPackBootstrapper.cs"
  },
  "Sənin ləqəbin / ən tanınan xüsusiyyətin nədir?": {

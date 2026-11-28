@@ -11,7 +11,7 @@ namespace Cevir.Core.UI
     /// <summary>
     /// Sign in / create account, shown over the whole app while the learner is signed out (only when a server is
     /// configured). Creating an account asks for a name, a nickname / best-known feature picked from a list of
-    /// dictionary signs (Deaf people call each other by such a sign), e-mail and password; the name is used in the app
+    /// dictionary signs (in sign language people are also called by such a sign), e-mail and password; the name is used in the app
     /// and on the league table, the nickname sign in the stories.
     /// </summary>
     public sealed class AuthScreenUI : MonoBehaviour

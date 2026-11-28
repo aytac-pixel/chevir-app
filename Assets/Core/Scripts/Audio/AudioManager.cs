@@ -29,7 +29,7 @@ namespace Cevir.Core.Audio
     }
 
     /// <summary>
-    /// Sound effects and music with a small voice pool. Many learners are Deaf or hard of hearing, so every
+    /// Sound effects and music with a small voice pool. Many learners may not hear sounds, so every
     /// cue that matters is also optionally a haptic pulse, and the UI must never rely on sound alone.
     /// </summary>
     public sealed class AudioManager : MonoBehaviour

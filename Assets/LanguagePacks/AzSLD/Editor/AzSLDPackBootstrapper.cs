@@ -16,7 +16,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
     /// entries (25 still letters, numerals and A1 words), the 10 A1 stories (Story 1 complete,
     /// the rest listed as coming soon) plus the shared registry and gamification config. Safe to re-run:
     /// existing assets and content edits are kept. Word lists are proposals for the content team; every sign's
-    /// AzSLD form must be confirmed with Deaf signers before recording references.
+    /// AzSLD form must be confirmed with native AzSL signers before recording references.
     /// </summary>
     public static class AzSLDPackBootstrapper
     {
@@ -665,7 +665,7 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
 
         /// <summary>
         /// Story 1 "Hello, my name is..." (end of Unit 1): on a street, Aysel walks up, greets the learner, explains that
-        /// Deaf people call each other by a nickname or best-known feature and asks for the learner's; the learner signs
+        /// in sign language people are also called by a nickname or best-known feature and asks for the learner's; the learner signs
         /// the word picked at sign-up (a dictionary sign); Aysel answers "Nice to meet you!".
         /// The NPC's sign sequence is a gloss proposal and must be checked by AzSLD signers.
         /// </summary>
@@ -687,8 +687,8 @@ namespace Cevir.LanguagePacks.AzSLD.Editor
                     type = StoryBeatType.NpcLine,
                     approach = true,
                     pose = NpcPose.Wave,
-                    text = new LocalizedString("Hello! Deaf people don't spell each other's names: we call each other by a nickname or best-known feature.",
-                        "Salam! Karlar bir-birinin adını hərf-hərf demir: bir-birimizi ləqəb və ya ən tanınan xüsusiyyətlə çağırırıq."),
+                    text = new LocalizedString("Hello! In sign language we call each other not only by name, but also by a nickname or best-known feature.",
+                        "Salam! İşarə dilində bir-birimizi adımızdan əlavə, ləqəb və ya ən tanınan xüsusiyyətimizlə də çağırırıq."),
                     npcSigns = Signs(words, "Salam")
                 },
                 new StoryBeat

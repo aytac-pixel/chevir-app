@@ -5,7 +5,7 @@ using Cevir.Core.Localization;
 namespace Cevir.Core.Stories
 {
     /// <summary>
-    /// Nicknames and best-known features a learner can pick as the sign they are called by (Deaf people call each
+    /// Nicknames and best-known features a learner can pick as the sign they are called by (in sign language people also call each
     /// other by such a sign instead of spelling the name). Every word is a sign of the chevirapp.com dictionary, so a
     /// story can check it with the word model when the model knows it. The list is picked at sign-up.
     /// Source and dictionary ids: kurikulum/ad-isaresi/Ad_isaresi_sozler.md.

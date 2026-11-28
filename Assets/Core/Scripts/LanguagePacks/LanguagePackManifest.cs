@@ -30,7 +30,7 @@ namespace Cevir.Core.LanguagePacks
         public string datasetLicense;
         public bool commercialUseCleared;
 
-        /// <summary>Set once the language's Deaf community representatives have reviewed the pack.</summary>
+        /// <summary>Set once the language's sign language community representatives have reviewed the pack.</summary>
         public bool communityReviewed;
 
         public string Badge => !string.IsNullOrEmpty(badge)

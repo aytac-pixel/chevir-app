@@ -108,7 +108,7 @@ Heart rule: tracking problems and "unsure" never count against the learner. Soft
 
 ## Adding another sign language
 
-Subclass `LanguagePackDefinition` (as `AzSLDLanguagePack` does), give it a manifest, then fill the same folders with curriculum, signs, references, rules and an optional model, and register it. Each language's rules must come from its own linguists and Deaf community.
+Subclass `LanguagePackDefinition` (as `AzSLDLanguagePack` does), give it a manifest, then fill the same folders with curriculum, signs, references, rules and an optional model, and register it. Each language's rules must come from its own linguists and sign language community.
 
 
 ## Server (Supabase)

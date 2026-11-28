@@ -4,7 +4,7 @@ namespace Cevir.Core.Recognition
 {
     /// <summary>
     /// Matcher thresholds. Starting values are proposals; the plan calls for calibrating them with the
-    /// Deaf community and pilot users, so each language pack carries its own asset.
+    /// sign language community and pilot users, so each language pack carries its own asset.
     /// </summary>
     [CreateAssetMenu(menuName = "Chevir/Recognition/Sign Matcher Config", fileName = "SignMatcherConfig")]
     public sealed class SignMatcherConfig : ScriptableObject

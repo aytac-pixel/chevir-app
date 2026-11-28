@@ -19,7 +19,7 @@ namespace Cevir.Core.Stories
         LearnerSign,
 
         /// <summary>
-        /// The learner shows their own name sign (ad işarəsi): Deaf people call each other by a sign for a nickname or
+        /// The learner shows their own name sign (ad işarəsi): in sign language people also call each other by a sign for a nickname or
         /// their most recognisable feature instead of spelling the name. The feature comes from the profile.
         /// </summary>
         LearnerNameSign

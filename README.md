@@ -30,7 +30,7 @@ Chevir I/O bu boşluğu doldurur: öyrənən işarəni telefonun ön kamerasına
 |---|---|
 | **Kamera ilə işarə tanıma** | MediaPipe əl, üz və bədən nöqtələri telefonda real vaxtda hesablanır. Video heç yerə göndərilmir. Əl forması, hərəkət trayektoriyası, yer və mimika ayrı-ayrı qiymətləndirilir. |
 | **A1 kursu** | Əlifbadan başlayıb salamlaşma, əvəzliklər, sual sözləri, ailə, rəqəmlər, vaxt, əşyalar və vacib yerlərə qədər 10 bölmə. Hər işarə üçün real video, şəkil və yavaş göstərmə var. |
-| **İnteraktiv hekayələr** | 10 piksel-art səhnəsi: personajla danışırsan, cavabı işarə dilində kameraya göstərirsən. Hekayədə öz **ad işarən (ləqəbin)** ilə tanış olursan, karlar bir-birini belə çağırır. |
+| **İnteraktiv hekayələr** | 10 piksel-art səhnəsi: personajla danışırsan, cavabı işarə dilində kameraya göstərirsən. Hekayədə öz **ad işarən (ləqəbin)** ilə tanış olursan, işarə dilində bir-birimizi addan əlavə belə də çağırırıq. |
 | **Motivasiya sistemi** | XP, gündəlik alov seriyası, 10 can (hər 12 dəqiqədən bir +1 can, 2 saata tam dolur, oynayarkən də), səviyyələr və təkrar dərsləri. |
 | **Liqalar** | Həftəlik, aylıq və illik reytinq, profil şəkilləri, Bürüncdən Almaza qədər 5 liqa, həftənin sonunda yüksəlmə və enmə. |
 | **Statistika** | Hər gün neçə dəqiqə məşğul olduğun, yığdığın XP, ən uzun alov, səviyyə və öyrəndiyin işarələrin sayı. |

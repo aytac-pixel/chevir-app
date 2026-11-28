@@ -110,7 +110,7 @@ namespace Cevir.Core.UI
 
             RectTransform intro = kit.Card(content, "Intro", 40, 14f);
             kit.Text(intro, "Title", Title, 38f, UIPalette.TextPrimary);
-            kit.Text(intro, "Body", Loc.T("Karlar bir-birini adla yox, ləqəb və ya ən tanınan xüsusiyyətlə çağırır. Sənə ən uyğun olanı seç: " +
+            kit.Text(intro, "Body", Loc.T("İşarə dilində bir-birimizi adımızdan əlavə, ləqəb və ya ən tanınan xüsusiyyətimizlə də çağırırıq. Sənə ən uyğun olanı seç: " +
                 "hekayələrdə bu işarəni göstərəcəksən."), 30f, UIPalette.TextSecondary, TextAlignmentOptions.TopLeft, false);
 
             foreach (NameSignOptions.Group group in NameSignOptions.Groups)
