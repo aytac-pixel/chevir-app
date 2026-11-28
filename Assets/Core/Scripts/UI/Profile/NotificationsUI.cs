@@ -60,14 +60,15 @@ namespace Cevir.Core.UI
             Header(kit, greetings, iconSun != null ? iconSun : iconBell, UIPalette.Amber, UIPalette.AmberLight,
                 Loc.Pick("Daily greetings", "Gündəlik salamlar", "Приветствия дня"),
                 Loc.Pick("A friendly message at four times of the day", "Günün dörd vaxtında səmimi bir mesaj", "Тёплое сообщение четыре раза в день"));
-            Line(kit, greetings, "07:00", Loc.Pick("Good morning! Ready for today?", "Sabahınız xeyir! Bu günə hazırsan?", "Доброе утро! Готов к новому дню?"),
-                Loc.Pick("every day", "hər gün", "каждый день"));
+            Line(kit, greetings, "07:00", Loc.Pick("Good morning! Ready for today?", "Sabahınız xeyir! Bu gün bir işarə öyrənməyə nə deyirsən?", "Доброе утро! Готов к новому дню?"),
+                Loc.Pick("every day, a different message each weekday", "hər gün, həftənin hər günü fərqli mesaj", "каждый день, в каждый день недели своё"));
             Line(kit, greetings, "13:00", Loc.Pick("Good afternoon! Would you like to start?", "Günortanız xeyir! Başlamaq istəyirsən?", "Добрый день! Хочешь начать?"),
                 Loc.Pick("not if you came in the morning", "səhər girmisənsə, gəlmir", "не приходит, если ты заходил утром"));
             Line(kit, greetings, "19:00", Loc.Pick("Good evening! When shall we start?", "Axşamınız xeyir! Nə zaman başlayaq?", "Добрый вечер! Когда начнём?"),
                 Loc.Pick("not if you came in the afternoon or did a lesson", "günortadan sonra girmisənsə və ya dərs keçmisənsə, gəlmir",
                     "не приходит, если ты заходил днём или прошёл урок"));
-            Line(kit, greetings, "22:00", Loc.Pick("Good night!", "Gecəniz xeyrə qarşı!", "Спокойной ночи!"), Loc.Pick("every day", "hər gün", "каждый день"));
+            Line(kit, greetings, "22:00", Loc.Pick("Good night!", "Gecəniz xeyrə qarşı! Bu gün əla işlədin", "Спокойной ночи!"),
+                Loc.Pick("every day; other words when you did a lesson that day", "hər gün; o gün dərs keçmisənsə, başqa sözlərlə", "каждый день; другие слова, если ты занимался"));
             _greetings = OnOff(kit, greetings, on => Set(on, null));
 
             // Practice reminders in the learner's own hours.

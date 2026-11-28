@@ -83,7 +83,9 @@ namespace Cevir.Core.Notifications
                 DayActivity record = day == 0 && progress != null ? progress.FindDay(date) : null;
                 bool playedToday = day == 0 && streak != null && streak.IsActiveToday(now);
 
-                Add(plan, now, date, MorningMinutes, Loc.Pick("Good morning! ☀", "Sabahınız xeyir! ☀", "Доброе утро! ☀"),
+                int weekday = ((int)date.DayOfWeek + 6) % 7; // Monday = 0
+                if (Loc.IsAz) AddSplit(plan, now, date, MorningMinutes, MorningAz[weekday]);
+                else Add(plan, now, date, MorningMinutes, Loc.Pick("Good morning! ☀", "Sabahınız xeyir! ☀", "Доброе утро! ☀"),
                     Loc.Pick("Ready for today? A short lesson is waiting for you.", "Bu günə hazırsan? Qısa bir dərs səni gözləyir.",
                         "Готов к новому дню? Тебя ждёт короткий урок."));
 
@@ -101,7 +103,8 @@ namespace Cevir.Core.Notifications
                             "Когда начнём? Сегодняшний урок ждёт тебя."));
                 }
 
-                Add(plan, now, date, NightMinutes, Loc.Pick("Good night! 🌙", "Gecəniz xeyrə qarşı! 🌙", "Спокойной ночи! 🌙"),
+                if (Loc.IsAz) AddSplit(plan, now, date, NightMinutes, playedToday ? NightPlayedAz[weekday] : NightNotPlayedAz[weekday]);
+                else Add(plan, now, date, NightMinutes, Loc.Pick("Good night! 🌙", "Gecəniz xeyrə qarşı! 🌙", "Спокойной ночи! 🌙"),
                     playedToday
                         ? Loc.Pick("You did great today. See you tomorrow!", "Bu gün əla işlədin. Sabah görüşənədək!",
                             "Сегодня ты молодец. До завтра!")
@@ -110,6 +113,50 @@ namespace Cevir.Core.Notifications
             }
 
             return plan;
+        }
+
+        // The 07:00 and 22:00 messages change with the day of the week (Monday first); 22:00 depends on whether the
+        // learner did a lesson that day. Texts chosen by Gulshan (2026-11-28).
+        private static readonly string[] MorningAz =
+        {
+            "Sabahınız xeyir! Yeni həftə, yeni işarələr. Hazırsan? ☀",
+            "Sabahınız xeyir! Bu gün bir işarə öyrənməyə nə deyirsən?",
+            "Günaydın! Əllərin isinsin, dərs səni gözləyir 👋",
+            "Sabahınız xeyir! Alovunu söndürmə, bu gün də davam 🔥",
+            "Xeyirli səhərlər! 5 dəqiqə də kifayətdir, başlayaq?",
+            "Sabahınız xeyir! Həftə sonu öyrənmək üçün ən yaxşı vaxtdır 🌤",
+            "Günaydın! Həftəni gözəl bitirək, bir dərs keçək?"
+        };
+
+        private static readonly string[] NightNotPlayedAz =
+        {
+            "Gecəniz xeyrə qarşı! Sabah yenidən başlayaq 🌙",
+            "Gecəniz xeyrə qarşı! Sabah bir işarə səni gözləyir.",
+            "Şirin yuxular! Sabah birlikdə davam edək ✨",
+            "Gecəniz xeyrə qarşı! Alovunu sabah yandırmağı unutma 🔥",
+            "Gecəniz xeyrə qarşı! Sabah yeni bir gün, yeni bir dərs.",
+            "Rahat yuxular! Sabah 5 dəqiqə ayıraq? 🌙",
+            "Gecəniz xeyrə qarşı! Yeni həftəyə hazır ol."
+        };
+
+        private static readonly string[] NightPlayedAz =
+        {
+            "Gecəniz xeyrə qarşı! Bu gün əla işlədin 🌟",
+            "Afərin! Bu gün də öyrəndin. Şirin yuxular 🌙",
+            "Gecəniz xeyrə qarşı! Alovun yanır, sabah da davam 🔥",
+            "Bu gün çox yaxşı idin! Rahat yuxular ✨",
+            "Gecəniz xeyrə qarşı! Hər gün bir az daha irəlidəsən.",
+            "Əla iş! Gecəniz xeyrə qarşı 🌟",
+            "Həftəni gözəl bitirdin! Gecəniz xeyrə qarşı 🌙"
+        };
+
+        /// <summary>One message as title (up to the first "!") and text (the rest).</summary>
+        private static void AddSplit(List<PlannedReminder> plan, DateTime now, DateTime date, int minutes, string message)
+        {
+            int cut = message.IndexOf('!');
+            string title = cut > 0 ? message.Substring(0, cut + 1) : "Chevir";
+            string body = cut > 0 ? message.Substring(cut + 1).Trim() : message;
+            Add(plan, now, date, minutes, title, body.Length > 0 ? body : message);
         }
 
         private static void Add(List<PlannedReminder> plan, DateTime now, DateTime date, int minutes, string title, string body)
