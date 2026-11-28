@@ -156,6 +156,7 @@ namespace Cevir.Core.Game
             Hearts.Tick();
             Streak = new StreakSystem(gamificationConfig, Progress.streak);
             Xp = new XpSystem(gamificationConfig, Progress.xp);
+            Xp.XpGained += (state, amount) => { if (amount > 0) Progress.GetOrCreateDay(LocalNow()).xp += amount; };
             Reviews = new ReviewScheduler();
             if (League == null) League = new LocalLeagueService(gamificationConfig);
             if (Social == null) Social = new InviteOnlySocialService();
@@ -187,10 +188,13 @@ namespace Cevir.Core.Game
         {
             if (paused)
             {
+                FlushActivity();
                 Save();
             }
             else if (Streak != null)
             {
+                _nextActivityFlush = 0f; // marks the morning / afternoon visit at once
+
                 Streak.Evaluate(LocalNow());
                 Hearts.Tick();
                 SettleLeague();
@@ -199,8 +203,35 @@ namespace Cevir.Core.Game
 
         private float _nextHeartTick;
 
+        private float _unsavedSeconds;
+        private float _nextActivityFlush;
+
+        /// <summary>Counts time with the app open into today's record (whole seconds every half minute and on pause).</summary>
+        private void TrackActivity()
+        {
+            if (Progress == null) return;
+            _unsavedSeconds += Mathf.Min(Time.unscaledDeltaTime, 1f); // a long frame is a pause, not use
+            if (Time.unscaledTime < _nextActivityFlush) return;
+            _nextActivityFlush = Time.unscaledTime + 30f;
+            FlushActivity();
+        }
+
+        private void FlushActivity()
+        {
+            if (Progress == null) return;
+            DateTime now = LocalNow();
+            DayActivity day = Progress.GetOrCreateDay(now);
+            int whole = (int)_unsavedSeconds;
+            day.seconds += whole;
+            _unsavedSeconds -= whole;
+            if (now.Hour >= 5 && now.Hour < 13) day.openedMorning = true;
+            if (now.Hour >= 13 && now.Hour < 19) day.openedAfternoon = true;
+        }
+
         private void Update()
         {
+            TrackActivity();
+
             // Hearts regenerate on a clock; check a few times a minute so the counters stay current.
             if (Hearts == null || Time.unscaledTime < _nextHeartTick) return;
             _nextHeartTick = Time.unscaledTime + 10f;
@@ -209,6 +240,7 @@ namespace Cevir.Core.Game
 
         private void OnApplicationQuit()
         {
+            FlushActivity();
             Save();
         }
 

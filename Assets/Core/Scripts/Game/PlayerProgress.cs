@@ -64,6 +64,38 @@ namespace Cevir.Core.Game
 
         public List<PackProgress> packs = new List<PackProgress>();
 
+        /// <summary>Time in the app and XP per local day (about the last two months), for the statistics page.</summary>
+        public List<DayActivity> activity = new List<DayActivity>();
+
+        public const int ActivityDaysKept = 62;
+
+        public static string DayKey(DateTime date) => date.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+        /// <summary>The record of a day, or null when nothing happened that day.</summary>
+        public DayActivity FindDay(DateTime date)
+        {
+            if (activity == null) return null;
+            string key = DayKey(date);
+            for (int i = activity.Count - 1; i >= 0; i--)
+            {
+                if (activity[i] != null && activity[i].date == key) return activity[i];
+            }
+
+            return null;
+        }
+
+        public DayActivity GetOrCreateDay(DateTime date)
+        {
+            DayActivity day = FindDay(date);
+            if (day != null) return day;
+            if (activity == null) activity = new List<DayActivity>();
+            day = new DayActivity { date = DayKey(date) };
+            activity.Add(day);
+            string oldest = DayKey(date.AddDays(-ActivityDaysKept));
+            activity.RemoveAll(d => d == null || string.CompareOrdinal(d.date, oldest) < 0);
+            return day;
+        }
+
         public PackProgress GetOrCreatePack(string languageCode)
         {
             foreach (PackProgress pack in packs)
@@ -190,6 +222,17 @@ namespace Cevir.Core.Game
         public int attempts;
     }
 
+    /// <summary>What the learner did on one local day.</summary>
+    [Serializable]
+    public sealed class DayActivity
+    {
+        public string date = "";      // yyyy-MM-dd, local
+        public int seconds;           // time with the app open
+        public int xp;
+        public bool openedMorning;    // opened between 05:00 and 13:00
+        public bool openedAfternoon;  // opened between 13:00 and 19:00
+    }
+
     /// <summary>
     /// When the learner can practise each day (minutes after local midnight) and whether reminders are on.
     /// Two reminders 30 minutes apart are sent inside the window; a third one when the flame is at stake.
@@ -205,6 +248,12 @@ namespace Cevir.Core.Game
         public bool enabled = true;
         public int startMinutes = 18 * 60;
         public int endMinutes = 20 * 60;
+
+        /// <summary>Good morning / afternoon / evening / night messages through the day.</summary>
+        public bool greetings = true;
+
+        /// <summary>A message when the learner's place in the weekly league changes.</summary>
+        public bool leagueAlerts = true;
 
         public void Normalize()
         {

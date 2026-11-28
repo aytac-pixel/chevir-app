@@ -638,176 +638,20 @@ namespace Cevir.Core.Editor
 
         private static ProfileScreenUI BuildProfileScreen(Transform parent, CevirTheme theme)
         {
+            // The profile card and the four page rows are built at runtime (ProfileScreenUI.Build), in the interface language.
             RectTransform screen = Rect("ProfileScreen", parent);
             Stretch(screen);
             ProfileScreenUI ui = screen.gameObject.AddComponent<ProfileScreenUI>();
-
-            ScrollRect scrollRect;
-            RectTransform content = ScrollColumn(screen, "Scroll", new RectOffset(60, 60, 60, 80), 34f, out scrollRect);
-
-            // Header card.
-            Image header = Img(content, "Header", Sprite("UI", "profile_header"), Color.white);
-            header.preserveAspect = false;
-            Layout(header.gameObject, preferredHeight: 330f);
-            HardShadow(header.gameObject);
-            // Square avatar: white frame, blue face, white person icon (or the photo, cut to the square).
-            Image avatarRing = Img(header.transform, "AvatarRing", Sprite("UI", "outline_r36"), Color.white, true);
-            Place(avatarRing.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(46f, 0f), new Vector2(220f, 220f));
-            Image avatar = Img(avatarRing.transform, "Avatar", Sprite("UI", "white"), UIPalette.Primary);
-            avatar.preserveAspect = false;
-            Place(avatar.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(208f, 208f));
-            Image avatarIcon = Img(avatar.transform, "Icon", IconSprite("user"), Color.white);
-            Place(avatarIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(120f, 120f));
-            // Profile photo, cut to the circle by the avatar's mask.
-            avatar.gameObject.AddComponent<Mask>().showMaskGraphic = true;
-            RectTransform photoRt = Rect("Photo", avatar.transform);
-            Stretch(photoRt);
-            RawImage photo = photoRt.gameObject.AddComponent<RawImage>();
-            photo.raycastTarget = false;
-            photoRt.gameObject.SetActive(false);
-
-            TextMeshProUGUI name = Text(header.transform, "Name", "User", 64f, Color.white, TextAlignmentOptions.BottomLeft, true);
-            Place(name.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(310f, 0f), new Vector2(330f, 90f));
-            name.enableWordWrapping = false;
-            name.overflowMode = TextOverflowModes.Ellipsis;
-            TextMeshProUGUI joined = Text(header.transform, "Joined", "Joined October 2026", 28f, new Color(1f, 1f, 1f, 0.88f), TextAlignmentOptions.TopLeft, true);
-            Place(joined.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 1f), new Vector2(310f, -6f), new Vector2(360f, 50f));
-
-            RectTransform edit = Rect("EditButton", header.transform);
-            Place(edit, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-36f, 10f), new Vector2(270f, 96f));
-            Image editBg = edit.gameObject.AddComponent<Image>();
-            editBg.sprite = Panel(24);
-            editBg.type = Image.Type.Sliced;
-            editBg.pixelsPerUnitMultiplier = 1f;
-            editBg.color = Color.white;
-            Button editButton = edit.gameObject.AddComponent<Button>();
-            editButton.targetGraphic = editBg;
-            Row(edit.gameObject, 12f, TextAnchor.MiddleCenter);
-            Icon(edit, "Icon", "pencil", 36f, UIPalette.Primary);
-            Label(edit, "Label", "Edit profile", "Profili dəyiş", 30f, UIPalette.Primary, TextAlignmentOptions.MidlineLeft, true);
-
-            // This week's XP · place in the league · league badge.
-            Image metrics = Glass(content, "Metrics", 36, UIPalette.Glass);
-            Layout(metrics.gameObject, preferredHeight: 190f);
-            HorizontalLayoutGroup metricsRow = Row(metrics.gameObject, 0f, TextAnchor.MiddleCenter);
-            metricsRow.childForceExpandWidth = true;
-            TextMeshProUGUI weeklyXp = Metric(metrics.transform, "WeeklyXp", "XP this week", "Bu həftə XP", true);
-            TextMeshProUGUI leagueRank = Metric(metrics.transform, "LeagueRank", "League place", "Liqada yer", true);
-            RectTransform badgeCell = Rect("League", metrics.transform);
-            Column(badgeCell.gameObject, 0, 10f, TextAnchor.MiddleCenter).childControlWidth = false;
-            Layout(badgeCell.gameObject, flexibleWidth: 1f);
-            Image badgeBackdrop = Img(badgeCell, "Backdrop", Sprite("UI", "white"), new Color(1f, 1f, 1f, 0f), false);
-            Layout(badgeBackdrop.gameObject, preferredWidth: 76f, preferredHeight: 76f);
-            Image badgeIcon = Img(badgeBackdrop.transform, "Icon", IconSprite("trophy"), LeagueTiers.Color(0));
-            Place(badgeIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(46f, 46f));
-            TextMeshProUGUI badgeLabel = Text(badgeCell, "Label", "Bronze", 27f, UIPalette.TextSecondary, TextAlignmentOptions.Center, true);
-            Layout(badgeLabel.gameObject, preferredWidth: 260f);
-
-            // Statistics grid.
-            Label(content, "StatisticsTitle", "Statistics", "Statistika", 44f, UIPalette.TextPrimary);
-            RectTransform grid = Rect("StatsGrid", content);
-            GridLayoutGroup gridLayout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            gridLayout.cellSize = new Vector2(488f, 210f);
-            gridLayout.spacing = new Vector2(24f, 24f);
-            gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            gridLayout.constraintCount = 2;
-            grid.gameObject.AddComponent<GridAutoFit>();
-            Layout(grid.gameObject, preferredHeight: 444f);
-            TextMeshProUGUI streak = StatCard(grid, "Streak", "flame", "Day Streak", "Günlük seriya", "0");
-            TextMeshProUGUI xp = StatCard(grid, "Xp", "zap", "Total XP", "Ümumi XP", "0");
-            TextMeshProUGUI level = StatCard(grid, "Level", "crown", "Level", "Səviyyə", "A1");
-            TextMeshProUGUI signs = StatCard(grid, "Signs", "hand", "Signs Learned", "Öyrənilən işarə", "0");
-
-            // Notifications: daily practice reminders.
-            Label(content, "NotificationsTitle", "Notifications", "Bildirişlər", 44f, UIPalette.TextPrimary);
-            Image notifications = Glass(content, "NotificationsCard", 36, UIPalette.Glass);
-            HorizontalLayoutGroup notificationsRow = Row(notifications.gameObject, 24f);
-            notificationsRow.padding = new RectOffset(30, 30, 28, 28);
-            Image bellTile = Img(notifications.transform, "IconTile", Sprite("UI", "white"), new Color(1f, 1f, 1f, 0f), false);
-            Layout(bellTile.gameObject, preferredWidth: 80f, preferredHeight: 104f).minWidth = 80f;
-            Image bell = Img(bellTile.transform, "Icon", IconSprite("bell"), UIPalette.Primary);
-            Place(bell.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(58f, 58f));
-            RectTransform notificationTexts = Rect("Texts", notifications.transform);
-            Column(notificationTexts.gameObject, 0, 4f, TextAnchor.MiddleLeft);
-            Layout(notificationTexts.gameObject, flexibleWidth: 1f);
-            Label(notificationTexts, "Title", "Practice reminders", "Məşq xatırlatmaları", 34f, UIPalette.TextPrimary);
-            TextMeshProUGUI notificationsStatus = Text(notificationTexts, "Status", "", 27f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
-            TextMeshProUGUI notificationsLabel;
-            Button notificationsButton = MakeButton(notifications.transform, "SetupButton", "AYARLA", UIPalette.CyanLight, UIPalette.Primary, 88f, out notificationsLabel);
-            notificationsLabel.fontSize = 30f;
-            Layout(notificationsButton.gameObject, preferredWidth: 200f).minWidth = 180f;
-
-            // Invite.
-            Label(content, "FriendsTitle", "Friends", "Dostlar", 44f, UIPalette.TextPrimary);
-            Image friends = Glass(content, "FriendsCard", 48, Color.white);
-            Column(friends.gameObject, 44, 18f);
-
-            Label(friends.transform, "Title", "Learning together is more fun!", "Birlikdə öyrənmək daha maraqlıdır!", 36f, UIPalette.TextPrimary);
-            Label(friends.transform, "Body", "Invite friends and share your streak.", "Dostlarını dəvət et və seriyanı paylaş.", 28f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
-            RectTransform actions = Rect("Actions", friends.transform);
-            Row(actions.gameObject, 20f);
-            Layout(actions.gameObject, preferredHeight: 124f);
-            TextMeshProUGUI inviteLabel;
-            Button invite = GradientButton(actions, "InviteButton", "Invite friends", "Dostları dəvət et", 124f, "users", out inviteLabel);
-            Layout(invite.gameObject, flexibleWidth: 1f);
-            Button instagram = IconButton(actions, "Instagram", "instagram", 116f, new Color32(0xC1, 0x35, 0x84, 0xFF), Color.white, false);
-            Button facebook = IconButton(actions, "Facebook", "facebook", 116f, new Color32(0x18, 0x77, 0xF2, 0xFF), Color.white, false);
-
-            // Account: e-mail and sign out (shown only when signed in to the server).
-            Image account = Glass(content, "AccountCard", 36, UIPalette.Glass);
-            Column(account.gameObject, 40, 14f);
-            Label(account.transform, "Title", "Account", "Hesab", 34f, UIPalette.TextPrimary);
-            TextMeshProUGUI email = Text(account.transform, "Email", "", 30f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
-            email.enableWordWrapping = false;
-            email.overflowMode = TextOverflowModes.Ellipsis;
-            TextMeshProUGUI settingsLabel;
-            Button settings = MakeButton(account.transform, "SettingsButton", "HESAB AYARLARI", UIPalette.CyanLight, UIPalette.Primary, 100f, out settingsLabel);
-            settingsLabel.fontSize = 32f;
-            TextMeshProUGUI signOutLabel;
-            Button signOut = MakeButton(account.transform, "SignOutButton", "SIGN OUT", UIPalette.RedLight, UIPalette.RedDark, 100f, out signOutLabel);
-            signOutLabel.fontSize = 32f;
-            signOutLabel.gameObject.AddComponent<LocalizedLabel>().Set("SIGN OUT", "HESABDAN ÇIX");
-            account.gameObject.SetActive(false);
-
-            // Edit profile sheet: name and signing hand (the app is in Azerbaijani; more languages come later).
-            RectTransform form;
-            BottomSheetUI sheet = BuildSheet(screen, "EditProfileSheet", out form);
-            TMP_InputField first = InputField(form, "FirstName", "Name", "Ad");
-            TMP_InputField last = InputField(form, "LastName", "Surname", "Soyad");
-            Label(form, "HandTitle", "Signing hand", "İşarə əli", 30f, UIPalette.TextSecondary);
-            RectTransform hands = Rect("Hands", form);
-            Row(hands.gameObject, 16f).childForceExpandWidth = true;
-            Button right = ToggleButton(hands, "Right", "Right", "Sağ");
-            Button left = ToggleButton(hands, "Left", "Left", "Sol");
-
-            Set(ui, "avatarPhoto", photo);
-            Set(ui, "avatarIcon", avatarIcon.gameObject);
-            Set(ui, "notificationsStatus", notificationsStatus);
-            Set(ui, "notificationsButton", notificationsButton);
-            Set(ui, "settingsButton", settings);
-            Set(ui, "nameLabel", name);
-            Set(ui, "joinedLabel", joined);
-            Set(ui, "editButton", editButton);
-            Set(ui, "weeklyXpValue", weeklyXp);
-            Set(ui, "leagueRankValue", leagueRank);
-            Set(ui, "leagueBadgeIcon", badgeIcon);
-            Set(ui, "leagueBadgeBackdrop", badgeBackdrop);
-            Set(ui, "leagueBadgeLabel", badgeLabel);
-            Set(ui, "streakValue", streak);
-            Set(ui, "xpValue", xp);
-            Set(ui, "levelValue", level);
-            Set(ui, "signsValue", signs);
-            Set(ui, "inviteButton", invite);
-            Set(ui, "instagramButton", instagram);
-            Set(ui, "facebookButton", facebook);
-            Set(ui, "sheet", sheet);
-            Set(ui, "firstNameField", first);
-            Set(ui, "lastNameField", last);
-            Set(ui, "rightHandButton", right);
-            Set(ui, "leftHandButton", left);
-            Set(ui, "accountCard", account.gameObject);
-            Set(ui, "emailLabel", email);
-            Set(ui, "signOutButton", signOut);
+            Set(ui, "font", _font);
+            Set(ui, "theme", theme);
+            Set(ui, "iconUser", IconSprite("user"));
+            Set(ui, "iconPencil", IconSprite("pencil"));
+            Set(ui, "iconFlame", IconSprite("flame"));
+            Set(ui, "iconZap", IconSprite("zap"));
+            Set(ui, "iconChart", IconSprite("chart"));
+            Set(ui, "iconBell", IconSprite("bell"));
+            Set(ui, "iconUsers", IconSprite("users"));
+            Set(ui, "iconSettings", IconSprite("settings"));
             return ui;
         }
 

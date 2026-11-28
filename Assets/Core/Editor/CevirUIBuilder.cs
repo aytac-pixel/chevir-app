@@ -83,6 +83,10 @@ namespace Cevir.Core.Editor
             LessonScreenUI lesson = BuildLessonScreen(safe, practice);
             StoryScreenUI story = BuildStoryScreen(safe, practice, theme);
             ToastUI toast = BuildToast(safe);
+            // Profile pages (under the account and reminder panels, which they open).
+            BuildRuntimePanel<StatisticsUI>(canvasGo.transform, "StatisticsLayer", theme);
+            BuildRuntimePanel<NotificationsUI>(canvasGo.transform, "NotificationsLayer", theme);
+            BuildRuntimePanel<FriendsUI>(canvasGo.transform, "FriendsLayer", theme);
             BuildRuntimePanel<AccountSettingsUI>(canvasGo.transform, "AccountSettingsLayer", theme);
             BuildRuntimePanel<ReminderSettingsUI>(canvasGo.transform, "ReminderSettingsLayer", theme);
             BuildAuthScreen(canvasGo.transform);
@@ -259,6 +263,29 @@ namespace Cevir.Core.Editor
             Set(ui, "iconBell", IconSprite("bell"));
             if (typeof(T) == typeof(AccountSettingsUI)) Set(ui, "iconUser", IconSprite("user"));
             if (typeof(T) == typeof(DataConsentUI)) Set(ui, "iconCamera", IconSprite("camera"));
+            if (typeof(T) == typeof(StatisticsUI))
+            {
+                Set(ui, "iconFlame", IconSprite("flame"));
+                Set(ui, "iconCrown", IconSprite("crown"));
+                Set(ui, "iconHand", IconSprite("hand"));
+                Set(ui, "iconZap", IconSprite("zap"));
+                Set(ui, "iconTrophy", IconSprite("trophy"));
+                Set(ui, "iconChart", IconSprite("chart"));
+            }
+
+            if (typeof(T) == typeof(NotificationsUI))
+            {
+                Set(ui, "iconSun", IconSprite("sun"));
+                Set(ui, "iconTrophy", IconSprite("trophy"));
+            }
+
+            if (typeof(T) == typeof(FriendsUI))
+            {
+                Set(ui, "iconUsers", IconSprite("users"));
+                Set(ui, "iconInstagram", IconSprite("instagram"));
+                Set(ui, "iconGlobe", IconSprite("globe"));
+                Set(ui, "logo", Sprite("Brand", "cevir_logo"));
+            }
 
             return ui;
         }

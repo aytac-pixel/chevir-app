@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace Cevir.Core.UI
 {
     /// <summary>
-    /// Profile > settings: profile photo, name and signing hand, e-mail, password, reminders, sign out and account
+    /// Profile > Account: the registered e-mail (and changing it), profile photo, name, ləqəb and signing hand, password, sign out and account
     /// deletion. Account parts show only when signed in to the server. Builds its own content at runtime.
     /// </summary>
     public sealed class AccountSettingsUI : MonoBehaviour
@@ -424,7 +424,7 @@ namespace Cevir.Core.UI
             UIKit.Row(top.gameObject, 20f);
             UIKit.Layout(top.gameObject, preferredHeight: 96f);
             kit.IconButton(top, "Back", iconBack, "‹", 96f, UIPalette.TextPrimary, Color.white, Close);
-            TextMeshProUGUI heading = kit.Text(top, "Heading", Loc.T("Hesab ayarları"), 46f, UIPalette.TextPrimary);
+            TextMeshProUGUI heading = kit.Text(top, "Heading", Loc.Pick("Account", "Hesab", "Аккаунт"), 46f, UIPalette.TextPrimary);
             UIKit.Layout(heading.gameObject, flexibleWidth: 1f);
 
             _message = kit.Text(content, "Message", "", 30f, UIPalette.GreenDark, TextAlignmentOptions.Center, false);
@@ -496,23 +496,6 @@ namespace Cevir.Core.UI
                 UIKit.Layout(_languageButtons[i].gameObject, flexibleWidth: 1f);
             }
 
-            // Reminders.
-            RectTransform reminders = kit.Card(content, "Reminders", 36, 10f);
-            RectTransform reminderRow = UIKit.Rect("Row", reminders);
-            UIKit.Row(reminderRow.gameObject, 22f);
-            Image bellTile = kit.Image(reminderRow, "BellTile", theme != null ? theme.panel : null, UIPalette.CyanLight, true);
-            UIKit.Layout(bellTile.gameObject, preferredWidth: 96f, preferredHeight: 96f, minWidth: 96f);
-            Image bell = kit.Image(bellTile.transform, "Bell", iconBell, UIPalette.Primary, false);
-            bell.rectTransform.anchorMin = bell.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-            bell.rectTransform.sizeDelta = new Vector2(54f, 54f);
-            RectTransform reminderTexts = UIKit.Rect("Texts", reminderRow);
-            UIKit.Column(reminderTexts.gameObject, 0, 4f, TextAnchor.MiddleLeft);
-            UIKit.Layout(reminderTexts.gameObject, flexibleWidth: 1f);
-            kit.Text(reminderTexts, "Title", Loc.T("Bildirişlər"), 36f, UIPalette.TextPrimary);
-            _remindersStatus = kit.Text(reminderTexts, "Status", "", 28f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
-            Button reminderButton = kit.Button(reminderRow, "Open", Loc.T("AYARLA"), UIPalette.CyanLight, UIPalette.Primary, 84f, false, OpenReminders);
-            UIKit.Layout(reminderButton.gameObject, preferredWidth: 210f, minWidth: 180f);
-
             // Data permission (sign samples for the dataset).
             RectTransform data = kit.Card(content, "DataConsent", 40, 16f);
             _dataCard = data.gameObject;
@@ -530,7 +513,8 @@ namespace Cevir.Core.UI
             // E-mail.
             RectTransform emailCard = kit.Card(content, "Email", 40, 18f);
             _emailCard = emailCard.gameObject;
-            kit.Text(emailCard, "Title", Loc.T("E-poçt"), 36f, UIPalette.TextPrimary);
+            kit.Text(emailCard, "Title", Loc.Pick("E-mail you registered with", "Qeydiyyatdan keçdiyin e-poçt", "Почта, с которой ты зарегистрирован"),
+                36f, UIPalette.TextPrimary);
             _emailCurrent = kit.Text(emailCard, "Current", "", 30f, UIPalette.TextSecondary, TextAlignmentOptions.MidlineLeft, false);
             _emailCurrent.enableWordWrapping = false;
             _emailCurrent.overflowMode = TextOverflowModes.Ellipsis;
@@ -552,6 +536,9 @@ namespace Cevir.Core.UI
             TextMeshProUGUI deleteLabel;
             kit.Button(danger, "Delete", Loc.T("HESABI SİL"), UIPalette.RedLight, UIPalette.RedDark, 104f, false, out deleteLabel, DeleteAccount);
             _deleteLabel = deleteLabel;
+
+            // The registered e-mail comes first, right under the title.
+            emailCard.SetSiblingIndex(_message.transform.GetSiblingIndex() + 1);
         }
     }
 }

@@ -163,8 +163,9 @@ namespace Cevir.Core.UI
         public static string FriendsTitle => Loc.Pick("Learning together is more fun!", "Birlikdə öyrənmək daha maraqlıdır!");
         public static string FriendsBody => Loc.Pick("Invite friends and share your streak.", "Dostlarını dəvət et və seriyanı paylaş.");
         public static string InviteFriends => Loc.Pick("Invite friends", "Dostları dəvət et");
-        public static string InviteMessage => Loc.Pick("I'm learning Azerbaijani Sign Language with Chevir. My streak: {0} days! Join me: {1}",
-            "Chevir ilə Azərbaycan İşarə Dilini öyrənirəm. Seriyam: {0} gün! Sən də qoşul: {1}");
+        public static string InviteMessage => Loc.Pick("I'm learning Azerbaijani Sign Language with Chevir. My flame: {0} days! Download it and join me: {1}",
+            "Chevir ilə Azərbaycan işarə dilini öyrənirəm. Alovum: {0} gün! Sən də yüklə və qoşul: {1}",
+            "Я учу азербайджанский жестовый язык с Chevir. Мой огонёк: {0} дн.! Скачай и присоединяйся: {1}");
         public static string LinkCopied => Loc.Pick("Invite link copied", "Dəvət linki kopyalandı");
         public static string Save => Loc.Pick("SAVE", "YADDA SAXLA");
         public static string AppLanguage => Loc.Pick("App language", "Tətbiqin dili");
