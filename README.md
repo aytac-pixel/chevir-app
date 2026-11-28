@@ -41,28 +41,6 @@ Chevir I/O bu boşluğu doldurur: öyrənən işarəni telefonun ön kamerasına
 | ☁️ **Hesab və sinxronizasiya** | E-poçtla qeydiyyat, telefonlar arasında irəliləyişin saxlanması, profil şəkli, ad, ləqəb və telefon nömrəsi. |
 | 🔒 **Məxfilik və etik məlumat toplama** | İşarə nümunələri yalnız istifadəçinin açıq razılığı ilə saxlanılır və istənilən vaxt silinə bilər. Telefon nömrəsi yalnız sahibinə görünür. |
 
-## Ekranlar
-
-<p align="center">
-  <img src="docs/images/ders.png" width="100%" alt="Dərs səhifəsi"><br>
-  <i>Dərs yolu: bölmə şəkilləri, kilidli bölmələr və saata görə dəyişən səma</i>
-</p>
-
-<p align="center">
-  <img src="docs/images/hekaye.png" width="49%" alt="Hekayələr">
-  <img src="docs/images/liqa.png" width="49%" alt="Liqa">
-</p>
-
-<p align="center">
-  <img src="docs/images/profil.png" width="80%" alt="Profil və statistika"><br>
-  <i>Profil kartı və həftəlik statistika</i>
-</p>
-
-<p align="center">
-  <img src="docs/images/sema.png" width="100%" alt="Saata və havaya görə fonlar"><br>
-  <i>Səhər, günorta, axşam, gecə, yağış və qar fonları</i>
-</p>
-
 ## Necə işləyir
 
 ```
@@ -97,16 +75,6 @@ Chevir I/O bu boşluğu doldurur: öyrənən işarəni telefonun ön kamerasına
 3. Hesab yarat, kameraya icazə ver və ilk hərfini göstər.
 
 Tələb: Android 7.0 və ya daha yeni, 64-bit telefon.
-
-## Yol xəritəsi
-
-- ✅ A1 kursu, hekayələr, liqalar, statistika, 3 dil, bildirişlər
-- 🔄 A2 səviyyəsi: lüğət və cümlə videoları
-- 🔄 Daha çox işarəçidən toplanan nümunələrlə daha dəqiq tanıma modeli
-- 🔜 B1 səviyyəsi: cümlələr və dialoqlar
-- 🔜 iOS versiyası və Google Play
-- 🔜 Yeni işarə dili paketləri (rus işarə dili və digərləri)
-- 🔜 Müəllimlər və məktəblər üçün sinif rejimi
 
 ## Tərtibatçılar üçün
 
