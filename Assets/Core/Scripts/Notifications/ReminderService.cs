@@ -20,8 +20,6 @@ namespace Cevir.Core.Notifications
         private const string ChannelId = "cevir_reminders";
         private const string GreetingChannelId = "cevir_greetings";
         private const string LeagueChannelId = "cevir_league";
-        private const string LeagueRankKey = "chevir.league.lastRank";
-        private const string LeagueWeekKey = "chevir.league.lastWeek";
         private const string PermissionAskedKey = "chevir.notifications.asked";
 
         private GameManager _game;
@@ -48,7 +46,6 @@ namespace Cevir.Core.Notifications
             if (_game == null) return;
             _game.Streak.StreakChanged += state => Reschedule();
             _game.ProfileChanged += Reschedule;
-            _game.ProfileChanged += CheckLeaguePlace;
             _game.ProfileChanged += SyncLeagueWatch;
             if (Cloud.CloudService.Instance != null) Cloud.CloudService.Instance.StateChanged += state => SyncLeagueWatch();
             Reschedule();
@@ -78,36 +75,7 @@ namespace Cevir.Core.Notifications
             _game.Save();
             if (asked) StartCoroutine(RequestPermissionThenSchedule(null));
             else Reschedule();
-        }
-
-        /// <summary>
-        /// When the weekly ranking comes in with a new place for the learner, says so at once. Works while the app runs
-        /// or checks the ranking (a closed app cannot know about other learners' XP without a push server).
-        /// </summary>
-        private void CheckLeaguePlace()
-        {
-            if (_game == null || _game.Progress == null) return;
-            Social.LeagueSnapshot league = _game.GetLeagueSnapshot();
-            Social.LeagueEntry you = league != null ? league.You : null;
-            if (league == null || league.Offline || you == null || you.Rank <= 0 || league.Entries == null || league.Entries.Count < 2) return;
-
-            int last = ExchangePlace(StreakSystemWeek(), you.Rank);
-            if (last == you.Rank) return;
-
-            ReminderSettings r = _game.Progress.reminders;
-            if (last == 0 || r == null || !r.leagueAlerts) return; // the first look this week is the starting point
-            bool up = you.Rank < last;
-            string place = UI.LeagueScreenUI.Ordinal(you.Rank);
-            string title = up
-                ? Loc.Pick("You moved up in the league! 🏆", "Liqada irəlilədin! 🏆", "Ты поднялся в лиге! 🏆")
-                : Loc.Pick("Someone passed you in the league", "Liqada səni ötdülər", "Тебя обогнали в лиге");
-            string body = up
-                ? Loc.Pick("You are now #" + you.Rank + " this week. Keep going!", "Həftəlik reytinqdə indi " + place + " yerdəsən. Belə davam et!",
-                    "Теперь ты на " + you.Rank + "-м месте за неделю. Так держать!")
-                : Loc.Pick("You are now #" + you.Rank + " this week. One lesson can win your place back.",
-                    "Həftəlik reytinqdə indi " + place + " yerdəsən. Bir dərslə yerini geri ala bilərsən.",
-                    "Теперь ты на " + you.Rank + "-м месте за неделю. Один урок вернёт тебе место.");
-            SendNow(title, body);
+            SyncLeagueWatch();
         }
 
         // ------------------------------------------------------------------ league check while the app is closed
@@ -117,34 +85,7 @@ namespace Cevir.Core.Notifications
         private bool _registering;
 
         /// <summary>
-        /// The place the app has just seen goes into the same store the background check uses (Android), so a change is
-        /// announced once. Returns the place stored before for the same week, 0 when none.
-        /// </summary>
-        private static int ExchangePlace(string week, int rank)
-        {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            try
-            {
-                using (AndroidJavaObject context = AppContext())
-                using (var watch = new AndroidJavaClass("com.chevir.leaguewatch.LeagueWatch"))
-                {
-                    return watch.CallStatic<int>("exchange", context, week, rank);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("[Chevir] League watch unavailable: " + e.Message);
-            }
-#endif
-            int last = PlayerPrefs.GetString(LeagueWeekKey, string.Empty) == week ? PlayerPrefs.GetInt(LeagueRankKey, 0) : 0;
-            PlayerPrefs.SetString(LeagueWeekKey, week);
-            PlayerPrefs.SetInt(LeagueRankKey, rank);
-            PlayerPrefs.Save();
-            return last;
-        }
-
-        /// <summary>
-        /// Turns the background league check on (signed in, league messages on) or off. The phone gets a random token
+        /// Turns the 07:00 league message (one a day, also while the app is closed) on (signed in, league messages on) or off. The phone gets a random token
         /// the server links to the account, so the check can ask for the place without the learner's password or session.
         /// </summary>
         private void SyncLeagueWatch()
@@ -205,13 +146,15 @@ namespace Cevir.Core.Notifications
                 using (var watch = new AndroidJavaClass("com.chevir.leaguewatch.LeagueWatch"))
                 {
                     watch.CallStatic("start", context, cloud.BaseUrl, cloud.AnonKey, token,
-                        Loc.Pick("You moved up in the league! 🏆", "Liqada irəlilədin! 🏆", "Ты поднялся в лиге! 🏆"),
-                        Loc.Pick("Someone passed you in the league", "Liqada səni ötdülər", "Тебя обогнали в лиге"),
-                        Loc.Pick("You are now #{0} this week. Keep going!", "Həftəlik reytinqdə indi {0} yerdəsən. Belə davam et!",
-                            "Теперь ты на {0}-м месте за неделю. Так держать!"),
-                        Loc.Pick("You are now #{0} this week. One lesson can win your place back.",
-                            "Həftəlik reytinqdə indi {0} yerdəsən. Bir dərslə yerini geri ala bilərsən.",
-                            "Теперь ты на {0}-м месте за неделю. Один урок вернёт тебе место."),
+                        // {0} = places moved since yesterday morning, {1} = place now.
+                        Loc.Pick("You moved up in the league! 🏆", "Liqada yüksəldiniz! 🏆", "Ты поднялся в лиге! 🏆"),
+                        Loc.Pick("You moved down in the league", "Liqada geriləmisiniz", "Ты опустился в лиге"),
+                        Loc.Pick("You moved up {0} places since yesterday. You are now #{1} this week.",
+                            "Siz dünəndən bəri {0} pillə yüksəldiniz. İndi həftəlik liqada {1} sıradasınız.",
+                            "Ты поднялся на {0} мест со вчерашнего дня. Сейчас ты на {1}-м месте за неделю."),
+                        Loc.Pick("You moved down {0} places since yesterday. You are now #{1}. Shall we keep learning?",
+                            "Siz dünəndən bəri {0} pillə geriləmisiniz, {1} sıradasınız. Öyrənməyə davam etmək istəyirsiniz?",
+                            "Ты опустился на {0} мест со вчерашнего дня, сейчас ты на {1}-м месте. Продолжим учиться?"),
                         Loc.Pick("League", "Liqa", "Лига"), Loc.IsAz);
                 }
 
@@ -249,34 +192,6 @@ namespace Cevir.Core.Notifications
             }
         }
 #endif
-
-        private string StreakSystemWeek()
-        {
-            return Gamification.StreakSystem.IsoWeek(_game.LocalNow());
-        }
-
-        private void SendNow(string title, string body)
-        {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            try
-            {
-                EnsureChannel();
-                AndroidNotificationCenter.SendNotification(new AndroidNotification
-                {
-                    Title = title,
-                    Text = body,
-                    FireTime = DateTime.Now,
-                    ShouldAutoCancel = true
-                }, LeagueChannelId);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("[Chevir] League message could not be shown: " + e.Message);
-            }
-#else
-            Debug.Log("[Chevir] League message: " + title + " / " + body);
-#endif
-        }
 
         private void OnDestroy()
         {
@@ -391,8 +306,7 @@ namespace Cevir.Core.Notifications
             {
                 Id = LeagueChannelId,
                 Name = Loc.Pick("League", "Liqa", "Лига"),
-                Description = Loc.Pick("When your place in the weekly league changes", "Həftəlik liqada yerin dəyişəndə",
-                    "Когда меняется твоё место в лиге недели"),
+                Description = Loc.Pick("Every morning: how your place in the weekly league changed", "Hər səhər: həftəlik liqada yerinin necə dəyişdiyi", "Каждое утро: как изменилось твоё место в лиге недели"),
                 Importance = Importance.Default
             });
             _channelReady = true;

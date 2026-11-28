@@ -89,9 +89,9 @@ namespace Cevir.Core.UI
             // League place.
             RectTransform league = kit.Card(content, "League", 40, 18f);
             Header(kit, league, iconTrophy, UIPalette.Gold, UIPalette.AmberLight, Loc.Pick("League", "Liqa", "Лига"),
-                Loc.Pick("A message when your place in the weekly league changes",
-                    "Həftəlik liqada yerin dəyişəndə dərhal mesaj gəlir",
-                    "Сообщение, когда меняется твоё место в лиге недели"));
+                Loc.Pick("Once a day at 07:00: how many places you moved up or down since yesterday morning",
+                    "Gündə bir dəfə, səhər 07:00-da: dünən səhərdən bəri liqada neçə pillə qalxdığın və ya düşdüyün",
+                    "Раз в день в 07:00: на сколько мест ты поднялся или опустился со вчерашнего утра"));
             _league = OnOff(kit, league, on => Set(null, on));
         }
 

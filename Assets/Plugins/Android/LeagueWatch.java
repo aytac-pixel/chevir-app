@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.SystemClock;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,17 +18,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
 
 /**
- * Checks the learner's place in the weekly league about every 30 minutes, also while Chevir is closed, and shows a
- * notification when it changed. Asks the database with a device token (no sign-in needed): league_place_for_device.
- * Started and configured from C# (ReminderService).
+ * Once a day at 07:00 (also while Chevir is closed) compares the learner's place in the weekly league with the place
+ * the morning before and, when it changed, shows one message: "you moved up / down N places, you are now X". No
+ * message when nothing changed or a new week started. Asks the database with a device token (no sign-in needed):
+ * league_place_for_device. Started and configured from C# (ReminderService).
  */
 public final class LeagueWatch {
     static final String PREFS = "chevir_league_watch";
     static final String CHANNEL = "cevir_league";
     private static final int REQUEST = 4711;
     private static final int NOTIFICATION_ID = 4712;
+    static final int HOUR = 7;
 
     private LeagueWatch() {
     }
@@ -60,24 +62,22 @@ public final class LeagueWatch {
         if (alarms != null) alarms.cancel(pending(context));
     }
 
-    /**
-     * Stores the place the app has just seen and returns the one stored before for the same week (0 when none), so the
-     * app and the background check never announce the same change twice.
-     */
-    public static synchronized int exchange(Context context, String week, int rank) {
-        SharedPreferences p = prefs(context);
-        int previous = week.equals(p.getString("week", "")) ? p.getInt("rank", 0) : 0;
-        p.edit().putString("week", week).putInt("rank", rank).apply();
-        return previous;
-    }
-
+    /** The next 07:00 on this phone's clock (allowed while the phone sleeps; may come a few minutes late). */
     static void arm(Context context) {
         if (!prefs(context).getBoolean("on", false)) return;
         AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarms == null) return;
-        alarms.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                AlarmManager.INTERVAL_HALF_HOUR, pending(context));
+        Calendar next = Calendar.getInstance();
+        next.set(Calendar.HOUR_OF_DAY, HOUR);
+        next.set(Calendar.MINUTE, 0);
+        next.set(Calendar.SECOND, 0);
+        next.set(Calendar.MILLISECOND, 0);
+        if (next.getTimeInMillis() <= System.currentTimeMillis() + 60000L) next.add(Calendar.DAY_OF_MONTH, 1);
+        if (Build.VERSION.SDK_INT >= 23) {
+            alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next.getTimeInMillis(), pending(context));
+        } else {
+            alarms.set(AlarmManager.RTC_WAKEUP, next.getTimeInMillis(), pending(context));
+        }
     }
 
     private static PendingIntent pending(Context context) {
@@ -129,10 +129,12 @@ public final class LeagueWatch {
             String week = row.optString("week", "");
             int rank = row.optInt("rank", 0);
             int players = row.optInt("players", 0);
-            if (week.isEmpty() || rank <= 0 || players < 2) return;
-            int previous = exchange(context, week, rank);
-            if (previous == 0 || previous == rank) return;
-            notify(context, rank < previous, rank);
+            if (week.isEmpty() || rank <= 0) return;
+            // Compare with yesterday morning's place in the same week; a new week starts from scratch.
+            int previous = week.equals(p.getString("week", "")) ? p.getInt("rank", 0) : 0;
+            p.edit().putString("week", week).putInt("rank", rank).apply();
+            if (previous == 0 || previous == rank || players < 2) return;
+            notify(context, rank < previous, Math.abs(previous - rank), rank);
         } catch (Exception ignored) {
             // offline or the database is not ready: try again at the next alarm
         } finally {
@@ -158,11 +160,12 @@ public final class LeagueWatch {
         return n + "-" + suffix;
     }
 
-    private static void notify(Context context, boolean up, int rank) {
+    private static void notify(Context context, boolean up, int steps, int rank) {
         SharedPreferences p = prefs(context);
         String title = p.getString(up ? "titleUp" : "titleDown", "Chevir");
-        String body = p.getString(up ? "bodyUp" : "bodyDown", "{0}").replace("{0}",
-                p.getBoolean("azOrdinal", false) ? ordinalAz(rank) : Integer.toString(rank));
+        String body = p.getString(up ? "bodyUp" : "bodyDown", "{1}")
+                .replace("{0}", Integer.toString(steps))
+                .replace("{1}", p.getBoolean("azOrdinal", false) ? ordinalAz(rank) : Integer.toString(rank));
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager == null) return;
